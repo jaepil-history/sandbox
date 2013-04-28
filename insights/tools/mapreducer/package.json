@@ -1,0 +1,40 @@
+{
+  "name": "datapro",
+  "version": "1.0.0",
+  "description": "MongoDB Map/Reduce Operation Server",
+  "main": "server.js",
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/appspand/datapro.git"
+  },
+  "directories": {
+      "test": "test",
+      "lib": "lib"
+  },
+  "scripts": {
+      "test": "mocha test/mr.js"
+  },
+  "keywords": [
+      "mongodb",
+      "mapreduce"
+  ],
+  "dependencies": {
+      "mongoose":  "3.2.2",
+      "mongoose-lifecycle": "1.0.0",
+      "express":   "3.1.0",
+      "moment":    ">=1.7.2",
+      "async":     "0.1.22",
+      "socket.io": ">=0.9.13",
+      "semver":    ">=1.1.0"
+  },
+  "devDependencies": {
+      "mocha": "~1.8.1",
+      "should": "~1.2.1"
+  },
+  "author": "Byoul Oh",
+  "license": "Doobic License",
+  "engines": {
+      "node": "0.10.x",
+      "npm": "1.2.x"
+  }
+}

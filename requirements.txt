@@ -1,0 +1,14 @@
+# Message Queue
+celery>=3.0.19
+
+# Web Framework
+tornado>=3.0.1
+
+# Data Serialization
+schematics>=0.5
+
+# MongoDB
+pytz
+greenlet
+pymongo
+motor
