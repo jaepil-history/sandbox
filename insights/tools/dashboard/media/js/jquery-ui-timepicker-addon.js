@@ -554,7 +554,7 @@
 					this.timeDefined = timeDefined;
 				}
 
-				// slideAccess integration: http://trentrichardson.com/2011/11/11/jquery-ui-sliders-and-touch-accessibility/
+				// slideAccess Integration: http://trentrichardson.com/2011/11/11/jquery-ui-sliders-and-touch-accessibility/
 				if (this._defaults.addSliderAccess) {
 					var sliderAccessArgs = this._defaults.sliderAccessArgs;
 					setTimeout(function() { // fix for inline mode
@@ -580,7 +580,7 @@
 						}
 					}, 10);
 				}
-				// end slideAccess integration
+				// end slideAccess Integration
 
 			}
 		},

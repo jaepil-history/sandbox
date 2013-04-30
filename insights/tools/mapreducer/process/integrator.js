@@ -6,4 +6,11 @@
  * To change this template use File | Settings | File Templates.
  */
 
+var mongoose = require('mongoose');
+
+// db 연결
+mongoose.connect('mongodb://localhost/appspand');
+var db = mongoose.connection;
+console.log('Connected to DB appspand');
+
 
