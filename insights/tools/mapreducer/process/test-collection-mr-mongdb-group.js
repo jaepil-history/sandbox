@@ -38,30 +38,40 @@ var finalize = function(key, reducedValue) {
 };
 console.log('finalize built');
 
-var MR = {
-    mapreduce: "user_info",
-    out:  'resultjs',
-    query: query,
-    map: map.toString(),
-    reduce: reduce.toString(),
-    finalize: finalize.toString()
-};
+//var MR = {
+//    mapreduce: "user_info",
+//    out:  'resultjs',
+//    query: query,
+//    map: map.toString(),
+//    reduce: reduce.toString(),
+//    finalize: finalize.toString()
+//};
 
-db.open(function (error, client) {
-    if (error) throw error;
+db.open(function (err, client) {
+    if(err) {
+        console.log('DB: Failed to connect the database');
+    }
+    else {
+        console.log('DB: Database is connected');
 
-    db.executeDbCommand(MR, function(err, dbres) {
-        if (err) throw err;
-
-        console.log(dbres);
-        var results = dbres.documents[0];//.results;
-        console.log("executing map reduce, results:");
-        console.log(JSON.stringify(results));
-
-        db.close();
-        db.on("close", function (err) {
-            if (err) throw err;
-            process.exit(0)
+        db.collection('user_info').mapReduce(map, reduce, {
+            out: {replace: 'resultjs'},
+            query: query,
+            finalize: finalize
+            }, function (err, collection, stats){
+                if(err) {
+                    console.log('Map reduce: Fail.');
+                }
+                else {
+                    console.log('Map reduce: Success.');
+                    console.log(stats);
+                    console.log(collection);
+//                    db.close();
+//                    db.on("close", function (err) {
+//                        if (err) throw err;
+//                        process.exit(0)
+//                    });
+                }
         });
-    });
-})
+    }
+});
