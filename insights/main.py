@@ -34,7 +34,7 @@ class Application(tornado.web.Application):
 
 
 def api_main(args, config):
-    from .insights.api import urls
+    from insights.api import urls
 
     mongodb_client = motor.MotorClient(
         config.mongodb_connection_uri,
