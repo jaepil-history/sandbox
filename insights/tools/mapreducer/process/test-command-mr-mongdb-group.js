@@ -6,10 +6,10 @@
  * To change this template use File | Settings | File Templates.
  */
 
-var mongodb = require('mongodb'),
-    server = new mongodb.Server("localhost", 27017, {}),
-    sys = require('util'),
-    db = new mongodb.Db('test', server, {});
+var mongodb = require('mongodb');
+var server = new mongodb.Server("localhost", 27017, {});
+//var sys = require('util');
+var db = new mongodb.Db('test', server, {w:1});
 
 var query={"ts": {$gte: 1000}};
 //query = {"_id.ts":{$gte:12060500,$lte:12060523}};
@@ -53,7 +53,7 @@ db.open(function (error, client) {
     db.executeDbCommand(MR, function(err, dbres) {
         if (err) throw err;
 
-        console.log(dbres);
+        //console.log(dbres);
         var results = dbres.documents[0];//.results;
         console.log("executing map reduce, results:");
         console.log(JSON.stringify(results));

@@ -56,47 +56,47 @@ db.open(function (error, client) {
     });
 
     var map = function() {
-            emit("_id", {"_id" : this._id,
-                         "product_id" : this.product_id,
-                         "name" : this.name
-                         });
-        }
+        emit("_id", {"_id" : this._id,
+                     "product_id" : this.product_id,
+                     "name" : this.name
+                     });
+    }
 
-        var reduce = function(key, values) {
+    var reduce = function(key, values) {
 
-            var items  = [];
-            var exists;
+        var items  = [];
+        var exists;
 
-            values.forEach(function(value) {
+        values.forEach(function(value) {
 
-                if(items.length > 0) {
+            if(items.length > 0) {
 
-                    items.forEach(function(item_val, key) {
-                        if(item_val.product_id == value.product_id) {
-                            exists = true;
-                        }
-                    });
-
-                    if(!exists) {
-                        items.push(value);
+                items.forEach(function(item_val, key) {
+                    if(item_val.product_id == value.product_id) {
+                        exists = true;
                     }
+                });
 
-                    exists = false;
-
-                } else {
-
+                if(!exists) {
                     items.push(value);
                 }
-            });
 
-            return {"items" : items};
-        }
+                exists = false;
 
-        this.collection.mapReduce(map, reduce, {out : {inline: 1}, limit: 4}, function(err, results) {
-            if (err) {
-                console.log(err);
             } else {
-                console.log(results[0].value.items);
+
+                items.push(value);
             }
         });
+
+        return {"items" : items};
+    }
+
+    this.collection.mapReduce(map, reduce, {out : {inline: 1}, limit: 4}, function(err, results) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(results[0].value.items);
+        }
+    });
 });
