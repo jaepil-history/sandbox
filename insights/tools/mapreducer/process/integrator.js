@@ -20,45 +20,49 @@
 //    tracking_uid: String,
 //    url: String,
 //    ip: String
-//}, {collection: 'integration'}); // 마지막은 collection name. 없으면 model_name = collection_name
+//}, {collection: 'integration'});
 
-//var sys = require('util');
-var mongodb = require('mongodb');
-var server_insight = new mongodb.Server("localhost", 27017, {});
-var server_appspand = new mongodb.Server("localhost", 27017, {});
-var server_processed = new mongodb.Server("localhost", 27017, {});
+var db_insight_url = "localhost:27017/test"; // "username:password@example.com/mydb"
+var cpu_collection = '51776dbc1d41c8061ef024b5.event.cpu';
+var all_collection = '51776dbc1d41c8061ef024b5.event.all';
+var collections_insight = [cpu_collection, all_collection];
+var db_user_info = require("mongojs").connect(db_insight_url, collections_insight);
 
-var db_insight = new mongodb.Db('test', server_insight, {w:1});
-console.log('Connected to DB insight');
-var db_appspand = new mongodb.Db('appspand', server_appspand, {w:1});
-console.log('Connected to DB appspand');
-var db_processed = new mongodb.Db('processed', server_processed, {w:1});
-console.log('Connected to DB processed');
+var db_appspand_url = 'localhost:27017/appspand';
+var application_collection = 'application';
+var account_collection = 'account';
+var collections_appspand = [application_collection, account_collection];
+var db_appspand = require('mongojs').connect(db_appspand_url, collections_appspand);
 
-var cpu_collection_name = '51776dbc1d41c8061ef024b5.event.cpu';
-var uuid;
-var cpu_uuid = function(collection_name, uuid) {
-    return db_insight.collection(collection_name).findOne({uuid : uuid});
-}
+var db_processed_url = 'localhost:27017/processed';
+var integration_collection = 'integration';
+var collections_processed = [integration_collection];
+var db_processed = require('mongojs').connect(db_processed_url, collections_processed);
 
-var doc;
-var all_cursor = db_insight.collection('51776dbc1d41c8061ef024b5.event.all').find();
-
-console.log(all_cursor);
-
-//while(all_cursor.hasNext()) {
-//    doc = all_cursor.next();
-//    if(doc.get("uuid") != null) uuid = doc.uuid;
-//    else continue;
-//
-//    var user_info = cpu_uuid(cpu_collection_name, uuid);
-//    doc.b = user_info.b;
-//    doc.g = user_info.g;
-//    doc.f = user_info.f;
-//
-//    db_processed.collection('integration').insert(doc);
-//}
-
+db_user_info.collection(all_collection).find({}, function(err, docs) {
+    if(err) throw err;
+    if(!docs) console.log('No docs found');
+    else docs.forEach(function(doc) {
+        if(doc.uuid) {
+            db_user_info.collection(cpu_collection).findOne({'uuid': doc.uuid}, function(err, cpu) {
+                if (err) throw err;
+                //console.log(cpu);
+                doc['b'] = cpu.b;
+                doc['g'] = cpu.g;
+                doc['f'] = cpu.f;
+                db_processed.collection('integration').insert(doc, function (err, inserted) {
+                    if (err) throw err;
+                    console.log(inserted);
+                });
+            });
+        }
+        else
+            db_processed.collection('integration').insert(doc, function (err, inserted) {
+                if (err) throw err;
+                console.log(inserted);
+            });
+    });
+});
 
 
 

@@ -23,17 +23,22 @@
 //}, {collection: 'integration'}); // 마지막은 collection name. 없으면 model_name = collection_name
 
 //var sys = require('util');
-var mongodb = require('mongodb');
-var BSON = require('mongodb').pure().BSON;
-var server1 = new mongodb.Server("localhost", 27017, {});
-var server2 = new mongodb.Server("localhost", 27017, {});
+//var mongodb = require('mongodb');
+//var BSON = require('mongodb').pure().BSON;
+//var server1 = new mongodb.Server("localhost", 27017, {});
+//var server2 = new mongodb.Server("localhost", 27017, {});
+//
+//var db_user_info = new mongodb.Db('test', server1, {w:1});
+//console.log('Connected to DB test');
+////var db_appspand = new mongodb.Db('appspand', server, {w:1});
+////console.log('Connected to DB appspand');
+//var db_processed = new mongodb.Db('processed', server2, {w:1});
+//console.log('Connected to DB processed');
 
-var db_user_info = new mongodb.Db('test', server1, {w:1});
-console.log('Connected to DB test');
-//var db_appspand = new mongodb.Db('appspand', server, {w:1});
-//console.log('Connected to DB appspand');
-var db_processed = new mongodb.Db('processed', server2, {w:1});
-console.log('Connected to DB processed');
+//var mongojs_user = require('mongojs');
+//var mongojs_proc = require('mongojs');
+//var db_user_info = mongojs_user('localhost:27017/test');
+//var db_processed = mongojs_proc('localhost:27017/processed');
 
 //var cpu_collection_name = 'user_info';
 //
@@ -42,9 +47,34 @@ console.log('Connected to DB processed');
 //    return db_insight.collection(collection_name).findOne({uuid : uuid});
 //}
 
+var db_url = "localhost:27017/test"; // "username:password@example.com/mydb"
+var collections = ['user_info', 'resultjs'];
+var db_user_info = require("mongojs").connect(db_url, collections);
+var user_info_collection = 'user_info';
+
+db_user_info.collection(user_info_collection).find({}, function(err, user_info) {
+    if(err || !user_info) console.log("No users found");
+    else user_info.forEach( function(user) {
+        console.log(user);
+    });
+});
+
+//db_user_info.open(function(err, db){
+//    if(err) throw err;
+//
+//    db.collection('user_info').find().forEach(function(doc){
+//        console.log(doc);
+//    });
+//});
+
 //db_user_info.open(function(err, db) {
 //    db.collection('user_info', function(err, collection) {
 //        collection.find({}, function(err, cursor) {
+//
+//            cursor.forEach(function(doc) {
+//                console.log(doc);
+//            });
+//
 //            cursor.toArray(function(err, docs) {
 //                console.log("Found " + docs.length + " documents");
 //                var queryResults = [];
@@ -57,28 +87,24 @@ console.log('Connected to DB processed');
 //    });
 //});
 
-db_user_info.open(function(err, db_user_info) {
-    db_processed.open(function(err,db_processed) {
-        var doc;
-        db_user_info.collection('user_info', function(err, collection) {
-            collection.find({}, function(err, cursor) {
-                cursor.toArray(function(err, docs) {
-                    for(var i = 0; i < docs.length; i++) {
-                        doc = docs[i];
-                        if(doc.uuid != none) uuid = doc.uuid;
-                        else continue;
-
-                        doc.b = 1;
-                        doc.g = 2;
-                        doc.f = 3;
-
-                        db_processed.collection('integration').insert(doc);
-                    }
-                });
-            })
-        });
-    });
-});
+//db_user_info.open(function(err, db_user_info) {
+//    db_processed.open(function(err,db_processed) {
+//        var doc;
+//        db_user_info.collection('user_info').find().toArray(function (err, docs) {
+//            for(var i = 0; i < docs.length; i++) {
+//                doc = docs[i];
+//                if(doc.uuid != none) uuid = doc.uuid;
+//                else continue;
+//
+//                doc.b = 1;
+//                doc.g = 2;
+//                doc.f = 3;
+//
+//                db_processed.collection('integration').insert(doc);
+//            }
+//        });
+//    });
+//});
 
 
 
