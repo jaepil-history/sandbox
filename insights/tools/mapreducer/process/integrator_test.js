@@ -1,113 +1,59 @@
-/**
- * Created with JetBrains WebStorm.
- * User: byouloh
- * Date: 13. 4. 11
- * Time: 오후 9:11
- * To change this template use File | Settings | File Templates.
- */
+var async = require('async');
+var Integrator = require('./integrator');
+var analyzer   = require('../lib/analyzer');
 
-//var Integration = new Schema({
-//    _mt: String,
-//    _dt: Date,
-//    user_uid: Number,
-//    birthday: String,
-//    gender: String,
-//    country: String,
-//    friends_count: Number,
-//    data: String,
-//    timestamp: Number,
-//    age: { type: Number, min: 8, max: 75 },
-//    tracking_uid: String,
-//    url: String,
-//    ip: String
-//}, {collection: 'integration'}); // 마지막은 collection name. 없으면 model_name = collection_name
+var a = analyzer.createAnalyzer({joinInterval: 600000});
+a.start();
 
-//var sys = require('util');
-//var mongodb = require('mongodb');
-//var BSON = require('mongodb').pure().BSON;
-//var server1 = new mongodb.Server("localhost", 27017, {});
-//var server2 = new mongodb.Server("localhost", 27017, {});
+
+//var apps;
 //
-//var db_user_info = new mongodb.Db('test', server1, {w:1});
-//console.log('Connected to DB test');
-////var db_appspand = new mongodb.Db('appspand', server, {w:1});
-////console.log('Connected to DB appspand');
-//var db_processed = new mongodb.Db('processed', server2, {w:1});
-//console.log('Connected to DB processed');
-
-//var mongojs_user = require('mongojs');
-//var mongojs_proc = require('mongojs');
-//var db_user_info = mongojs_user('localhost:27017/test');
-//var db_processed = mongojs_proc('localhost:27017/processed');
-
-//var cpu_collection_name = 'user_info';
-//
-//var uuid;
-//var cpu_uuid = function(collection_name, uuid) {
-//    return db_insight.collection(collection_name).findOne({uuid : uuid});
-//}
-
-var db_url = "localhost:27017/test"; // "username:password@example.com/mydb"
-var collections = ['user_info', 'resultjs'];
-var db_user_info = require("mongojs").connect(db_url, collections);
-var user_info_collection = 'user_info';
-
-db_user_info.collection(user_info_collection).find({}, function(err, user_info) {
-    if(err || !user_info) console.log("No users found");
-    else user_info.forEach( function(user) {
-        console.log(user);
-    });
-});
-
-//db_user_info.open(function(err, db){
-//    if(err) throw err;
-//
-//    db.collection('user_info').find().forEach(function(doc){
-//        console.log(doc);
-//    });
+//async.waterfall([
+//    function(callback) {
+//        Integrator.getAppsList(db_appspand, application_collection);
+//        console.log('which? ' + apps);
+//        console.log('processed?');
+//        //callback(null, apps);
+//    },
+//    function(apps, callback) {
+//        console.log('apps length : ' + apps.length);
+//        var cluster_name;
+//        var db_name;
+//        var appId;
+//        console.log('who? ' + apps);
+//        for (var i in apps) {
+//            console.log(apps[i]);
+//            cluster_name = apps[i].cluster.name;
+//            console.log(cluster_name);
+//            db_name = apps[i].cluster.db_name;
+//            console.log(db_name);
+//            appId = apps[i]._id.toString();
+//            console.log(appId);
+//            Integrator.joinAllandCPU(cluster_name, db_name, appId, callback);
+//            //callback(null, '2');
+//        }
+//    }
+//],
+//// optional callback
+//function(err, results) {
+//    // results is ...
 //});
 
-//db_user_info.open(function(err, db) {
-//    db.collection('user_info', function(err, collection) {
-//        collection.find({}, function(err, cursor) {
-//
-//            cursor.forEach(function(doc) {
-//                console.log(doc);
-//            });
-//
-//            cursor.toArray(function(err, docs) {
-//                console.log("Found " + docs.length + " documents");
-//                var queryResults = [];
-//                for(var i=0; i<docs.length; i++) {
-//                    queryResults[queryResults.length] = docs[i];
-//                }
-//                db_user_info.close();
-//            });
-//        });
-//    });
+//// an example using an object instead of an array
+//async.series({
+//    one: function(callback) {
+//        setTimeout(function() {
+//            console.log('1');
+//            callback(null, 1);
+//        }, 200);
+//    },
+//    two: function(callback) {
+//        setTimeout(function() {
+//            console.log('2');
+//            callback(null, 2);
+//        }, 100);
+//    }
+//},
+//function(err, results) {
+//    // results is now equal to: {one: 1, two: 2}
 //});
-
-//db_user_info.open(function(err, db_user_info) {
-//    db_processed.open(function(err,db_processed) {
-//        var doc;
-//        db_user_info.collection('user_info').find().toArray(function (err, docs) {
-//            for(var i = 0; i < docs.length; i++) {
-//                doc = docs[i];
-//                if(doc.uuid != none) uuid = doc.uuid;
-//                else continue;
-//
-//                doc.b = 1;
-//                doc.g = 2;
-//                doc.f = 3;
-//
-//                db_processed.collection('integration').insert(doc);
-//            }
-//        });
-//    });
-//});
-
-
-
-
-
-

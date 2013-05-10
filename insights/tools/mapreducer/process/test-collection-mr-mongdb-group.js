@@ -58,13 +58,13 @@ db.open(function (err, client) {
             out: {replace: 'resultjs'},
             query: query,
             finalize: finalize
-            }, function (err, collection, stats){
+            }, function (err, collection){
                 if(err) {
                     console.log('Map reduce: Fail.');
                 }
                 else {
                     console.log('Map reduce: Success.');
-                    console.log(stats);
+                    //console.log(stats);
                     console.log(collection);
 //                    db.close();
 //                    db.on("close", function (err) {

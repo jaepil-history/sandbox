@@ -9,61 +9,83 @@
 //var Integration = new Schema({
 //    _mt: String,
 //    _dt: Date,
-//    user_uid: Number,
-//    birthday: String,
-//    gender: String,
-//    country: String,
-//    friends_count: Number,
+//    uuid: Number,
+//    b: String,        // '1936/10/22'
+//    g: String,        // gender: {f, m, u} (female, male, unknown)
+//    lc: String,       // country
+//    f: Number         // friends_count: Number,
 //    data: String,
 //    timestamp: Number,
-//    age: { type: Number, min: 8, max: 75 },
+//    age: Number,
 //    tracking_uid: String,
 //    url: String,
 //    ip: String
-//}, {collection: 'integration'});
+//}, {collection: 'appId.integration'});
 
-var db_insight_url = "localhost:27017/test"; // "username:password@example.com/mydb"
-var cpu_collection = '51776dbc1d41c8061ef024b5.event.cpu';
-var all_collection = '51776dbc1d41c8061ef024b5.event.all';
-var collections_insight = [cpu_collection, all_collection];
-var db_user_info = require("mongojs").connect(db_insight_url, collections_insight);
+var async = require('async');
+var moment = require('moment');
+var dbclient = require('../dbclient');
+//var IntervalBuilder = require('../lib/intervalBuilder');
 
-var db_appspand_url = 'localhost:27017/appspand';
-var application_collection = 'application';
-var account_collection = 'account';
-var collections_appspand = [application_collection, account_collection];
-var db_appspand = require('mongojs').connect(db_appspand_url, collections_appspand);
+var Integrator = function() {
+};
 
-var db_processed_url = 'localhost:27017/processed';
-var integration_collection = 'integration';
-var collections_processed = [integration_collection];
-var db_processed = require('mongojs').connect(db_processed_url, collections_processed);
+Integrator.prototype.join = function() {
+    dbclient.db_appspand.collection('application').find({}, {'cluster':1, 'name':1}, function (err, apps) {
+        if (err) throw err;
 
-db_user_info.collection(all_collection).find({}, function(err, docs) {
-    if(err) throw err;
-    if(!docs) console.log('No docs found');
-    else docs.forEach(function(doc) {
-        if(doc.uuid) {
-            db_user_info.collection(cpu_collection).findOne({'uuid': doc.uuid}, function(err, cpu) {
-                if (err) throw err;
-                //console.log(cpu);
-                doc['b'] = cpu.b;
-                doc['g'] = cpu.g;
-                doc['f'] = cpu.f;
-                db_processed.collection('integration').insert(doc, function (err, inserted) {
-                    if (err) throw err;
-                    console.log(inserted);
-                });
-            });
+        var appId;
+
+        for (var i in apps) {
+            appId = apps[i]._id.toString();
+            joinAllandCPU(appId, function(err) {if(err) throw err; return true});
         }
-        else
-            db_processed.collection('integration').insert(doc, function (err, inserted) {
-                if (err) throw err;
-                console.log(inserted);
-            });
     });
-});
+};
 
+var joinAllandCPU = function(appId, callback) {
+    var cpu_collection = appId + '.event.cpu';
+    var all_collection = appId + '.event.all';
+    var integration_collection = appId + '.integration';
 
+    dbclient.db_insight.collection(all_collection).find({}, function(err, docs) {
+        if(err) throw err;
+        if(!docs) {
+            console.log('No docs to be integrated found');
+            dbclient.db_insight.close();
+        }
+        else {
+            var today = new Date();
+            console.log(today);
+            docs.forEach(function(doc) {
+                if(doc.uuid) {
+                    dbclient.db_insight.collection(cpu_collection).findOne({'uuid': doc.uuid}, function(err, cpu) {
+                        if (err) throw err;
+                        //console.log(cpu_collection);
+                        //console.log(cpu);
+                        doc['b'] = cpu.b;
+                        doc['g'] = cpu.g;
+                        doc['f'] = cpu.f;
+                        doc['lc'] = cpu.lc;
+                        doc['age'] = today.getFullYear() - cpu.b.split('/', 1);
+                        dbclient.db_processed.collection(integration_collection).insert(doc, function (err, inserted) {
+                            if (err) throw err;
+                            //console.log(inserted);
+                        });
+                    });
+                }
+                else {
+                    dbclient.db_processed.collection(integration_collection).insert(doc, function (err, inserted) {
+                        if (err) throw err;
+                        //console.log(inserted);
+                    });
+                }
+                console.log('inserted');
+            });
+            //db_insight.close();
+            //db_processed.close();
+        }
+    });
+};
 
-
+module.exports = new Integrator();

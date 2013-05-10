@@ -8,10 +8,12 @@
 
 var db_processed_url = 'localhost:27017/test';
 var integration_collection = 'user_info';
-var collections_processed = [integration_collection];
+var out_collection = 'resultjs';
+var stats_reports_collection = 'stats_reports';
+var collections_processed = [integration_collection, out_collection, stats_reports_collection];
 var db_processed = require('mongojs').connect(db_processed_url, collections_processed);
 
-var query={"ts": {$gte: 1000}};
+var query={"ts": {$gte: 850}};
 //query = {"_id.ts":{$gte:12060500,$lte:12060523}};
 console.log(query);
 
@@ -39,25 +41,28 @@ var finalize = function(key, reducedValue) {
 console.log('finalize built');
 
 var MR = {
-    mapreduce: "user_info",
-    out:  'resultjs',
+    mapreduce: integration_collection,
+    out:  {merge: out_collection},
     query: query,
     map: map.toString(),
     reduce: reduce.toString(),
-    finalize: finalize.toString()
+    finalize: finalize.toString(),
+    verbose: true
 };
 
-db_processed.executeDbCommand(MR, function(err, dbres) {
+db_processed.executeDbCommand(MR, function(err, result) {
+    if (err) throw err;
+
+    //console.log(dbres);
+    var doc = result.documents[0];//.results;
+    console.log("executing map reduce with mongojs, results:");
+    console.log(JSON.stringify(doc));
+
+    doc.ts = Date.now();
+
+    console.log(JSON.stringify(doc));
+    db_processed.collection(stats_reports_collection).insert(doc, function(err){
         if (err) throw err;
-
-        //console.log(dbres);
-        var results = dbres.documents[0];//.results;
-        console.log("executing map reduce with mongojs, results:");
-        console.log(JSON.stringify(results));
-
-//        db.close();
-//        db.on("close", function (err) {
-//            if (err) throw err;
-//            process.exit(0)
-//        });
+        console.log('insert completed');
     });
+});

@@ -48,11 +48,14 @@ class InsightsClient(object):
                     "%02d" % random.randint(1, 12),
                     "%02d" % random.randint(1, 28)]
         gender = ["m", "f", "u"]
+        country = ["Seoul", "Busan", "Incheon", "Jeju", "Jeonju", "Daejeon", "Daegu", "Pohang", "Gyeongju",
+                   "Jinju", "Ulsan", "Chuncheon", "Anyang", "Bucheon", "Cheongju", "Gumi", "Gunsan"]
 
         params = {
             "uuid": uuid,
             "b": "/".join(birthday),
             "g": gender[random.randint(0, 2)],
+            "lc": country[random.randint(0, 16)],
             "f": random.randint(0, 1000)
         }
 
