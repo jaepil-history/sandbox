@@ -1,0 +1,98 @@
+#!/usr/bin/env python
+#
+# Copyright 2013 Appspand
+
+import logging
+import sys
+
+# try:
+# 	import insights
+# except:
+# 	print 'Insights is not installed'
+# 	sys.exit()
+
+from insights.datapro.system.daemon import Daemon
+from insights import __version__
+from insights import settings
+from insights.main import Application
+
+import motor
+import tornado.ioloop
+
+options = settings.parse_options()
+
+PIDFILE = '/var/run/insightsd.pid'
+# Keep all log files in one place
+LOGFILE = '/usr/local/insights/insightsd.log'
+
+# Configure logging
+logging.basicConfig(filename=LOGFILE,level=logging.DEBUG)
+logger = logging.getLogger('insightsd')
+
+class InsightsDaemon(Daemon):
+
+    def run(self):
+        try:
+            from insights.api import urls
+        except Exception, e:
+            logger.exception('import failed')
+
+        try:
+            mongodb_client = motor.MotorClient(
+                options.mongodb_connection_uri,
+                max_concurrent=options.mongodb_max_concurrent,
+                max_wait_time=options.mongodb_max_wait_time
+            ).open_sync()
+        except Exception, e:
+            logger.exception('motor.MotorClient exception occurred')
+
+        application = Application(
+            handlers=None,
+            options=options,
+            mongodb_client=mongodb_client
+        )
+        application.add_handlers("api.insights.appspand.com", urls.handlers)
+
+        http_server = tornado.httpserver.HTTPServer(application)
+        http_server.listen(options.port)
+        tornado.ioloop.IOLoop.instance().start()
+
+if __name__ == "__main__":
+
+    daemon = InsightsDaemon(PIDFILE)
+
+    if len(sys.argv) == 2:
+        if 'start' == sys.argv[1]:
+            try:
+                daemon.start()
+            except Exception, e:
+                logger.exception("Insights Daemon cant be started")
+        elif 'stop' == sys.argv[1]:
+            print "Stopping Insights Daemon ..."
+            daemon.stop()
+        elif 'restart' == sys.argv[1]:
+            print "Restarting Insights Daemon ..."
+            daemon.restart()
+        elif 'status' == sys.argv[1]:
+            try:
+                pf = file(PIDFILE, 'r')
+                pid = int(pf.read().strip())
+                pf.close()
+            except IOError:
+                pid = None
+            except SystemExit:
+                pid = None
+
+            if pid:
+                print 'Insights Daemon {0} is running as pid {1}'.format(__version__, pid)
+            else:
+                print 'Insights Daemon {0} is not running.'.format(__version__)
+
+        else:
+            print "Unknown command"
+            sys.exit(2)
+            sys.exit(0)
+    else:
+        print "usage: %s start|stop|restart|status" % sys.argv[0]
+        sys.exit(2)
+
