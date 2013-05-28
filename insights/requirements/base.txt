@@ -1,5 +1,5 @@
 tornado==3.0.1
-schematics==0.5
+schematics==0.6
 pytz==2013b
 pymongo==2.5
 motor==0.1
