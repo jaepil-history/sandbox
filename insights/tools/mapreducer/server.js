@@ -6,9 +6,9 @@ var http       = require('http');
 var express    = require('express');
 var socketIo   = require('socket.io');
 var fs         = require('fs');
-var StatsReport = require('./models/statsReport');
-var dataProc   = require('./lib/dataProcessor');
-//var analyzer   = require('./lib/analyzer');
+//var StatsReport = require('./models/statsReport');
+//var dataProc   = require('./lib/dataProcessor');
+var analyzer   = require('./lib/analyzer');
 //var config     = require('config');
 
 var app = module.exports = express();
@@ -18,22 +18,22 @@ var server = http.createServer(app);
 var config     = require('./config/config');
 
 // database
-var mongoose   = require('./dbclient');
+var dbclient   = require('./dbclient');
 
 // data processor
-var p;
-if (config.autoStartDataPro) {
-    p = dataProc.createDataProc(config.processor);
-    p.start();
-}
+//var p;
+//if (config.autoStartDataPro) {
+//    p = dataProc.createDataProc(config.processor);
+//    p.start();
+//}
 
-//var a = analyzer.createAnalyzer(config.analyzer);
-//a.start();
+var a = analyzer.createAnalyzer({joinInterval: 600000});
+a.start();
 
 // Configuration
 app.configure(function(){
     app.use(app.router);
-    // the following middlewares are only necessary for the mounted 'dashboard' api,
+    // the following middlewares are only necessary for the mounted 'datapro' api,
     // but express needs it on the parent api (?) and it therefore pollutes the api
     app.use(express.bodyParser());
     app.use(express.methodOverride());
@@ -42,7 +42,7 @@ app.configure(function(){
 });
 
 app.configure('development', function() {
-    if (config.verbose) mongoose.set('debug', true);
+    //if (config.verbose) dbclient.set('debug', true);
     app.use(express.static(__dirname + '/public'));
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
@@ -70,9 +70,9 @@ io.configure('development', function() {
     if (!config.verbose) io.set('log level', 1);
 });
 
-StatsReport.on('afterInsert', function(event) {
-    io.sockets.emit('StatsReport', event.toJSON());
-});
+//StatsReport.on('afterInsert', function(event) {
+//    io.sockets.emit('StatsReport', event.toJSON());
+//});
 
 io.sockets.on('connection', function(socket) {
     socket.on('set check', function(check) {

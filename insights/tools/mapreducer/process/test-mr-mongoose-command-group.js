@@ -60,6 +60,7 @@ db.on("open", function(){
     db.db.executeDbCommand(command, function(error, dbres) {
         if (error) throw error;
 
+        console.dir(JSON.stringify(dbres));
         console.dir(dbres.documents[0]);
         console.log('m/r completed');
         console.log('END');

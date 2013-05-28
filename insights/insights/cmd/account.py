@@ -5,7 +5,7 @@ from pymongo import MongoClient
 
 from tornado.options import OptionParser
 
-from ..api import models
+from insights.api import models
 
 
 options = OptionParser()
