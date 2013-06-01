@@ -3,7 +3,7 @@ import os
 from tornado import options
 
 
-config_path = "settings.conf"
+config_path = "insights/settings/settings.conf"
 
 
 def parse_options(args=None):

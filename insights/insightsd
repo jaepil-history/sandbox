@@ -13,13 +13,13 @@ import sys
 
 from insights.datapro.system.daemon import Daemon
 from insights import __version__
-from insights import settings
+from insights.settings import base
 from insights.main import Application
 
 import motor
 import tornado.ioloop
 
-options = settings.parse_options()
+options = base.parse_options()
 
 PIDFILE = '/var/run/insightsd.pid'
 # Keep all log files in one place
