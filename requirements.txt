@@ -8,7 +8,7 @@ celery==3.0.19
 tornado==3.0.1
 
 # Data Serialization
-schematics==0.5
+schematics==0.6
 
 # MongoDB
 pytz==2013b
