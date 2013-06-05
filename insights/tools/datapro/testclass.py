@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
+#
+# Copyright 2013 Appspand
+
 __author__ = 'byouloh'
 
 from datetime import date
@@ -150,7 +153,7 @@ class FriendsGroup:
         return self
 
     def incr(self, doc):
-        fc = doc['fc']
+        fc = doc['f']
         if fc >= 0 and fc < 11:
             self._0_10.incr(doc)
         elif fc >= 11 and fc < 21:
@@ -281,7 +284,7 @@ class CountryGroup:
 # print y.__dict__
 # print z.to_dict()
 #
-# doc = {'g': 'f', 'fc': 220, 'lc': 'Seoul', 'b': '1970/01/10'}
+# doc = {'g': 'f', 'f': 220, 'lc': 'Seoul', 'b': '1970/01/10'}
 #
 # x.incr(doc)
 

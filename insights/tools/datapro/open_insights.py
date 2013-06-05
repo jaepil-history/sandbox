@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # This Python file uses the following encoding: utf-8
-__author__ = 'byouloh'
+#
+# Copyright 2013 Appspand
+
 
 import sys
 
@@ -32,7 +34,7 @@ def test_open_db_clients(connection_uri, db_name, appId):
     print list(col_cpu.find().limit(5))
 
 
-def list_application(config):
+def getApps(config):
     db_client = MongoClient(host=config.mongodb_appspand_connection_uri,
                             max_pool_size=config.mongodb_max_concurrent)
     db_appspand = db_client[config.mongodb_appspand_db_name]
@@ -43,12 +45,12 @@ def list_application(config):
 def main(options):
     db_client_processed = MongoClient(host=options.mongodb_processed_connection_uri,
                             max_pool_size=options.mongodb_max_concurrent)
-    list = list_application(options)
-    print list
+    apps = getApps(options)
+    print apps
 
     insights_config = []
 
-    for app in list:
+    for app in apps:
         temp = {}
         temp['app_id'] = str(app['_id'])
         temp['cluster_name'] = app['cluster']['name']
@@ -56,7 +58,8 @@ def main(options):
         temp['app_name'] = app['name']
         temp['db'] = open_db_clients("mongodb://localhost:27017", app['cluster']['db_name'])
         insights_config.append(temp)
-        print insights_config
+
+    print insights_config
 
 
 if __name__ == "__main__":

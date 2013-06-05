@@ -1,9 +1,14 @@
+#!/usr/bin/env python
+# This Python file uses the following encoding: utf-8
+#
+# Copyright 2013 Appspand
+
 import os
 
 from tornado import options
 
 
-config_path = "insights/settings/settings.conf"
+config_path = "settings/settings.conf"
 
 
 def parse_options(args=None):

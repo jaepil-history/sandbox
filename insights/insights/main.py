@@ -1,6 +1,8 @@
 #!/usr/bin/env python
+# This Python file uses the following encoding: utf-8
 #
 # Copyright 2013 Appspand
+
 
 import importlib
 
@@ -34,7 +36,7 @@ class Application(tornado.web.Application):
 
 
 def api_main(args, config):
-    from insights.api import urls
+    from api import urls
 
     mongodb_client = motor.MotorClient(
         config.mongodb_connection_uri,
@@ -60,7 +62,9 @@ def cmd_main(args, config):
     if len(args) < 1:
         return 1
 
-    app = importlib.import_module(".".join(["insights", "cmd", args[0]]))
+    app = importlib.import_module(".".join(["cmd", args[0]])) #importlib.import_module(".".join(["insights", "cmd", args[0]]))
+    print str(app)
+    print args[0]
     app.main(args, config)
 
     return 0

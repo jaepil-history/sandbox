@@ -1,11 +1,8 @@
 #!/usr/bin/env python
-### BEGIN INIT INFO
-# Provides:          amonlite
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Start the Amon Lite web interface
-# Description:       Runs the amon Lite web application.
-### END INIT INFO
+# This Python file uses the following encoding: utf-8
+#
+# Copyright 2013 Appspand
+
 import logging
 import sys
 

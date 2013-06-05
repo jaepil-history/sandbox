@@ -1,11 +1,7 @@
 #!/usr/bin/env python
-### BEGIN INIT INFO
-# Provides:          amond
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Start the Amon system info collector
-# Description:       Amon daemon that collects system and process information.
-### END INIT INFO
+# This Python file uses the following encoding: utf-8
+#
+# Copyright 2013 Appspand
 
 import sys
 import time
