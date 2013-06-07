@@ -22,18 +22,8 @@ logger = logging.getLogger('autogen')
 
 import settings
 
+
 options = settings.parse_options()
-
-# db_client_processed = MongoClient(host=options.mongodb_processed_connection_uri,
-#                             max_pool_size=options.mongodb_max_concurrent)
-# db_processed = db_client_processed[options.mongodb_processed_db_name]
-
-# db_client_appspand = MongoClient(host=options.mongodb_appspand_connection_uri,
-#                             max_pool_size=options.mongodb_max_concurrent)
-# db_appspand = db_client_appspand[options.mongodb_appspand_db_name]
-# col_application = db_appspand.application
-# print apps
-
 
 class InsightsClient(object):
     INSIGHTS_API_URL = "http://api.insights.appspand.com:8001/api/v1/"
@@ -159,32 +149,51 @@ def getApps(config):
 
 
 def main(options):
+    # db_client_processed = MongoClient(host=options.mongodb_processed_connection_uri,
+    #                             max_pool_size=options.mongodb_max_concurrent)
+    # db_processed = db_client_processed[options.mongodb_processed_db_name]
+
+    db_client_insights = MongoClient(host=options.mongodb_insights_connection_uri,
+                                max_pool_size=options.mongodb_max_concurrent)
+    db_insights = db_client_insights[options.mongodb_insights_db_name]
+
     apps = getApps(options)
     print apps
 
-    clients = []
+    http_clients = []
     for app in apps:
-        clients.append(InsightsClient(app_id=str(app['_id'])))
+        http_clients.append(InsightsClient(app_id=str(app['_id'])))
 
-    for uuid in range(12000, 20000):
-        # client is picked randomly
-        client = clients[random.randint(0, len(apps) - 1)]
+    for uuid in range(10000, 20000):
+        # client and user are picked randomly
+        while True:
+            http_client = http_clients[random.randint(0, len(apps) - 1)]
+            col_cpu_name = str(http_client.app_id) + '.event.cpu'
+            # print col_cpu_name
+            user = db_insights[col_cpu_name].find_one({'uuid': uuid})
+            # print 'user: ' + str(user)
+            if user is not None:
+                break
+            # else:
+            #     print 'user is None'
+
+        # print 'here is the user'
 
         '''
         # client actions
         '''
         # Generate data at random time(unit: milisecond)
-        time.sleep(random.randint(0, 1000) * 0.001)
-        client.track_apa(uuid)
+        time.sleep(random.randint(0, 10) * 0.001)
+        http_client.track_apa(uuid)
         # Generate data at random time(unit: milisecond)
-        time.sleep(random.randint(0, 1000) * 0.001)
-        client.track_cpu(uuid)
+        # time.sleep(random.randint(0, 100) * 0.001)
+        # http_client.track_cpu(uuid)
         # Generate data at random time(unit: milisecond)
-        time.sleep(random.randint(0, 1000) * 0.001)
-        client.track_pgr(uuid)
+        time.sleep(random.randint(0, 10) * 0.001)
+        http_client.track_pgr(uuid)
         # Generate data at random time(unit: milisecond)
-        time.sleep(random.randint(0, 1000) * 0.001)
-        client.track_pgr(uuid)
+        time.sleep(random.randint(0, 10) * 0.001)
+        http_client.track_pgr(uuid)
         #client.track_mtu(uuid)
 
 
