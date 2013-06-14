@@ -130,6 +130,42 @@ class ProcessModel(BaseModel):
         return process_data
 
 
+class ProcessedDataModel(BaseModel):
+
+    def __init__(self):
+        super(ProcessedDataModel, self).__init__()
+
+    """
+    Return pymongo object of processed data
+    """
+    def get_processed_data(self, active_checks, date_from, date_to):
+
+        checks = {}
+
+        for check in active_checks:
+            row = self.mongo.get_collection(check)
+
+            try:
+                checks[check] = row.find({"time": {"$gte": date_from,"$lte": date_to }}).sort('time', ASCENDING)
+            except IndexError:
+                checks[check] = False
+
+        return checks
+
+    """
+    Used in the Javascript calendar - doesn't permit checks for dates before this date
+    """
+    def get_first_check_date(self):
+        row = self.mongo.get_collection('cpu')
+        start_date = row.find_one()
+
+        if start_date != None:
+            start_date = start_date.get('time', 0)
+        else:
+            start_date = 0
+
+        return start_date
+
 class ExceptionModel(BaseModel):
     
     def __init__(self):
@@ -234,6 +270,7 @@ class UserModel(BaseModel):
         return result
 
 
+processed_data_model = ProcessedDataModel()
 dashboard_model = DashboardModel()
 process_model = ProcessModel()
 system_model = SystemModel()

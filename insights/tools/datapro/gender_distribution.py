@@ -33,9 +33,6 @@ app_id.processed schema
 }
 '''
 
-# import sys
-# sys.path.append("/GIT/appspand/insights")
-
 from pymongo import MongoClient
 import settings
 
@@ -43,6 +40,7 @@ from datetime import datetime, date
 import time
 
 from collections import defaultdict
+from operator import itemgetter
 
 
 options = settings.parse_options()
@@ -78,6 +76,12 @@ for app in apps:
 # print insights_dbs
 
 
+'''
+ n개의 group 분석에 사용하려고 Groups 클래스를 만들었지만,
+ 그래프로 표현하거나 사람이 인식하는 문제가 있어서, 2개의 group 분석까지만
+ 적용하기로 한다.
+ total sum은 2차원, 즉 2개의 group 분석에 대해서만 적용되었다.
+'''
 class Groups:
     '''
      사용할 group들을 사전 등록
@@ -136,6 +140,13 @@ class Groups:
             for (k, v) in x.iteritems()
         ) if isinstance(x, defaultdict) else x
 
+        dimension = len(self.args)
+
+        # 1차원이면 전체 합계 필드만 추가
+        if dimension == 1:
+            pass
+
+        # 2차원이면 각각의 합계 필드 추가
         dimension = len(self.args)
 
         if dimension == 2:

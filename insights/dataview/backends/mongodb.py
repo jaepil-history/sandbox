@@ -10,7 +10,24 @@ from dataview.core import settings
 class MongoBackend():
 
     # Cron is for testing purposes
-    internal_collections = ['logs', 'exceptions', 'unread', 'cron', 'sessions', 'users', 'tags']
+    internal_collections = ['logs', 'exceptions', 'unread', 'cron', 'sessions', 'users', 'tags',
+                            "discovery", "emails", "events", "installs", "invites", "messages",
+                            "monetization", "notifications", "virality", "returning_users",
+                            "stream", "traffic", "time", "user_distribution",
+                            "user_retention", "user_sessions", "unique_visitors",
+                            '51ada4f8bdeadf2d03d96f25.event.all',
+                            '51ada4f8bdeadf2d03d96f25.event.apa',
+                            '51ada4f8bdeadf2d03d96f25.event.cpu',
+                            '51ada4f8bdeadf2d03d96f25.event.pgr',
+                            '51ada50ebdeadf2d09f110a9.event.all',
+                            '51ada50ebdeadf2d09f110a9.event.apa',
+                            '51ada50ebdeadf2d09f110a9.event.cpu',
+                            '51ada50ebdeadf2d09f110a9.event.pgr',
+                            '51ada51cbdeadf2d0f85ee6b.event.all',
+                            '51ada51cbdeadf2d0f85ee6b.event.apa',
+                            '51ada51cbdeadf2d0f85ee6b.event.cpu',
+                            '51ada51cbdeadf2d0f85ee6b.event.pgr'
+                            ]
 
     host = settings.MONGO['host']
     port = settings.MONGO['port']

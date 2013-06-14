@@ -4,6 +4,7 @@ import base64
 import tornado.web
 
 from dataview.views.app import(
+        ProcessedDataView,
         DashboardView,
         SystemView,
         ProcessesView,
@@ -31,7 +32,8 @@ app_settings = {
 
 handlers = [
 	# App
-	(r"/", DashboardView),
+    (r"/", ProcessedDataView),
+	(r"/dashboard", DashboardView),
 	(r"/system", SystemView),
 	(r"/processes", ProcessesView),
 	(r"/exceptions", ExceptionsView),

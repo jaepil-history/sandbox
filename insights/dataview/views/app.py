@@ -10,6 +10,7 @@ from dataview.utils.dates import (
         utc_now_to_localtime
         )
 from dataview.views.models import (
+        processed_data_model,
         dashboard_model,        
         system_model,
         process_model,
@@ -51,6 +52,7 @@ class DashboardView(BaseView):
                 system_check_first=system_check_first,
                 process_check_first=process_check_first,
                 )
+
 
 class SystemView(BaseView):
 
@@ -141,6 +143,7 @@ class SystemView(BaseView):
                     max_date=max_date
                     )
 
+
 class ProcessesView(BaseView):
 
     def initialize(self):
@@ -203,6 +206,68 @@ class ProcessesView(BaseView):
                 )
 
 
+class ProcessedDataView(BaseView):
+
+    def initialize(self):
+        super(ProcessedDataView, self).initialize()
+        self.current_page = 'processed'
+
+    @authenticated
+    def get(self):
+
+        processed = self.get_arguments('processed', None)
+        date_from = self.get_argument('date_from', False)
+        date_to = self.get_argument('date_to', False)
+
+        if date_from:
+            date_from = datestring_to_utc_datetime(date_from)
+        # Default - 24 hours period
+        else:
+            day = timedelta(hours=24)
+            date_from = self.now - day
+
+        if date_to:
+            date_to = datestring_to_utc_datetime(date_to)
+        else:
+            date_to = self.now
+
+        date_from = datetime_to_unixtime(date_from)
+        date_to = datetime_to_unixtime(date_to)
+
+
+        all_processes_checks = settings.PROCESS_CHECKS
+
+        if len(processed) > 0:
+            processes_checks = processed
+        else:
+            processes_checks = settings.PROCESS_CHECKS
+
+        process_data = process_model.get_process_data(processes_checks, date_from, date_to)
+
+        # Convert the dates to local time for display
+        date_from = utc_unixtime_to_localtime(date_from)
+        date_to = utc_unixtime_to_localtime(date_to)
+
+        # Get the difference between UTC and localtime - used to display
+        # the ticks in the charts
+        zone_difference = localtime_utc_timedelta()
+
+        # Get the max date - utc, converted to localtime
+        max_date = utc_now_to_localtime()
+
+        self.render('processed_data.html',
+                current_page=self.current_page,
+                all_processes_checks=all_processes_checks,
+                processes_checks=processes_checks,
+                processes=processed,
+                process_data=process_data,
+                date_from=date_from,
+                date_to=date_to,
+                zone_difference=zone_difference,
+                max_date=max_date
+                )
+
+
 class ExceptionsView(BaseView):
 
     def initialize(self):
@@ -220,6 +285,7 @@ class ExceptionsView(BaseView):
                 exceptions=exceptions,
                 current_page=self.current_page,
                 )
+
 
 class LogsView(BaseView):
 
@@ -247,6 +313,7 @@ class LogsView(BaseView):
                 all_tags=all_tags,
                 )
 
+
 class SettingsView(BaseView):
 
     def initialize(self):
@@ -263,6 +330,7 @@ class SettingsView(BaseView):
             max_date=max_date,
             current_page=self.current_page,
         )
+
 
 class SettingsDeleteLogsView(BaseView):
 

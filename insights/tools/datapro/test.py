@@ -1,115 +1,97 @@
-#!/usr/bin/env python
-# This Python file uses the following encoding: utf-8
-#
-# Copyright 2013 Appspand
+data = {'10': {'a': 2, 'c': 3}, '20': {'a': 3, 'b': 4}, '30': {'b': 5, 'd': 1}}
 
-__author__ = 'byouloh'
+param = ['a', 'b', 'c', 'd', 't']
+grand_total = {}
 
-import sys
+for key in param:
+    grand_total[key] = 0
 
-sys.path.append("/GIT/appspand/insights")
-# for i in sys.path:
-#     print i
-from pymongo import MongoClient
+for sub_dict in data.values():
+    subtotal = 0
+    for value in sub_dict.values():
+        subtotal += value
+        sub_dict['t'] = subtotal
+        for key in grand_total.keys():
+            if sub_dict.has_key(key):
+                grand_total[key] += sub_dict[key]
 
-import tornado.options
+data['t'] = grand_total
 
-import settings
-from insights.api import models
+print data
 
+import numpy as np
 
-options = settings.parse_options()
-options.define(name="list", type=bool, default=False, help="List all applications")
+gender = ['m', 'f', 'u', 't']
+ages = ['0-12', '13-17', '18-24', '25-29', '30-34', '35-39', '40-49', '50-59', '60-64', '65+', 't']
+friends = ['0-10', '11-20', '21-40', '41-60', '61-80', '81-125', '126-249', '250+', 'u', 't']
+country = ['Seoul', 'Busan', 'Incheon', 'Jeju', 'Jeonju', 'Daejeon', 'Daegu', 'Pohang', 'Gyeongju',
+           'Jinju', 'Ulsan', 'Chuncheon', 'Anyang', 'Bucheon', 'Cheongju', 'Gumi', 'Gunsan', 'u', 't']
 
+data = np.matrix('1 2; 3 4')
 
-def open_db_clients(connection_uri, db_name):
-    db_client = MongoClient(host=connection_uri)
-    db = db_client[db_name]
-    return db
+print data
 
+a = np.array(data).tolist()
 
-def test_open_db_clients(connection_uri, db_name, appId):
-    db_client = MongoClient(host=connection_uri)
-    db = db_client[db_name]
+print 'a: ' + str(a)
 
-    col_all_name = appId + '.event.all'
-    col_cpu_name = appId + '.event.cpu'
-    col_all = db[col_all_name]
-    col_cpu = db[col_cpu_name]
+a = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+b = np.array(a)
+print b
 
-    print list(col_all.find().limit(5))
-    print list(col_cpu.find().limit(5))
-
-
-def list_application(config):
-    db_client = MongoClient(host=config.mongodb_appspand_connection_uri,
-                            max_pool_size=config.mongodb_max_concurrent)
-    db_appspand = db_client[config.mongodb_appspand_db_name]
-    col_application = db_appspand.application
-
-    return list(col_application.find())
-
-
-class InsightsClient(object):
-    INSIGHTS_API_URL = "http://api.insights.appspand.com:8001/api/v1/"
-
-    def __init__(self, app_id):
-        self.app_id = app_id
-
-    def make_request(self, app_id, message_type, params):
-        url = self.INSIGHTS_API_URL
-        url += app_id + "/" + message_type + "/?"
-        url += tornado.httputil.urlencode(params)
-
-        return url
-
-    def send_request(self, url):
-        client = tornado.httpclient.HTTPClient()
-        try:
-            client.fetch(url)
-        except tornado.httpclient.HTTPError as e:
-            print "Error:", e
-        client.close()
-
-
-def main(options):
-    list = list_application(options)
-    print list
-
-    insights_config = []
-
-    for app in list:
-        temp = {}
-        temp['app_id'] = str(app['_id'])
-        temp['cluster_name'] = app['cluster']['name']
-        temp['db_name'] = app['cluster']['db_name']
-        temp['app_name'] = app['name']
-        temp['db'] = open_db_clients("mongodb://localhost:27017", app['cluster']['db_name'])
-        insights_config.append(temp)
-        print insights_config
+c = np.array(b).tolist()
+print 'c: ' + str(c)
 
 
 
+x = np.matrix(np.arange(12).reshape((3,4)))
+print x
+
+print sum(x)
+
+y = [0, 1, 2, 4]
+y.append(sum(y))
+
+print y
+
+# matrix([[ 0,  1,  2,  3],
+#         [ 4,  5,  6,  7],
+#         [ 8,  9, 10, 11]])
+
+_x = np.array(x).tolist()
+print _x
+
+print
+
+print '======'
+
+y = x[0];
+print y
+# matrix([[0, 1, 2, 3]])
+
+print (x == y)
+# matrix([[ True,  True,  True,  True],
+#         [False, False, False, False],
+#         [False, False, False, False]], dtype=bool)
+
+print (x == y).all()
+# False
+
+print (x == y).all(0)
+# matrix([[False, False, False, False]], dtype=bool)
+
+print (x == y).all(1)
+# matrix([[ True],
+#         [False],
+#         [False]], dtype=bool)
+
+m = np.matrix([1,2,3])
+print m
 
 
 
+l = np.array(m).flat
+print l
 
-# def main(args):
-#     if len(args) < 2:
-#         print "load_gen.py [App ID]"
-#         return
-#
-#     app_id = args[1]
-#
-#     client = InsightsClient(app_id=app_id)
-#
-#     for uuid in range(10000, 12000):
-#         client.track_apa(uuid)
-#         client.track_pgr(uuid)
-#         client.track_cpu(uuid)
-#         client.track_pgr(uuid)
-#         #client.track_mtu(uuid)
-
-
-if __name__ == "__main__":
-    main(options)
+l = np.array(m).flatten().tolist()
+print l

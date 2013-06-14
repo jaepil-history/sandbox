@@ -55,7 +55,7 @@ class BaseView(tornado.web.RequestHandler):
             except:
                 url = self.request.uri
 
-            list = ['/', '/exceptions', '/logs', '/system', '/processes']
+            list = ['/', '/dashboard', '/exceptions', '/logs', '/system', '/processes']
             if url in list:
                 return 1
             else:
