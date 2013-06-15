@@ -5,12 +5,12 @@ Django==1.5.1
 celery==3.0.19
 
 # Web Framework
-tornado==3.0.1
+tornado==3.0.2
 
 # Data Serialization
 schematics==0.6
 
 # MongoDB
 pytz==2013b
-pymongo==2.5
+pymongo==2.5.2
 motor==0.1
