@@ -11,10 +11,6 @@ class MongoBackend():
 
     # Cron is for testing purposes
     internal_collections = ['logs', 'exceptions', 'unread', 'cron', 'sessions', 'users', 'tags',
-                            "discovery", "emails", "events", "installs", "invites", "messages",
-                            "monetization", "notifications", "virality", "returning_users",
-                            "stream", "traffic", "time", "user_distribution",
-                            "user_retention", "user_sessions", "unique_visitors",
                             '51ada4f8bdeadf2d03d96f25.event.all',
                             '51ada4f8bdeadf2d03d96f25.event.apa',
                             '51ada4f8bdeadf2d03d96f25.event.cpu',
@@ -26,7 +22,10 @@ class MongoBackend():
                             '51ada51cbdeadf2d0f85ee6b.event.all',
                             '51ada51cbdeadf2d0f85ee6b.event.apa',
                             '51ada51cbdeadf2d0f85ee6b.event.cpu',
-                            '51ada51cbdeadf2d0f85ee6b.event.pgr'
+                            '51ada51cbdeadf2d0f85ee6b.event.pgr',
+                            '51ada4f8bdeadf2d03d96f25.processed',
+                            '51ada50ebdeadf2d09f110a9.processed',
+                            '51ada51cbdeadf2d0f85ee6b.processed'
                             ]
 
     host = settings.MONGO['host']
@@ -34,8 +33,9 @@ class MongoBackend():
     user = settings.MONGO['user']
     password = settings.MONGO['password']
     database = settings.MONGO['database']
-    valid_collections = settings.SYSTEM_CHECKS \
+    valid_collections = settings.SYSTEM_CHECKS\
             + settings.PROCESS_CHECKS\
+            + settings.PROCESSED_LIST\
             + internal_collections
 
     def __init__(self):

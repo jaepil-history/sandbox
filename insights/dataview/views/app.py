@@ -235,14 +235,14 @@ class ProcessedDataView(BaseView):
         date_to = datetime_to_unixtime(date_to)
 
 
-        all_processes_checks = settings.PROCESS_CHECKS
+        all_processed_list = settings.PROCESSED_LIST
 
         if len(processed) > 0:
-            processes_checks = processed
+            processed_list = processed
         else:
-            processes_checks = settings.PROCESS_CHECKS
+            processed_list = settings.PROCESSED_LIST
 
-        process_data = process_model.get_process_data(processes_checks, date_from, date_to)
+        processed_data = processed_data_model.get_processed_data(processed_list, date_from, date_to)
 
         # Convert the dates to local time for display
         date_from = utc_unixtime_to_localtime(date_from)
@@ -257,10 +257,10 @@ class ProcessedDataView(BaseView):
 
         self.render('processed_data.html',
                 current_page=self.current_page,
-                all_processes_checks=all_processes_checks,
-                processes_checks=processes_checks,
-                processes=processed,
-                process_data=process_data,
+                all_processed_list=all_processed_list,
+                processed_list=processed_list,
+                processed=processed,
+                processed_data=processed_data,
                 date_from=date_from,
                 date_to=date_to,
                 zone_difference=zone_difference,

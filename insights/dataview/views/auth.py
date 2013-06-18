@@ -18,8 +18,8 @@ class LoginView(BaseView):
         if users == 0:
             self.redirect('/create_user')
         else:
-            message =  self.session.get('message',None)
-            errors =  self.session.get('errors',None)
+            message =  self.session.get('message', None)
+            errors =  self.session.get('errors', None)
             next = self.get_argument('next', None)
             
             try:

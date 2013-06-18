@@ -8,7 +8,7 @@ import tornado.web
 
 import bson
 import motor
-from dataview.api import models
+from dataview.api import dbmodels
 
 #from ..proxy import kontagent
 
@@ -61,7 +61,7 @@ class BaseHandler(tornado.web.RequestHandler):
             if doc is None:
                 raise Exception("Application ID not found")
 
-            app_info = models.ApplicationInfo(**doc)
+            app_info = dbmodels.ApplicationInfo(**doc)
             raise tornado.gen.Return(app_info)
 
         @tornado.gen.coroutine
@@ -112,7 +112,7 @@ class ApplicationAddedHandler(BaseHandler):
         #     use_test_server=self.options.kontagent_use_test_server)
         # kontagent.track_application_added(**self.context.arguments)
 
-        apa = models.ApplicationAdded(**self.context.arguments)
+        apa = dbmodels.ApplicationAdded(**self.context.arguments)
         yield apa.save(db_context=self.db_context, collection_name="apa", validate=True)
         self.write("1")
         self.finish()
@@ -122,7 +122,7 @@ class ApplicationRemovedHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
-        apr = models.ApplicationRemoved(**self.context.arguments)
+        apr = dbmodels.ApplicationRemoved(**self.context.arguments)
         yield apr.save(db_context=self.db_context, collection_name="apr", validate=True)
         self.write("1")
         self.finish()
@@ -132,7 +132,7 @@ class UserInformationHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
-        cpu = models.UserInformation(**self.context.arguments)
+        cpu = dbmodels.UserInformation(**self.context.arguments)
         yield cpu.save(db_context=self.db_context, collection_name="cpu", validate=True)
         self.write("1")
         self.finish()
@@ -142,7 +142,7 @@ class CustomEventHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
-        evt = models.CustomEvent(**self.context.arguments)
+        evt = dbmodels.CustomEvent(**self.context.arguments)
         yield evt.save(db_context=self.db_context, collection_name="evt", validate=True)
         self.write("1")
         self.finish()
@@ -164,7 +164,7 @@ class RevenueTrackingHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
-        mtu = models.RevenueTracking(**self.context.arguments)
+        mtu = dbmodels.RevenueTracking(**self.context.arguments)
         yield mtu.save(db_context=self.db_context, collection_name="mtu", validate=True)
         self.write("1")
         self.finish()
@@ -174,7 +174,7 @@ class PageRequestHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
-        pgr = models.PageRequest(**self.context.arguments)
+        pgr = dbmodels.PageRequest(**self.context.arguments)
         yield pgr.save(db_context=self.db_context, collection_name="pgr", validate=True)
         self.write("1")
         self.finish()

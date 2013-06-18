@@ -34,12 +34,13 @@ class BaseModel(object):
         result = cursor.limit(self.page_size).skip(skip)
 
         pagination = {
-                "pages": total_pages, 
-                "current_page": page,
-                "result": result 
+            "pages": total_pages,
+            "current_page": page,
+            "result": result
         }
         
         return pagination
+
 
 class DashboardModel(BaseModel):
     
@@ -165,6 +166,7 @@ class ProcessedDataModel(BaseModel):
             start_date = 0
 
         return start_date
+
 
 class ExceptionModel(BaseModel):
     
