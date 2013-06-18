@@ -4,11 +4,12 @@ try:
 except ImportError:
     import simplejson as json
 
+config_path = 'dataview/config/dataview.conf'
 try:
-    config_file = file('dataview/config/dataview.conf').read()
+    config_file = file(config_path).read()
     config = json.loads(config_file)
 except Exception, e:
-    print "There was an error in your configuration file (dataview/config/dataview.conf)"
+    print "There was an error in your configuration file: " + config_path
     raise e
 
 #  DataView Defaults
@@ -35,6 +36,9 @@ if sys.platform == 'darwin':
     del SYSTEM_CHECKS[3]  # Delete network check on macos
 
 PROCESS_CHECKS = config.get('process_checks', [])
+
+
+PROCESSED_LIST = config.get('processed_list', [])
 
 
 host = _web_app.get('host', 'http://127.0.0.1')

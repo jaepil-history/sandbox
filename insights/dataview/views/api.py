@@ -1,3 +1,5 @@
+from dataview.api import exception as _exception
+from dataview.api import log as _log
 import tornado.web
 
 class ApiLogs(tornado.web.RequestHandler):

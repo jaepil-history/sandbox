@@ -38,6 +38,8 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
             try:
+                print 'Starting DataView Web Daemon at {0}:{1}'.format(settings.WEB_APP['host'],
+                        settings.WEB_APP['port'])
                 daemon.start()
             except:
                 pass
@@ -45,7 +47,8 @@ if __name__ == "__main__":
             print "Stopping DataView WebDaemon ..."
             daemon.stop()
         elif 'restart' == sys.argv[1]:
-            print "Restarting DataView WebDaemon ..."
+            print 'Restarting DataView WebDaemon at {0}:{1}'.format(settings.WEB_APP['host'],
+                        settings.WEB_APP['port'])
             daemon.restart()
         elif 'status' == sys.argv[1]:
             try:

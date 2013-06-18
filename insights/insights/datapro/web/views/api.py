@@ -1,3 +1,5 @@
+from insights.datapro.api import exception as _exception
+from insights.datapro.api import log as _log
 import tornado.web
 
 class ApiLogs(tornado.web.RequestHandler):

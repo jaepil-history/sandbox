@@ -9,11 +9,12 @@ try:
 except ImportError:
     import simplejson as json
 
+config_path = 'insights/datapro/config/datapro.conf'
 try:
-    config_file = file('insights/datapro/config/datapro.conf').read()
+    config_file = file(config_path).read()
     config = json.loads(config_file)
 except Exception, e:
-    print "There was an error in your configuration file (insights/datapro/config/datapro.conf)"
+    print "There was an error in your configuration file: " + config_path
     raise e
 
 #  DataPro Defaults
