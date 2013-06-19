@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}
-Processed Data
+Discovery
 {% endblock %}
 {% block breadcrumb %}
-<li>Processed Data</li>
+<li>Discovery</li>
 {% endblock %}
 {% block header %}
 	<link rel="stylesheet" href="/media/css/chosen.css" />
@@ -12,13 +12,13 @@ Processed Data
 {% endblock %}
 {% block content %}
 
-<form action="{{ base_url|url('') }}">
+<form action="{{ base_url|url('discovery') }}">
 <ul class='tabs'>
 	<li>
 		<div class="input_background system-charts-dropdown">
-		<select id='processed-select' name='selected_data' style="width:220px;" tabindex="3" multiple="" data-placeholder="Select processed data">
-			{% for p in all_processed_list %}
-				<option {% if p in selected_data %}selected='selected' {% endif %} value="{{ p }}">{{ p }}</option>
+		<select id='discovery-select' name='discovery' style="width:220px;" tabindex="3" multiple="" data-placeholder="Select discovery">
+			{% for p in all_processed_list  %}
+				<option {% if p in processed %}selected='selected' {% endif %} value="{{ p }}">{{ p }}</option>
 			{% endfor %}
 		</select>
 		</div>
@@ -41,20 +41,20 @@ Processed Data
 </ul>
 </form>
 
-{% for processed in processed_list %}
-    {% set sanitized_processed = processed|clean_slashes %}
-    <h2>{{ processed }}</h2>
-    {% if processed_data[processed].clone().count() > 0 %}
+{% for item in checked_items  %}
+    {% set sanitized_item = item|clean_slashes %}
+    <h2>{{ item }}</h2>
+    {% if process_data[item].clone().count() > 0 %}
     <h3>CPU</h3>
-     <div id="{{ sanitized_processed }}_cpu" class='chart_container processed_data'>
-        <div class='y_axis' id="cpu_{{ sanitized_processed }}_y_axis"></div>
-        <div id="cpu-chart_{{ sanitized_processed }}" class='chart processed_data'></div>
+     <div id="{{ sanitized_item }}_cpu" class='chart_container processes'>
+        <div class='y_axis' id="cpu_{{ sanitized_item }}_y_axis"></div>
+        <div id="cpu-chart_{{ sanitized_item }}" class='chart processes'></div>
     </div>
 
     <h3>Memory</h3>
-     <div id="{{ sanitized_processed }}_memory" class='chart_container processed_data'>
-        <div class='y_axis' id="memory_{{ sanitized_processed }}_y_axis"></div>
-        <div id="memory-chart_{{ sanitized_processed }}" class='chart processed_data'></div>
+     <div id="{{ sanitized_item }}_memory" class='chart_container processes'>
+        <div class='y_axis' id="memory_{{ sanitized_item }}_y_axis"></div>
+        <div id="memory-chart_{{ sanitized_item }}" class='chart processes'></div>
     </div>
     {% else %}
     <div class='message'>No data</div>
@@ -79,12 +79,12 @@ $(function()  {
     }
     var colors = ['#00ADFC', '#7AB317', '#8000A9']   
    
-{% for processed in processed_data %}
-{% set sanitized_processed = processed|clean_slashes %}
+{% for item in process_data %}
+{% set sanitized_item = item|clean_slashes %}
 
-{% if processed_data[processed].clone().count() > 0 %}
-var {{ sanitized_processed }}_memory_graph = new Rickshaw.Graph({
-	element: document.getElementById("memory-chart_{{ sanitized_processed }}"),
+{% if process_data[item].clone().count() > 0 %}
+var {{ sanitized_item }}_memory_graph = new Rickshaw.Graph({
+	element: document.getElementById("memory-chart_{{ sanitized_item }}"),
 	width: width,
 	height: height,
 	renderer: 'line',
@@ -92,7 +92,7 @@ var {{ sanitized_processed }}_memory_graph = new Rickshaw.Graph({
     {% strip %}
 	series: [
 		{   color: colors[0],
-            data: [{% for data in processed_data[processed].clone()%}
+            data: [{% for data in process_data[item].clone()%}
             {% if zone_difference.0 == 'negative' %}{x:{{ data.time-zone_difference.1 }},
             {% else %}{x: {{ data.time+zone_difference.1 }}, {% endif %} y: {{ data.memory }} },{% endfor %}],
 			name: 'Memory'
@@ -100,10 +100,10 @@ var {{ sanitized_processed }}_memory_graph = new Rickshaw.Graph({
     {% endstrip %}
 });
 
-{{ sanitized_processed }}_memory_graph.render();
+{{ sanitized_item }}_memory_graph.render();
 
 var memory_hover = new Rickshaw.Graph.HoverDetail({
-    graph: {{ sanitized_processed }}_memory_graph,
+    graph: {{ sanitized_item }}_memory_graph,
     formatter: function(series, x, y) {
 		var date = _format_date(x);
 		var content = '<span class="metric">' + series.name + ": " + parseInt(y) + 'MB</span>' + date;
@@ -112,23 +112,23 @@ var memory_hover = new Rickshaw.Graph.HoverDetail({
 });
 
 
-var {{ sanitized_processed }}_memory_x = new Rickshaw.Graph.Axis.Time({
-    graph: {{ sanitized_processed }}_memory_graph,
+var {{ sanitized_item }}_memory_x = new Rickshaw.Graph.Axis.Time({
+    graph: {{ sanitized_item }}_memory_graph,
 });
 
 
-var {{ sanitized_processed }}_memory_y = new Rickshaw.Graph.Axis.Y({
-    graph: {{ sanitized_processed }}_memory_graph,
+var {{ sanitized_item }}_memory_y = new Rickshaw.Graph.Axis.Y({
+    graph: {{ sanitized_item }}_memory_graph,
     tickFormat: function(y) { return y +'MB'}, 
-    element: document.getElementById('memory_{{ sanitized_processed }}_y_axis'),
+    element: document.getElementById('memory_{{ sanitized_item }}_y_axis'),
 });
 
-{{ sanitized_processed }}_memory_x.render();
-{{ sanitized_processed }}_memory_y.render();
+{{ sanitized_item }}_memory_x.render();
+{{ sanitized_item }}_memory_y.render();
 
 // CPU
-var {{ sanitized_processed }}_cpu_graph = new Rickshaw.Graph({
-	element: document.getElementById("cpu-chart_{{ sanitized_processed }}"),
+var {{ sanitized_item }}_cpu_graph = new Rickshaw.Graph({
+	element: document.getElementById("cpu-chart_{{ sanitized_item }}"),
 	width: width,
 	height: height,
 	renderer: 'line',
@@ -136,7 +136,7 @@ var {{ sanitized_processed }}_cpu_graph = new Rickshaw.Graph({
     {% strip %}
 	series: [
 		{   color: colors[1],
-            data: [{% for data in processed_data[processed].clone()%}
+            data: [{% for data in process_data[item].clone()%}
             {% if zone_difference.0 == 'negative' %}{x:{{ data.time-zone_difference.1 }},
             {% else %}{x: {{ data.time+zone_difference.1 }}, {% endif %} y: {{ data.cpu }} },{% endfor %}],
 			name: 'CPU'
@@ -144,10 +144,10 @@ var {{ sanitized_processed }}_cpu_graph = new Rickshaw.Graph({
     {% endstrip %}
 });
 
-{{ sanitized_processed }}_cpu_graph.render();
+{{ sanitized_item }}_cpu_graph.render();
 
 var cpu_hover = new Rickshaw.Graph.HoverDetail({
-    graph: {{ sanitized_processed }}_cpu_graph,
+    graph: {{ sanitized_item }}_cpu_graph,
     formatter: function(series, x, y) {
 		var date = _format_date(x);
 		var content = '<span class="metric">' + series.name + ": " + parseInt(y) + '%</span>' + date;
@@ -156,22 +156,22 @@ var cpu_hover = new Rickshaw.Graph.HoverDetail({
 });
 
 
-var {{ sanitized_processed }}_cpu_x = new Rickshaw.Graph.Axis.Time({
-    graph: {{ sanitized_processed }}_cpu_graph,
+var {{ sanitized_item }}_cpu_x = new Rickshaw.Graph.Axis.Time({
+    graph: {{ sanitized_item }}_cpu_graph,
 });
 
 
-var {{ sanitized_processed }}_cpu_y = new Rickshaw.Graph.Axis.Y({
-    graph: {{ sanitized_processed }}_cpu_graph,
+var {{ sanitized_item }}_cpu_y = new Rickshaw.Graph.Axis.Y({
+    graph: {{ sanitized_item }}_cpu_graph,
     tickFormat: function(y) { return y +'%'}, 
-    element: document.getElementById('cpu_{{ sanitized_processed }}_y_axis'),
+    element: document.getElementById('cpu_{{ sanitized_item }}_y_axis'),
 });
 
-{{ sanitized_processed }}_cpu_x.render();
-{{ sanitized_processed }}_cpu_y.render();
+{{ sanitized_item }}_cpu_x.render();
+{{ sanitized_item }}_cpu_y.render();
 
 {%  endif %}{# count #}
-{% endfor %}{# processed #}
+{% endfor %}{# item #}
 
 var datetime_options = {
 	separator: '-',
@@ -184,7 +184,7 @@ var datetime_options = {
 };
 $('#date_from').datetimepicker(datetime_options);
 $('#date_to').datetimepicker(datetime_options);
-$("#processed-select").chosen();
+$("#discovery-select").chosen();
 
 });
 </script>

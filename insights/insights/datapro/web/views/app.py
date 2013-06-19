@@ -191,7 +191,7 @@ class ProcessesView(BaseView):
         # Get the max date - utc, converted to localtime
         max_date = utc_now_to_localtime()
 
-        self.render('processes.html',
+        self.render('discovery.html',
                 current_page=self.current_page,
                 all_processes_checks=all_processes_checks,
                 processes_checks=processes_checks,

@@ -10,33 +10,30 @@ from dataview.core import settings
 class MongoBackend():
 
     # Cron is for testing purposes
-    internal_collections = ['logs', 'exceptions', 'unread', 'cron', 'sessions', 'users', 'tags',
-                            '51ada4f8bdeadf2d03d96f25.event.all',
-                            '51ada4f8bdeadf2d03d96f25.event.apa',
-                            '51ada4f8bdeadf2d03d96f25.event.cpu',
-                            '51ada4f8bdeadf2d03d96f25.event.pgr',
-                            '51ada50ebdeadf2d09f110a9.event.all',
-                            '51ada50ebdeadf2d09f110a9.event.apa',
-                            '51ada50ebdeadf2d09f110a9.event.cpu',
-                            '51ada50ebdeadf2d09f110a9.event.pgr',
-                            '51ada51cbdeadf2d0f85ee6b.event.all',
-                            '51ada51cbdeadf2d0f85ee6b.event.apa',
-                            '51ada51cbdeadf2d0f85ee6b.event.cpu',
-                            '51ada51cbdeadf2d0f85ee6b.event.pgr',
-                            '51ada4f8bdeadf2d03d96f25.processed',
-                            '51ada50ebdeadf2d09f110a9.processed',
-                            '51ada51cbdeadf2d0f85ee6b.processed'
-                            ]
+    internal_collections = ['cron', 'sessions', 'users']
+    #                         '51ada4f8bdeadf2d03d96f25.event.all',
+    #                         '51ada4f8bdeadf2d03d96f25.event.apa',
+    #                         '51ada4f8bdeadf2d03d96f25.event.cpu',
+    #                         '51ada4f8bdeadf2d03d96f25.event.pgr',
+    #                         '51ada50ebdeadf2d09f110a9.event.all',
+    #                         '51ada50ebdeadf2d09f110a9.event.apa',
+    #                         '51ada50ebdeadf2d09f110a9.event.cpu',
+    #                         '51ada50ebdeadf2d09f110a9.event.pgr',
+    #                         '51ada51cbdeadf2d0f85ee6b.event.all',
+    #                         '51ada51cbdeadf2d0f85ee6b.event.apa',
+    #                         '51ada51cbdeadf2d0f85ee6b.event.cpu',
+    #                         '51ada51cbdeadf2d0f85ee6b.event.pgr',
+    #                         '51ada4f8bdeadf2d03d96f25.processed',
+    #                         '51ada50ebdeadf2d09f110a9.processed',
+    #                         '51ada51cbdeadf2d0f85ee6b.processed'
+    #                         ]
 
     host = settings.MONGO['host']
     port = settings.MONGO['port']
     user = settings.MONGO['user']
     password = settings.MONGO['password']
     database = settings.MONGO['database']
-    valid_collections = settings.SYSTEM_CHECKS\
-            + settings.PROCESS_CHECKS\
-            + settings.PROCESSED_LIST\
-            + internal_collections
+    valid_collections = settings.PROCESSED_LIST + internal_collections
 
     def __init__(self):
         if not pymongo:

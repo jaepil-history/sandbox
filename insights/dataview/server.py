@@ -6,13 +6,8 @@ import tornado.web
 from dataview.views.app import(
         ProcessedDataView,
         DashboardView,
-        SystemView,
-        ProcessesView,
-        ExceptionsView,
-        LogsView,
+        DiscoveryView,
         SettingsView,
-        SettingsDeleteLogsView,
-        SettingsDeleteExceptionsView,
         SettingsChangePasswordView)
 from dataview.views.auth import LoginView, CreateUserView, LogoutView
 from dataview.settings import PROJECT_ROOT
@@ -34,14 +29,8 @@ handlers = [
 	# App
     (r"/", ProcessedDataView),
 	(r"/dashboard", DashboardView),
-	(r"/system", SystemView),
-	(r"/processes", ProcessesView),
-	(r"/exceptions", ExceptionsView),
-	(r"/logs", LogsView),
-	(r"^/logs/(?P<page>\d+)$", LogsView),
+	(r"/discovery", DiscoveryView),
 	(r"^/settings", SettingsView),
-	(r"^/settings/delete-logs$", SettingsDeleteLogsView),
-    (r"^/settings/delete-exceptions$", SettingsDeleteExceptionsView),
     (r"^/settings/change-password$", SettingsChangePasswordView),
 	# Auth
 	(r"/login", LoginView),

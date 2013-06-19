@@ -73,30 +73,24 @@ class DashboardModel(BaseModel):
         return process_check
 
 
-
-class SystemModel(BaseModel):
-
+class DiscoveryModel(BaseModel):
+    
     def __init__(self):
-        super(SystemModel, self).__init__()
+        super(DiscoveryModel, self).__init__()
 
     """
-    Return pymongo object every active check
-    Example: 
-        active_checks = ['cpu'] will get everything in the collection dataview_cpu, between date_from and date_to
+    Return pymongo object of processed data
     """
-    def get_system_data(self, active_checks, date_from, date_to):
+    def get_data(self, checked_list, date_from, date_to):
         
-        checks = {}
-
-        for check in active_checks:
-            row = self.mongo.get_collection(check)
+        process_data = {}
+        for process in checked_list:
+            row = self.mongo.get_collection(process)
+            cursor = row.find({"time": {"$gte": date_from, '$lte': date_to}}).sort('time', ASCENDING) 
             
-            try:
-                checks[check] = row.find({"time": {"$gte": date_from,"$lte": date_to }}).sort('time', ASCENDING)
-            except IndexError:
-                checks[check] = False
+            process_data[process] = cursor
 
-        return checks
+        return process_data
 
     """
     Used in the Javascript calendar - doesn't permit checks for dates before this date
@@ -111,24 +105,6 @@ class SystemModel(BaseModel):
             start_date = 0
 
         return start_date
-
-
-    
-class ProcessModel(BaseModel):
-    
-    def __init__(self):
-        super(ProcessModel, self).__init__()
-
-    def get_process_data(self, active_checks, date_from, date_to):
-        
-        process_data = {}
-        for process in active_checks:
-            row = self.mongo.get_collection(process)
-            cursor = row.find({"time": {"$gte": date_from, '$lte': date_to}}).sort('time', ASCENDING) 
-            
-            process_data[process] = cursor
-
-        return process_data
 
 
 class ProcessedDataModel(BaseModel):
@@ -168,76 +144,6 @@ class ProcessedDataModel(BaseModel):
         return start_date
 
 
-class ExceptionModel(BaseModel):
-    
-    def __init__(self):
-        super(ExceptionModel, self).__init__()
-        self.collection = self.mongo.get_collection('exceptions') 
-
-    def get_exceptions(self):
-        exceptions = self.collection.find().sort('last_occurrence', DESCENDING)
-
-        return exceptions
-
-    def delete_before_date(self, date):
-        self.collection.remove({"last_occurrence": {"$lte": date}})
-
-class LogModel(BaseModel):
-    
-    def __init__(self):
-        super(LogModel, self).__init__()
-        self.collection = self.mongo.get_collection('logs') 
-        self.tags = self.mongo.get_collection('tags')
-
-    def get_logs(self, tags=None, search=None, page=None, filter='and'):
-        params = {}
-        
-        if tags:
-            filter = "$and" if filter == 'and' else '$or'
-            tags_params = [{'tags': x} for x in tags]
-            params = {filter : tags_params}
-
-        if search:
-            params['_searchable'] = { "$regex": str(search), "$options": 'i'}
-
-        query = self.collection.find(params).sort('time', DESCENDING)
-
-        logs = self.paginate(query, page)
-
-        return logs
-
-        
-    def get_tags(self):
-        return self.tags.find()
-
-    def delete_before_date(self, date):
-        self.collection.remove({"time": {"$lte": date}})
-
-
-class UnreadModel(BaseModel):
-
-    def __init__(self):
-        super(UnreadModel, self).__init__()
-        self.collection = self.mongo.get_collection('unread')
-
-    def mark_logs_as_read(self):
-        self.collection.update({"id": 1}, {"$set": {"logs": 0}})
-
-    def mark_exceptions_as_read(self):
-        self.collection.update({"id": 1}, {"$set": {"exceptions": 0}})
-
-    def get_unread_values(self):
-
-        record_exists = self.collection.count()
-
-        if record_exists == 0:
-            self.collection.insert({'id':1, 'exceptions': 0, 'logs': 0})
-
-        unread_values = self.collection.find_one()
-        
-        return unread_values
-
-
 class UserModel(BaseModel):
     
     def __init__(self):
@@ -274,9 +180,5 @@ class UserModel(BaseModel):
 
 processed_data_model = ProcessedDataModel()
 dashboard_model = DashboardModel()
-process_model = ProcessModel()
-system_model = SystemModel()
-exception_model = ExceptionModel()
-log_model = LogModel()
+discovery_model = DiscoveryModel()
 user_model = UserModel()
-unread_model = UnreadModel()

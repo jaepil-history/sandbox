@@ -12,11 +12,7 @@ from dataview.utils.dates import (
 from dataview.views.models import (
         processed_data_model,
         dashboard_model,        
-        system_model,
-        process_model,
-        exception_model,
-        log_model,
-        unread_model,
+        discovery_model,
         user_model
         )
 
@@ -54,16 +50,18 @@ class DashboardView(BaseView):
                 )
 
 
-class SystemView(BaseView):
+class DiscoveryView(BaseView):
 
     def initialize(self):
-        super(SystemView, self).initialize()
+        super(DiscoveryView, self).initialize()
+        self.current_page = 'discovery'
 
     @authenticated
     def get(self):
+
+        checked_list = self.get_arguments('checked_list', None)
         date_from = self.get_argument('date_from', False)
         date_to = self.get_argument('date_to', False)
-        charts = self.get_arguments('charts', None)
 
         if date_from:
             date_from = datestring_to_utc_datetime(date_from)
@@ -80,125 +78,36 @@ class SystemView(BaseView):
         date_from = datetime_to_unixtime(date_from)
         date_to = datetime_to_unixtime(date_to)
 
-        if len(charts) > 0:
-            active_checks = charts
-        else:
-            active_checks = settings.SYSTEM_CHECKS
 
-        checks = system_model.get_system_data(active_checks, date_from, date_to)
-        first_check_date = system_model.get_first_check_date()
+        all_processed_list = settings.DISCOVERY
+
+        if len(checked_list) > 0:
+            selected_data = checked_list
+        else:
+            selected_data = all_processed_list
+
+        processed_data = discovery_model.get_data(selected_data, date_from, date_to)
+        first_check_date = discovery_model.get_first_check_date()
 
         # Convert the dates to local time for display
         first_check_date = utc_unixtime_to_localtime(first_check_date)
         date_from = utc_unixtime_to_localtime(date_from)
         date_to = utc_unixtime_to_localtime(date_to)
 
-        # Get the difference between UTC and localtime - used to display 
+        # Get the difference between UTC and localtime - used to display
         # the ticks in the charts
         zone_difference = localtime_utc_timedelta()
 
         # Get the max date - utc, converted to localtime
         max_date = utc_now_to_localtime()
 
-        if checks != False:
-            network = []
-            network_interfaces = []
-
-            disk = []
-            volumes = []
-
-            # # Add network adapters
-            # if 'network' in active_checks:
-            #     for check in checks['network']:
-            #         network.append(check)
-            #
-            #     _interfaces = get_network_interfaces()
-            #     for interface in _interfaces:
-            #         if interface not in network_interfaces:
-            #             network_interfaces.append(interface)
-            #
-            # # Add disk volumes
-            # if 'disk' in active_checks:
-            #     for check in checks['disk']:
-            #         disk.append(check)
-            #
-            #     _volumes = get_disk_volumes()
-            #     for volume in _volumes:
-            #         if volume not in volumes:
-            #             volumes.append(volume)
-
-            self.render('system.html',
-                    current_page='system',
-                    active_checks=active_checks,
-                    charts=charts,
-                    checks=checks,
-                    network=network,
-                    network_interfaces=network_interfaces,
-                    volumes=volumes,
-                    disk=disk,
-                    date_from=date_from,
-                    date_to=date_to,
-                    first_check_date=first_check_date,
-                    zone_difference=zone_difference,
-                    max_date=max_date
-                    )
-
-
-class ProcessesView(BaseView):
-
-    def initialize(self):
-        super(ProcessesView, self).initialize()
-        self.current_page = 'processes'
-
-    @authenticated
-    def get(self):
-
-        processes = self.get_arguments('processes', None)
-        date_from = self.get_argument('date_from', False)
-        date_to = self.get_argument('date_to', False)
-
-        if date_from:
-            date_from = datestring_to_utc_datetime(date_from)
-        # Default - 24 hours period
-        else:
-            day = timedelta(hours=24)
-            date_from = self.now - day
-
-        if date_to:
-            date_to = datestring_to_utc_datetime(date_to)
-        else:
-            date_to = self.now
-
-        date_from = datetime_to_unixtime(date_from)
-        date_to = datetime_to_unixtime(date_to)
-
-
-        all_processes_checks = settings.PROCESS_CHECKS
-
-        if len(processes) > 0:
-            processes_checks = processes
-        else:
-            processes_checks = settings.PROCESS_CHECKS
-
-        process_data = process_model.get_process_data(processes_checks, date_from, date_to)
-
-        # Convert the dates to local time for display
-        date_from = utc_unixtime_to_localtime(date_from)
-        date_to = utc_unixtime_to_localtime(date_to)
-
-        # Get the difference between UTC and localtime - used to display 
-        # the ticks in the charts
-        zone_difference = localtime_utc_timedelta()
-
-        # Get the max date - utc, converted to localtime
-        max_date = utc_now_to_localtime()
-
-        self.render('processes.html',
+        if processed_data != False:
+            self.render('discovery.html',
                 current_page=self.current_page,
-                all_processes_checks=all_processes_checks,
-                processes_checks=processes_checks,
-                processes=processes,
-                process_data=process_data,
+                all_processed_list=all_processed_list,
+                selected_data=selected_data,
+                checked_list=checked_list,
+                processed_data=processed_data,
                 date_from=date_from,
                 date_to=date_to,
                 zone_difference=zone_difference,
@@ -206,16 +115,17 @@ class ProcessesView(BaseView):
                 )
 
 
+
 class ProcessedDataView(BaseView):
 
     def initialize(self):
         super(ProcessedDataView, self).initialize()
-        self.current_page = 'processed'
+        self.current_page = 'processed_data'
 
     @authenticated
     def get(self):
 
-        processed = self.get_arguments('processed', None)
+        selected_data = self.get_arguments('selected_data', None)
         date_from = self.get_argument('date_from', False)
         date_to = self.get_argument('date_to', False)
 
@@ -237,8 +147,8 @@ class ProcessedDataView(BaseView):
 
         all_processed_list = settings.PROCESSED_LIST
 
-        if len(processed) > 0:
-            processed_list = processed
+        if len(selected_data) > 0:
+            processed_list = selected_data
         else:
             processed_list = settings.PROCESSED_LIST
 
@@ -259,58 +169,12 @@ class ProcessedDataView(BaseView):
                 current_page=self.current_page,
                 all_processed_list=all_processed_list,
                 processed_list=processed_list,
-                processed=processed,
+                selected_data=selected_data,
                 processed_data=processed_data,
                 date_from=date_from,
                 date_to=date_to,
                 zone_difference=zone_difference,
                 max_date=max_date
-                )
-
-
-class ExceptionsView(BaseView):
-
-    def initialize(self):
-        super(ExceptionsView, self).initialize()
-        self.current_page = 'exceptions'
-
-    @authenticated
-    def get(self):
-
-        exceptions = exception_model.get_exceptions()
-    
-        unread_model.mark_exceptions_as_read()
-
-        self.render('exceptions.html',
-                exceptions=exceptions,
-                current_page=self.current_page,
-                )
-
-
-class LogsView(BaseView):
-
-    def initialize(self):
-        super(LogsView, self).initialize()
-        self.current_page = 'logs'
-
-    @authenticated
-    def get(self):
-        page = self.get_argument('page',1)
-        tags = self.get_arguments('tags', None)
-        query = self.get_argument('query', None)
-        filter = self.get_argument('filter', None)
-
-        logs = log_model.get_logs(tags, query, page, filter)
-        all_tags = log_model.get_tags()
-        unread_model.mark_logs_as_read()
-
-        self.render('logs.html',
-                current_page=self.current_page,
-                logs=logs,
-                tags=tags,
-                query=query,
-                filter=filter,
-                all_tags=all_tags,
                 )
 
 
@@ -330,42 +194,6 @@ class SettingsView(BaseView):
             max_date=max_date,
             current_page=self.current_page,
         )
-
-
-class SettingsDeleteLogsView(BaseView):
-
-    def initialize(self):
-        super(SettingsDeleteLogsView, self).initialize()
-        self.current_page = 'settings'
-
-    @authenticated
-    def post(self):
-
-        date = self.get_argument('logs-date')
-        date_utc = datestring_to_utc_datetime(date)
-        date_unix = datetime_to_unixtime(date_utc)
-
-        log_model.delete_before_date(date_unix)
-
-        self.redirect('/settings')
-
-
-class SettingsDeleteExceptionsView(BaseView):
-
-    def initialize(self):
-        super(SettingsDeleteExceptionsView, self).initialize()
-        self.current_page = 'settings'
-
-    @authenticated
-    def post(self):
-
-        date = self.get_argument('exceptions-date')
-        date_utc = datestring_to_utc_datetime(date)
-        date_unix = datetime_to_unixtime(date_utc)
-
-        exception_model.delete_before_date(date_unix)
-
-        self.redirect('/settings')
 
 
 class SettingsChangePasswordView(BaseView):

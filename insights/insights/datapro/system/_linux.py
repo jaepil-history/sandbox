@@ -24,6 +24,7 @@ class LinuxSystemCollector(object):
 
 
     def get_disk_usage(self):
+
         df = subprocess.Popen(['df','-h'], stdout=subprocess.PIPE, close_fds=True).communicate()[0] 
         
         volumes = df.split('\n')    
@@ -112,9 +113,9 @@ class LinuxSystemCollector(object):
 
 
     def get_load_average(self):
+
         _loadavg_columns = ['minute','five_minutes','fifteen_minutes','scheduled_processes']
         
-            
         lines = open('/proc/loadavg','r').readlines()
 
         load_data = lines[0].split()

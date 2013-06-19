@@ -11,12 +11,13 @@ System
 	<link rel="stylesheet" href="/media/css/chart.css" />
 {% endblock %}
 {% block content %}
+
 <form action="{{ base_url|url('system') }}">
 <ul class='tabs'>
 	<li>
 		<div class="input_background system-charts-dropdown">
 		<select id='charts-select' name='charts' style="width:220px;" tabindex="3" multiple="" data-placeholder="Select charts">
-			<option {% if 'memory' in charts %}selected="selected"{% endif %} value="memory">Memory</option>
+			<option {% if 'memory' in charts %}selected='selected'{% endif %} value="memory">Memory</option>
 			<option {% if 'cpu' in charts %}selected='selected' {% endif %} value="cpu">CPU</option>
 			<option {% if 'loadavg' in charts %}selected='selected' {% endif %} value="loadavg">Load Average</option>
 			<option {% if 'network' in charts %}selected='selected' {% endif %} value="network">Network</option>
@@ -43,7 +44,6 @@ System
 </form>
 
 {% if 'memory' in active_checks %}
-
 <a name='memory' class='anchor'></a>
 <h2>Memory</h2>
 <div class='legend'>
@@ -68,6 +68,7 @@ System
 <div class="message">No data</div>
 {% endif %}{# count #}
 {% endif %}{# memory in active_checks #}
+
 {% if 'loadavg' in active_checks %}
 <a name='loadavg' class='anchor'></a>
 <h2>Load Average</h2>

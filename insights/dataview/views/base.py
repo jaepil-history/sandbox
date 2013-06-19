@@ -5,7 +5,6 @@ import tornado.web
 from dataview import __version__
 
 from dataview.core import settings
-from dataview.views.models import unread_model
 from dataview.libs.session import MongoDBSession
 from dataview.views.template import render as jinja_render
 
@@ -17,13 +16,9 @@ class BaseView(tornado.web.RequestHandler):
         self.now = datetime.utcnow()
         self.acl = settings.ACL
 
-        # Unread logs and exceptions -> in the sidebar
-        unread_values = unread_model.get_unread_values()        
-        
         # Template variables. Passing that dictionary to Jinja
         self.template_vars = {
             "user": self.current_user,
-            "unread_values": unread_values,
             "url": self.request.uri,
             "version": __version__
         }
@@ -55,11 +50,16 @@ class BaseView(tornado.web.RequestHandler):
             except:
                 url = self.request.uri
 
-            list = ['/', '/dashboard', '/exceptions', '/logs', '/system', '/processes']
-            if url in list:
+            url_list = ['/']
+
+            for item in settings.PROCESSED_LIST:
+                item = '/' + item
+                url_list.append(item)
+
+            if url in url_list:
                 return 1
             else:
-                 return None
+                return None
 
     def write_error(self, status_code, **kwargs):
         error_trace = None

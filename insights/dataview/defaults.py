@@ -27,16 +27,23 @@ MONGO = {
     'database' : 'processed',
 }
 
-# 1 minute default
-SYSTEM_CHECK_PERIOD = config.get('system_check_period', 60)
-
-SYSTEM_CHECKS = ['cpu', 'memory', 'disk', 'network', 'loadavg']
-
-if sys.platform == 'darwin':
-    del SYSTEM_CHECKS[3]  # Delete network check on macos
-
-PROCESS_CHECKS = config.get('process_checks', [])
-
+DISCOVERY = config.get('discovery', [])
+EMAILS = config.get('emails', [])
+EVENTS = config.get('events', [])
+INSTALLS = config.get('installs', [])
+INVITES = config.get('invites', [])
+MESSAGES = config.get('messages', [])
+MONETIZATION = config.get('monetization', [])
+NOTIFICATIONS = config.get('notifications', [])
+VIRALITY = config.get('virality', [])
+RETURNING_USERS = config.get('returning_users', [])
+STREAM = config.get('stream', [])
+TRAFFIC = config.get('traffic', [])
+TIME = config.get('time', [])
+USER_DISTRIBUTION = config.get('user_distribution', [])
+USER_RETENTION = config.get('user_retention', [])
+USER_SESSIONS = config.get('user_sessions', [])
+UNIQUE_VISITORS = config.get('unique_visitors', [])
 
 PROCESSED_LIST = config.get('processed_list', [])
 
