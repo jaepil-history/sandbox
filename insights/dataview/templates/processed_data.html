@@ -3,7 +3,6 @@
 Processed Data
 {% endblock %}
 {% block breadcrumb %}
-<li>Processed Data</li>
 {% endblock %}
 {% block header %}
 	<link rel="stylesheet" href="/media/css/chosen.css" />
@@ -16,7 +15,7 @@ Processed Data
 <ul class='tabs'>
 	<li>
 		<div class="input_background system-charts-dropdown">
-		<select id='processed-select' name='selected_data' style="width:220px;" tabindex="3" multiple="" data-placeholder="Select processed data">
+		<select id='processed-select' name='selected_data' style="width:200px;" tabindex="3" multiple="" data-placeholder="Select">
 			{% for p in all_processed_list %}
 				<option {% if p in selected_data %}selected='selected' {% endif %} value="{{ p }}">{{ p }}</option>
 			{% endfor %}

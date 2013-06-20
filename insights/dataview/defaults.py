@@ -4,7 +4,7 @@ try:
 except ImportError:
     import simplejson as json
 
-config_path = 'dataview/config/dataview.conf'
+config_path = 'config/dataview.conf'
 try:
     config_file = file(config_path).read()
     config = json.loads(config_file)
