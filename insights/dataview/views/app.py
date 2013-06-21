@@ -125,16 +125,20 @@ class ProcessedDataView(BaseView):
     @authenticated
     def get(self):
 
+        category = self.get_argument('category', None)
+        print 'category: ' + str(category)
         selected_data = self.get_arguments('selected_data', None)
         date_from = self.get_argument('date_from', False)
         date_to = self.get_argument('date_to', False)
 
         if date_from:
+            print 'if: ' + str(date_from)
             date_from = datestring_to_utc_datetime(date_from)
         # Default - 24 hours period
         else:
             day = timedelta(hours=24)
             date_from = self.now - day
+            print 'else: ' + str(date_from)
 
         if date_to:
             date_to = datestring_to_utc_datetime(date_to)
@@ -144,13 +148,52 @@ class ProcessedDataView(BaseView):
         date_from = datetime_to_unixtime(date_from)
         date_to = datetime_to_unixtime(date_to)
 
+        if category == 'discovery':
+            all_processed_list = settings.DISCOVERY
+        elif category == 'emails':
+            all_processed_list = settings.EMAILS
+        elif category == 'events':
+            all_processed_list = settings.EVENTS
+        elif category == 'installs':
+            all_processed_list = settings.INSTALLS
+        elif category == 'invites':
+            all_processed_list = settings.INVITES
+        elif category == 'messages':
+            all_processed_list = settings.MESSAGES
+        elif category == 'monetization':
+            all_processed_list = settings.MONETIZATION
+        elif category == 'notifications':
+            all_processed_list = settings.NOTIFICATIONS
+        elif category == 'virality':
+            all_processed_list = settings.VIRALITY
+        elif category == 'returning_users':
+            all_processed_list = settings.RETURNING_USERS
+        elif category == 'stream':
+            all_processed_list = settings.STREAM
+        elif category == 'traffic':
+            all_processed_list = settings.TRAFFIC
+        elif category == 'time':
+            all_processed_list = settings.TIME
+        elif category == 'user_distribution':
+            all_processed_list = settings.USER_DISTRIBUTION
+        elif category == 'user_retention':
+            all_processed_list = settings.USER_RETENTION
+        elif category == 'user_sessions':
+            all_processed_list = settings.USER_SESSIONS
+        elif category == 'unique_visitors':
+            all_processed_list = settings.UNIQUE_VISITORS
+        else:
+            all_processed_list = settings.DISCOVERY
 
-        all_processed_list = settings.PROCESSED_LIST
+        print 'selected_data: ' + str(selected_data)
+        print 'all_processed_list: ' + str(all_processed_list)
 
         if len(selected_data) > 0:
             processed_list = selected_data
         else:
-            processed_list = settings.PROCESSED_LIST
+            processed_list = all_processed_list
+
+        print 'processed_list: ' + str(processed_list)
 
         processed_data = processed_data_model.get_processed_data(processed_list, date_from, date_to)
 
@@ -175,7 +218,7 @@ class ProcessedDataView(BaseView):
                 date_to=date_to,
                 zone_difference=zone_difference,
                 max_date=max_date
-                )
+        )
 
 
 class SettingsView(BaseView):
@@ -192,7 +235,7 @@ class SettingsView(BaseView):
 
         self.render('settings.html',
             max_date=max_date,
-            current_page=self.current_page,
+            current_page=self.current_page
         )
 
 

@@ -122,10 +122,12 @@ class ProcessedDataModel(BaseModel):
         for check in active_checks:
             row = self.mongo.get_collection(check)
 
-            try:
-                checks[check] = row.find({"time": {"$gte": date_from,"$lte": date_to }}).sort('time', ASCENDING)
-            except IndexError:
-                checks[check] = False
+            if row is None:
+                print 'collection is None'
+                try:
+                    checks[check] = row.find({"time": {"$gte": date_from,"$lte": date_to }}).sort('time', ASCENDING)
+                except IndexError:
+                    checks[check] = False
 
         return checks
 

@@ -106,48 +106,47 @@
     </header>
 
 
-    <div class="container-fluid">
+    <div class="container-fluid"  style="min-height:70%">
 
         <!-- Docs nav
         ================================================== -->
         <div class="row-fluid">
             <div class="span3 bs-docs-sidebar">
                 <ul class="nav nav-list bs-docs-sidenav affix-top">
-                    <li><a href="/discovery"><i class="icon-chevron-right"></i>Discovery</a></li>
-                    <li><a href="/emails"><i class="icon-chevron-right"></i>Emails</a></li>
-                    <li><a href="/events"><i class="icon-chevron-right"></i>Events</a></li>
-                    <li><a href="/installs"><i class="icon-chevron-right"></i>Installs</a></li>
-                    <li><a href="/invites"><i class="icon-chevron-right"></i>Invites</a></li>
-                    <li><a href="/messages"><i class="icon-chevron-right"></i>Messages</a></li>
-                    <li><a href="/monetization"><i class="icon-chevron-right"></i>Monetization</a></li>
-                    <li><a href="/notifications"><i class="icon-chevron-right"></i>Notifications</a></li>
-                    <li><a href="/virality"><i class="icon-chevron-right"></i>Virality</a></li>
-                    <li><a href="/returning_users"><i class="icon-chevron-right"></i>Returning Users</a></li>
-                    <li><a href="/stream"><i class="icon-chevron-right"></i>Stream</a></li>
-                    <li><a href="/traffic"><i class="icon-chevron-right"></i>Traffic</a></li>
-                    <li><a href="/time"><i class="icon-chevron-right"></i>Time</a></li>
-                    <li><a href="/user_distribution"><i class="icon-chevron-right"></i>User Distribution</a></li>
-                    <li><a href="/user_retention"><i class="icon-chevron-right"></i>User Retention</a></li>
-                    <li><a href="/user_sessions"><i class="icon-chevron-right"></i>User Sessions</a></li>
-                    <li><a href="/unique_visitors"><i class="icon-chevron-right"></i>Unique Visitors</a></li>
+                    <li><a href="/?category=discovery"><i class="icon-chevron-right"></i>Discovery</a></li>
+                    <li><a href="/?category=emails"><i class="icon-chevron-right"></i>Emails</a></li>
+                    <li><a href="/?category=events"><i class="icon-chevron-right"></i>Events</a></li>
+                    <li><a href="/?category=installs"><i class="icon-chevron-right"></i>Installs</a></li>
+                    <li><a href="/?category=invites"><i class="icon-chevron-right"></i>Invites</a></li>
+                    <li><a href="/?category=messages"><i class="icon-chevron-right"></i>Messages</a></li>
+                    <li><a href="/?category=monetization"><i class="icon-chevron-right"></i>Monetization</a></li>
+                    <li><a href="/?category=notifications"><i class="icon-chevron-right"></i>Notifications</a></li>
+                    <li><a href="/?category=virality"><i class="icon-chevron-right"></i>Virality</a></li>
+                    <li><a href="/?category=returning_users"><i class="icon-chevron-right"></i>Returning Users</a></li>
+                    <li><a href="/?category=stream"><i class="icon-chevron-right"></i>Stream</a></li>
+                    <li><a href="/?category=traffic"><i class="icon-chevron-right"></i>Traffic</a></li>
+                    <li><a href="/?category=time"><i class="icon-chevron-right"></i>Time</a></li>
+                    <li><a href="/?category=user_distribution"><i class="icon-chevron-right"></i>User Distribution</a></li>
+                    <li><a href="/?category=user_retention"><i class="icon-chevron-right"></i>User Retention</a></li>
+                    <li><a href="/?category=user_sessions"><i class="icon-chevron-right"></i>User Sessions</a></li>
+                    <li><a href="/?category=unique_visitors"><i class="icon-chevron-right"></i>Unique Visitors</a></li>
                 </ul>
             </div>
             <div class="span9">
                 <!-- Main Content Area -->
                 <div class="wrapper">
-                        <div id="content">
-                            <div id="breadcrumb">
-                                <ul>
-                                    {% block breadcrumb %}
-                                    {% endblock breadcrumb %}
-                                </ul>
-                            </div>
-                            {% block filter %}{% endblock %}
-                            {% block content %}
-                            {% endblock %}
-                        </div><!-- content end -->
-                    </div><!-- wrapper end -->
-
+                    <div id="content">
+                        <div id="breadcrumb">
+                            <ul>
+                                {% block breadcrumb %}
+                                {% endblock breadcrumb %}
+                            </ul>
+                        </div>
+                        {% block filter %}{% endblock %}
+                        {% block content %}
+                        {% endblock %}
+                    </div><!-- content end -->
+                </div><!-- wrapper end -->
             </div>
         </div>
     </div>

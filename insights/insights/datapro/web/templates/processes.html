@@ -15,7 +15,7 @@ Processes
 <ul class='tabs'>
 	<li>
 		<div class="input_background system-charts-dropdown">
-		<select id='process-select' name='processes' style="width:220px;" tabindex="3" multiple="" data-placeholder="Select process">
+		<select id='process-select' name='processes' style="width:220px;" tabindex="7" multiple="" data-placeholder="Select process">
 			{% for p in all_processes_checks  %}
 				<option {% if p in processes %}selected='selected' {% endif %} value="{{ p }}">{{ p }}</option>
 			{% endfor %}

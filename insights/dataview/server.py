@@ -28,8 +28,6 @@ app_settings = {
 handlers = [
 	# App
     (r"/", ProcessedDataView),
-	(r"/dashboard", DashboardView),
-	(r"/discovery", DiscoveryView),
 	(r"^/settings", SettingsView),
     (r"^/settings/change-password$", SettingsChangePasswordView),
 	# Auth

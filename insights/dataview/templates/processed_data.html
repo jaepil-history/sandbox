@@ -43,21 +43,6 @@ Processed Data
 {% for processed in processed_list %}
     {% set sanitized_processed = processed|clean_slashes %}
     <h2>{{ processed }}</h2>
-    {% if processed_data[processed].clone().count() > 0 %}
-    <h3>CPU</h3>
-     <div id="{{ sanitized_processed }}_cpu" class='chart_container processed_data'>
-        <div class='y_axis' id="cpu_{{ sanitized_processed }}_y_axis"></div>
-        <div id="cpu-chart_{{ sanitized_processed }}" class='chart processed_data'></div>
-    </div>
-
-    <h3>Memory</h3>
-     <div id="{{ sanitized_processed }}_memory" class='chart_container processed_data'>
-        <div class='y_axis' id="memory_{{ sanitized_processed }}_y_axis"></div>
-        <div id="memory-chart_{{ sanitized_processed }}" class='chart processed_data'></div>
-    </div>
-    {% else %}
-    <div class='message'>No data</div>
-    {% endif %}{# count #}
 {% endfor %}
 
 {% endblock %}
@@ -77,104 +62,15 @@ $(function()  {
 		return '<span class="date">'+ moment.utc(_date).format("DD.MM.YY H:mm:ss") + '</span>';
     }
     var colors = ['#00ADFC', '#7AB317', '#8000A9']   
-   
+
 {% for processed in processed_data %}
 {% set sanitized_processed = processed|clean_slashes %}
 
-{% if processed_data[processed].clone().count() > 0 %}
-var {{ sanitized_processed }}_memory_graph = new Rickshaw.Graph({
-	element: document.getElementById("memory-chart_{{ sanitized_processed }}"),
-	width: width,
-	height: height,
-	renderer: 'line',
-    padding: padding, 
-    {% strip %}
-	series: [
-		{   color: colors[0],
-            data: [{% for data in processed_data[processed].clone()%}
-            {% if zone_difference.0 == 'negative' %}{x:{{ data.time-zone_difference.1 }},
-            {% else %}{x: {{ data.time+zone_difference.1 }}, {% endif %} y: {{ data.memory }} },{% endfor %}],
-			name: 'Memory'
-		}]
-    {% endstrip %}
-});
-
-{{ sanitized_processed }}_memory_graph.render();
-
-var memory_hover = new Rickshaw.Graph.HoverDetail({
-    graph: {{ sanitized_processed }}_memory_graph,
-    formatter: function(series, x, y) {
-		var date = _format_date(x);
-		var content = '<span class="metric">' + series.name + ": " + parseInt(y) + 'MB</span>' + date;
-		return content;
-    }
-});
-
-
-var {{ sanitized_processed }}_memory_x = new Rickshaw.Graph.Axis.Time({
-    graph: {{ sanitized_processed }}_memory_graph,
-});
-
-
-var {{ sanitized_processed }}_memory_y = new Rickshaw.Graph.Axis.Y({
-    graph: {{ sanitized_processed }}_memory_graph,
-    tickFormat: function(y) { return y +'MB'}, 
-    element: document.getElementById('memory_{{ sanitized_processed }}_y_axis'),
-});
-
-{{ sanitized_processed }}_memory_x.render();
-{{ sanitized_processed }}_memory_y.render();
-
-// CPU
-var {{ sanitized_processed }}_cpu_graph = new Rickshaw.Graph({
-	element: document.getElementById("cpu-chart_{{ sanitized_processed }}"),
-	width: width,
-	height: height,
-	renderer: 'line',
-    padding: padding, 
-    {% strip %}
-	series: [
-		{   color: colors[1],
-            data: [{% for data in processed_data[processed].clone()%}
-            {% if zone_difference.0 == 'negative' %}{x:{{ data.time-zone_difference.1 }},
-            {% else %}{x: {{ data.time+zone_difference.1 }}, {% endif %} y: {{ data.cpu }} },{% endfor %}],
-			name: 'CPU'
-		}]
-    {% endstrip %}
-});
-
-{{ sanitized_processed }}_cpu_graph.render();
-
-var cpu_hover = new Rickshaw.Graph.HoverDetail({
-    graph: {{ sanitized_processed }}_cpu_graph,
-    formatter: function(series, x, y) {
-		var date = _format_date(x);
-		var content = '<span class="metric">' + series.name + ": " + parseInt(y) + '%</span>' + date;
-		return content;
-    }
-});
-
-
-var {{ sanitized_processed }}_cpu_x = new Rickshaw.Graph.Axis.Time({
-    graph: {{ sanitized_processed }}_cpu_graph,
-});
-
-
-var {{ sanitized_processed }}_cpu_y = new Rickshaw.Graph.Axis.Y({
-    graph: {{ sanitized_processed }}_cpu_graph,
-    tickFormat: function(y) { return y +'%'}, 
-    element: document.getElementById('cpu_{{ sanitized_processed }}_y_axis'),
-});
-
-{{ sanitized_processed }}_cpu_x.render();
-{{ sanitized_processed }}_cpu_y.render();
-
-{%  endif %}{# count #}
 {% endfor %}{# processed #}
 
 var datetime_options = {
 	separator: '-',
-	dateFormat: 'dd-mm-yy',  
+	dateFormat: 'dd-mm-yy',
 	timeFormat: 'hh:mm',
 	hourGrid: 2,
 	minuteGrid: 10,
