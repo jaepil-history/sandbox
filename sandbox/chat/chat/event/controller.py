@@ -1,12 +1,16 @@
 # Copyright (c) 2013 Appspand, Inc.
 
-import ws.controller
+import net.websocket.controller
 
 
-def on_message_created(room_uid, user_uid, member_uids, message):
-    c = ws.controller.find_user(user_uid=user_uid)
-    if c is not None:
-        c.write_message(message)
+def on_message_send(room_uid, user_uid, member_uids, message):
+    online, offline = net.websocket.controller.find(user_uids=member_uids)
+
+    for uid, connection in online:
+        connection.write_message(message)
+    for uid in offline:
+        # TODO: send message via push notification
+        pass
 
 
 def on_message_read(room_uid, user_uid, member_uids, message_uids):

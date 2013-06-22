@@ -27,10 +27,10 @@ def create(room_uid, user_uid, message):
                                   message=message, countdown=countdown,
                                   issued_at=issued_at, expires_at=expires_at)
 
-    event.controller.on_message_created(room_uid=room_uid,
-                                        user_uid=user_uid,
-                                        member_uids=room_info.members,
-                                        message=message)
+    event.controller.on_message_send(room_uid=room_uid,
+                                     user_uid=user_uid,
+                                     member_uids=room_info.members,
+                                     message=message)
 
     return message_info
 
@@ -75,3 +75,5 @@ def read(room_uid, user_uid, message_uids):
                                      user_uid=user_uid,
                                      member_uids=room_info.members,
                                      message_uids=message_uids)
+
+    return True

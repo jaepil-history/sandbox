@@ -23,3 +23,17 @@ def remove_user(user_uid, connection):
 
 def find_user(user_uid):
     return connections.get(user_uid, None)
+
+
+def find(user_uids):
+    online_users = []
+    offline_users = []
+
+    for user_uid in user_uids:
+        user = find_user(user_uid)
+        if user is not None:
+            online_users.append((user_uid, user))
+        else:
+            offline_users.append(user_uid)
+
+    return online_users, offline_users
