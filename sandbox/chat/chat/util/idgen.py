@@ -38,7 +38,7 @@ class IDGenerator(object):
     @classmethod
     def instance(cls, **kwargs):
         if cls._instance is None:
-            cls._instance = IDGenerator(**kwargs)
+            cls._instance = cls(**kwargs)
 
         return cls._instance
 
