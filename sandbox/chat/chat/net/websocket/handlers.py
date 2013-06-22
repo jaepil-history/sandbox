@@ -8,7 +8,9 @@ import message.controller
 import room.controller
 import user.controller
 import net.websocket.controller
+from net.websocket.link import WebSocketLink
 
+import net
 import net.protocols
 
 
@@ -25,10 +27,18 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         self.user_uid = None
 
-        print "websocket opened"
-        # net.websocket.controller.add_user(user_uid='1', connection=self)
+        link = WebSocketLink(self)
+        self.link_id = link.hash()
+
+        net.LinkManager.instance().add(link_id=link.hash(), link=link)
+
+        print "websocket opened:", self.link_id
 
     def on_message(self, message):
+        link = net.LinkManager.instance().find(link_id=self.link_id)
+        if link is None:
+            print "link not found:", self.link_id
+
         print "websocket:", message
 
         msg = json.loads(message)
@@ -61,7 +71,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             pass
 
     def on_close(self):
-        print "websocket closed:", self.user_uid
+        print "websocket closed:", self.link_id
+        net.LinkManager.instance().remove(link_id=self.link_id)
+
         net.websocket.controller.remove_user(user_uid=self.user_uid, connection=self)
 
     def user_login(self, user_uid, request):

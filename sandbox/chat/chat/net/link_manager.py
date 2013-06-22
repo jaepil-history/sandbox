@@ -1,47 +1,32 @@
 # Copyright (c) 2013 Appspand, Inc.
 
+__all__ = ["LinkManager"]
+
 
 class LinkManager(object):
     _instance = None
 
     def __init__(self):
-        pass
+        super(LinkManager, self).__init__()
 
+        self.links = {}
 
-connections = {}
+    @classmethod
+    def instance(cls, **kwargs):
+        if cls._instance is None:
+            cls._instance = cls(**kwargs)
 
+        return cls._instance
 
-def add_user(user_uid, connection):
-    if connections.get(user_uid, None):
-        return False
+    def add(self, link_id, link):
+        self.links[link_id] = link
 
-    connections[user_uid] = connection
+    def remove(self, link_id, link):
+        del self.links[link_id]
 
-    return True
+    def find(self, link_id):
+        return self.links.get(link_id, None)
 
-
-def remove_user(user_uid, connection):
-    if connections.get(user_uid, None) is None:
-        return False
-
-    del connections[user_uid]
-
-    return True
-
-
-def find_user(user_uid):
-    return connections.get(user_uid, None)
-
-
-def find(user_uids):
-    online_users = []
-    offline_users = []
-
-    for user_uid in user_uids:
-        user = find_user(user_uid)
-        if user is not None:
-            online_users.append((user_uid, user))
-        else:
-            offline_users.append(user_uid)
-
-    return online_users, offline_users
+    def for_each(self, f):
+        for link_id, link in self.links:
+            f(link_id, link)
