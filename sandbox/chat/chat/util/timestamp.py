@@ -6,7 +6,7 @@ import time
 
 def get_timestamp(t=None):
     if t is None:
-        t = time.time()
+        t = int(round(time.time()))
 
     if isinstance(t, datetime):
         return int(time.mktime(t.timetuple()))
