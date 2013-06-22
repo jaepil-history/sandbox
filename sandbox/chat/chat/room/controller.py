@@ -47,16 +47,19 @@ def find(room_uid):
 
 
 def invite(room_uid, user_uid, invitee_uids):
-    room_info = find(room_uid=room_uid)
-    if room_info is None:
-        return None
+    if room_uid is None:
+        room_info = create(owner_uid=user_uid, invitee_uids=invitee_uids)
+    else:
+        room_info = find(room_uid=room_uid)
+        if room_info is None:
+            return None
 
-    for uid in invitee_uids:
-        if uid not in room_info.members:
-            room_info.members.append(uid)
+        for uid in invitee_uids:
+            if uid not in room_info.members:
+                room_info.members.append(uid)
 
     redis = cache.get_connection()
-    key = ("room.%s" % room_uid)
+    key = ("room.%s" % room_info.uid)
     json = room_info.to_json()
     redis.set(name=key, value=json)
 
@@ -67,13 +70,31 @@ def invite(room_uid, user_uid, invitee_uids):
     return room_info
 
 
-def join(room_uid, user_uid):
-    room_info = find(room_uid=room_uid)
-    if room_info is None:
-        return None
+def join(room_uid, user_uid, invitee_uids):
+    # room_info = find(room_uid=room_uid)
+    # if room_info is None:
+    #     return None
+    #
+    # if user_uid not in room_info.members:
+    #     return None
 
-    if user_uid not in room_info.members:
-        return None
+    if room_uid is None:
+        room_info = create(owner_uid=user_uid, invitee_uids=invitee_uids)
+    else:
+        room_info = find(room_uid=room_uid)
+        if room_info is None:
+            return None
+
+        if user_uid not in room_info.members:
+            room_info.members.append(user_uid)
+        # for uid in invitee_uids:
+        #     if uid not in room_info.members:
+        #         room_info.members.append(uid)
+
+    redis = cache.get_connection()
+    key = ("room.%s" % room_info.uid)
+    json = room_info.to_json()
+    redis.set(name=key, value=json)
 
     event.controller.on_user_joined(room_uid=room_uid,
                                     user_uid=user_uid)
@@ -92,7 +113,7 @@ def leave(room_uid, user_uid):
     room_info.members.remove(user_uid)
 
     redis = cache.get_connection()
-    key = ("room.%s" % room_uid)
+    key = ("room.%s" % room_info.uid)
     json = room_info.to_json()
     redis.set(name=key, value=json)
 
