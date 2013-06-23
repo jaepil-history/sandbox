@@ -15,42 +15,6 @@ from util import cache
 
 
 config = base.parse_options()
-# celery = Celery(main="chat.mq", broker=config.celery_broker_url,
-#                 backend=config.celery_result_backend_url)
-
-
-# class User:
-#     user_id = ""
-#     data = ""
-#
-#
-# class Message:
-#     message_id = ""
-#     data = ""
-#     read_count = 0
-#
-#
-# class group:
-#     group_id = ""
-#     user_list = []
-#     message_queue = []
-#
-#
-# class Chat:
-#     def invite(self):
-#         pass
-#
-#     def join(self):
-#         pass
-#
-#     def leave(self):
-#         pass
-#
-#     def send(self):
-#         pass
-#
-#     def read(self):
-#         pass
 
 
 class Application(web.Application):
