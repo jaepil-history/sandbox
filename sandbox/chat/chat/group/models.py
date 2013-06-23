@@ -13,7 +13,7 @@ from mongoengine import blacklist
 from mongoengine import whitelist
 
 
-class group(Document):
+class Group(Document):
     uid = StringField(required=True, max_length=512)
     title = StringField(max_length=512)
     owner = StringField(required=True, max_length=512)

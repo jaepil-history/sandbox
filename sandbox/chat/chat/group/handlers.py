@@ -9,7 +9,7 @@ import tornado.web
 import controller
 
 
-class groupHandler(tornado.web.RequestHandler):
+class GroupHandler(tornado.web.RequestHandler):
     @tornado.web.asynchronous
     def get(self):
         cmd = self.get_argument("cmd", None)

@@ -4,5 +4,5 @@ import handlers
 
 
 handlers = [
-    (r"/v1/group", handlers.groupHandler)
+    (r"/v1/group", handlers.GroupHandler)
 ]

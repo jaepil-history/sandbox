@@ -18,7 +18,7 @@ def create(owner_uid, invitee_uids, title=None):
     uid = ("%d" % idgen.get_next_id())
 
     members = [owner_uid] + invitee_uids
-    group_info = models.group(uid=uid,
+    group_info = models.Group(uid=uid,
                             title=title,
                             owner=owner_uid,
                             members=members,
@@ -41,7 +41,7 @@ def find(group_uid):
     key = ("group.%s" % group_uid)
     json = redis.get(name=key)
 
-    group_info = models.group.from_json(json)
+    group_info = models.Group.from_json(json)
 
     return group_info
 
