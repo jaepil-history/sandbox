@@ -9,7 +9,7 @@ import tornado.web
 import controller
 
 
-class RoomHandler(tornado.web.RequestHandler):
+class groupHandler(tornado.web.RequestHandler):
     @tornado.web.asynchronous
     def get(self):
         cmd = self.get_argument("cmd", None)
@@ -17,31 +17,31 @@ class RoomHandler(tornado.web.RequestHandler):
             pass
 
         if cmd == "invite":
-            self.room_invite()
+            self.group_invite()
         elif cmd == "join":
-            self.room_join()
+            self.group_join()
         elif cmd == "leave":
-            self.room_leave()
+            self.group_leave()
         else:
             pass
 
         self.finish()
 
-    def room_invite(self):
-        room_uid = self.get_argument("room_uid")
+    def group_invite(self):
+        group_uid = self.get_argument("group_uid")
         user_uid = self.get_argument("user_uid")
         invitees = self.get_argument("invitees")
 
         parsed_invitees = re.split(r"\s*[,]\s*", invitees.strip())
 
-        invited_users = controller.invite(room_uid=room_uid,
+        invited_users = controller.invite(group_uid=group_uid,
                                           user_uid=user_uid,
                                           invitee_uids=parsed_invitees)
 
         self.write("%s" % invited_users.to_json())
 
-    def room_join(self):
-        room_uid = self.get_argument("room_uid", None)
+    def group_join(self):
+        group_uid = self.get_argument("group_uid", None)
         user_uid = self.get_argument("user_uid")
         invitees = self.get_argument("invitees", None)
 
@@ -49,14 +49,14 @@ class RoomHandler(tornado.web.RequestHandler):
         if invitees is not None:
             parsed_invitees = re.split(r"\s*[,]\s*", invitees.strip())
 
-        result = controller.join(room_uid=room_uid,
+        result = controller.join(group_uid=group_uid,
                                  user_uid=user_uid,
                                  invitee_uids=parsed_invitees)
         self.write("%s" % result.to_json())
 
-    def room_leave(self):
-        room_uid = self.get_argument("room_uid")
+    def group_leave(self):
+        group_uid = self.get_argument("group_uid")
         user_uid = self.get_argument("user_uid")
 
-        result = controller.leave(room_uid=room_uid, user_uid=user_uid)
+        result = controller.leave(group_uid=group_uid, user_uid=user_uid)
         self.write("%s" % result.to_json())

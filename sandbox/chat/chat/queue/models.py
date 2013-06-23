@@ -13,20 +13,17 @@ from mongoengine import blacklist
 from mongoengine import whitelist
 
 
-class Room(Document):
-    uid = StringField(required=True, max_length=512)
-    title = StringField(max_length=512)
-    owner = StringField(required=True, max_length=512)
-    members = ListField(StringField(max_length=512), required=True)
-    dt_created = IntField(required=True)
+class Queue(Document):
+    user_uid = StringField(required=True, max_length=512)
+    message_uids = ListField(LongField())
 
     meta = {
-        # "indexes": [
-        #     {"fields": ["uid"], "unique": True}
-        # ],
+        "indexes": [
+            {"fields": ["user_uid"], "unique": True}
+        ],
         "roles": {
             "json": {
-                "_default": blacklist("id", "dt_created")
+                "_default": blacklist("id")
             }
         }
     }

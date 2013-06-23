@@ -2,6 +2,7 @@
 
 from util import timestamp
 
+import queue.controller
 import models
 
 

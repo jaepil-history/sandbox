@@ -21,7 +21,7 @@ class LinkManager(object):
     def add(self, link_id, link):
         self.links[link_id] = link
 
-    def remove(self, link_id, link):
+    def remove(self, link_id):
         del self.links[link_id]
 
     def find(self, link_id):

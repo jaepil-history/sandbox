@@ -30,8 +30,8 @@ config = base.parse_options()
 #     read_count = 0
 #
 #
-# class Room:
-#     room_id = ""
+# class group:
+#     group_id = ""
 #     user_list = []
 #     message_queue = []
 #
@@ -60,12 +60,12 @@ class Application(web.Application):
 def build_url_handlers():
     from message import urls as message_urls
     from net.websocket import urls as ws_urls
-    from room import urls as room_urls
+    from group import urls as group_urls
     from user import urls as user_urls
 
     # fav_icon_handler = [(r"/(favicon.ico)", None)]
     handlers = message_urls.handlers + ws_urls.handlers\
-               + room_urls.handlers + user_urls.handlers
+               + group_urls.handlers + user_urls.handlers
 
     return handlers
 

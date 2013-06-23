@@ -59,51 +59,51 @@ class User_LoginAns(Message):
     error_message = StringType(required=True)
 
 
-# Room
-class Room_JoinReq(Message):
-    room_uid = StringType(max_length=512)
+# group
+class group_JoinReq(Message):
+    group_uid = StringType(max_length=512)
     user_uid = StringType(required=True, max_length=512)
     invitee_uids = ListType(StringType(max_length=512))
 
 
-class Room_JoinAns(Message):
-    request = ModelType(Room_JoinReq)
+class group_JoinAns(Message):
+    request = ModelType(group_JoinReq)
     error_code = IntType(required=True)
     error_message = StringType(required=True)
 
 
-class Room_LeaveReq(Message):
-    room_uid = StringType(required=True, max_length=512)
+class group_LeaveReq(Message):
+    group_uid = StringType(required=True, max_length=512)
     user_uid = StringType(required=True, max_length=512)
 
 
-class Room_LeaveAns(Message):
-    request = ModelType(Room_LeaveReq)
+class group_LeaveAns(Message):
+    request = ModelType(group_LeaveReq)
     error_code = IntType(required=True)
     error_message = StringType(required=True)
 
 
-class Room_InviteReq(Message):
-    room_uid = StringType(required=True, max_length=512)
+class group_InviteReq(Message):
+    group_uid = StringType(required=True, max_length=512)
     user_uid = StringType(required=True, max_length=512)
     invitee_uids = ListType(StringType(max_length=512), required=True)
 
 
-class Room_InviteAns(Message):
-    request = ModelType(Room_InviteReq)
+class group_InviteAns(Message):
+    request = ModelType(group_InviteReq)
     error_code = IntType(required=True)
     error_message = StringType(required=True)
 
 
 # Message
 class Message_NewNoti(Message):
-    room_uid = StringType(required=True, max_length=512)
+    group_uid = StringType(required=True, max_length=512)
     sender_uid = StringType(required=True, max_length=512)
     message = StringType(required=True, max_length=1024)
 
 
 class Message_SendReq(Message):
-    room_uid = StringType(required=True, max_length=512)
+    group_uid = StringType(required=True, max_length=512)
     user_uid = StringType(required=True, max_length=512)
     message = StringType(required=True, max_length=1024)
 
@@ -116,7 +116,7 @@ class Message_SendAns(Message):
 
 
 class Message_ReadReq(Message):
-    room_uid = StringType(required=True, max_length=512)
+    group_uid = StringType(required=True, max_length=512)
     user_uid = StringType(required=True, max_length=512)
     message_uids = ListType(StringType(max_length=512), required=True)
 

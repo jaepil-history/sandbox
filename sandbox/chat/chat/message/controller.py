@@ -2,78 +2,109 @@
 
 import models
 import event.controller
-import room.controller
+import queue.controller
+import group.controller
 
 from util import idgen
 from util import timestamp
 
 
-def create(room_uid, user_uid, message):
-    room_info = room.controller.find(room_uid=room_uid)
-    if room_info is None:
-        # TODO: error
-        return None
+def _find_group(group_uid):
+    group_info = group.controller.find(group_uid=group_uid)
+    if group_info is None:
+        raise ValueError("Invalid group id")
 
-    if user_uid not in room_info.members:
-        # TODO: error
-        return None
+    return group_info
 
-    # TODO: sets the value for attributes below
-    uid = idgen.get_next_id()
-    countdown = len(room_info.members) - 1
+
+def send(src_uid, dest_uid, message, is_group=None):
+    if is_group:
+        group_info = _find_group(group_uid=dest_uid)
+        dest_uids = group_info.members
+        countdown = len(dest_uids) - 1
+    else:
+        dest_uids = [dest_uid]
+        countdown = 1
+
+    message_uid = idgen.get_next_id()
     issued_at = timestamp.get_timestamp()
     expires_at = 0
-    message_info = models.Message(uid=uid, room_uid=room_uid, user_uid=user_uid,
+    message_info = models.Message(uid=message_uid, user_uid=src_uid,
                                   message=message, countdown=countdown,
                                   issued_at=issued_at, expires_at=expires_at)
+    message_info.save()
 
-    event.controller.on_message_send(room_uid=room_uid,
-                                     user_uid=user_uid,
-                                     member_uids=room_info.members,
+    for user_uid in dest_uids:
+        queue_info = queue.controller.find_one(user_uid=user_uid)
+        if queue_info is None:
+            queue_info = queue.controller.create(user_uid=user_uid)
+        queue_info.message_uids.append(message_uid)
+        queue_info.save()
+
+    if src_uid not in dest_uids:
+        queue_info = queue.controller.find_one(user_uid=src_uid)
+        if queue_info is None:
+            queue_info = queue.controller.create(user_uid=src_uid)
+        queue_info.message_uids.append(message_uid)
+        queue_info.save()
+
+    event.controller.on_message_send(user_uid=src_uid,
+                                     member_uids=dest_uids,
                                      message=message)
 
     return message_info
 
 
-def delete(room_uid, user_uid, message_uids):
-    room_info = room.controller.find(room_uid=room_uid)
-    if room_info is None:
-        # TODO: error
-        return None
+def find_one(message_uid):
+    return models.Message.objects(uid=message_uid).first()
 
 
-def find_one(room_uid, user_uid, message_uid):
-    room_info = room.controller.find(room_uid=room_uid)
-    if room_info is None:
-        # TODO: error
-        return None
+def find(message_uids):
+    result = models.Message.objects(uid__in=message_uids)
+
+    messages = []
+    if result is not None:
+        for m in result:
+            messages.append(m)
+
+    return messages
 
 
-def find(room_uid, user_uid, message_uids):
-    room_info = room.controller.find(room_uid=room_uid)
-    if room_info is None:
-        # TODO: error
-        return None
+def read(src_uid, dest_uid, message_uids, is_group=None):
+    if is_group:
+        group_info = _find_group(group_uid=dest_uid)
+        dest_uids = group_info.members
+    else:
+        dest_uids = [dest_uid]
 
+    queue_info = queue.controller.find_one(user_uid=src_uid)
+    if queue_info is None:
+        queue_info = queue.controller.create(user_uid=src_uid)
 
-def read(room_uid, user_uid, message_uids):
-    room_info = room.controller.find(room_uid=room_uid)
-    if room_info is None:
-        # TODO: error
-        return None
+    for message_uid in message_uids:
+        if message_uid in queue_info.message_uids:
+            queue_info.message_uids.remove(message_uid)
 
-    if user_uid not in room_info.members:
-        # TODO: error
-        return None
+    queue_info.save()
 
-    messages = find(room_uid=room_uid, user_uid=user_uid, message_uids=message_uids)
+    messages = find(message_uids=message_uids)
     for message_info in messages:
-        if message_info.countdown > 0:
+        if message_info.countdown > 1:
             message_info.countdown -= 1
+            message_info.save()
+        else:
+            message_info.delete()
 
-    event.controller.on_message_read(room_uid=room_uid,
-                                     user_uid=user_uid,
-                                     member_uids=room_info.members,
+    event.controller.on_message_read(user_uid=src_uid,
+                                     member_uids=dest_uids,
                                      message_uids=message_uids)
 
-    return True
+    return messages
+
+
+def get(src_uid, dest_uid, is_group=False):
+    queue_info = queue.controller.find_one(user_uid=src_uid)
+    if queue_info is None:
+        queue_info = queue.controller.create(user_uid=src_uid)
+
+    return find(message_uids=queue_info.message_uids)

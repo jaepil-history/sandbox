@@ -5,7 +5,7 @@ import json
 import tornado.websocket
 
 import message.controller
-import room.controller
+import group.controller
 import user.controller
 import net.websocket.controller
 from net.websocket.link import WebSocketLink
@@ -16,9 +16,9 @@ import net.protocols
 
 MessageDispatcher = {
     "User_LoginReq": net.protocols.User_LoginReq,
-    "Room_JoinReq": net.protocols.Room_JoinReq,
-    "Room_LeaveReq": net.protocols.Room_LeaveReq,
-    "Room_InviteReq": net.protocols.Room_InviteReq,
+    "group_JoinReq": net.protocols.group_JoinReq,
+    "group_LeaveReq": net.protocols.group_LeaveReq,
+    "group_InviteReq": net.protocols.group_InviteReq,
     "Message_SendReq": net.protocols.Message_SendReq,
     "Message_ReadReq": net.protocols.Message_ReadReq
 }
@@ -56,12 +56,12 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
         if cmd == "User_LoginReq":
             self.user_login(user_uid=user_uid, request=req)
-        elif cmd == "Room_JoinReq":
-            self.room_join(user_uid=user_uid, request=req)
-        elif cmd == "Room_LeaveReq":
-            self.room_leave(user_uid=user_uid, request=req)
-        elif cmd == "Room_InviteReq":
-            self.room_invite(user_uid=user_uid, request=req)
+        elif cmd == "group_JoinReq":
+            self.group_join(user_uid=user_uid, request=req)
+        elif cmd == "group_LeaveReq":
+            self.group_leave(user_uid=user_uid, request=req)
+        elif cmd == "group_InviteReq":
+            self.group_invite(user_uid=user_uid, request=req)
         elif cmd == "Message_SendReq":
             self.message_send(user_uid=user_uid, request=req)
         elif cmd == "Message_ReadReq":
@@ -96,53 +96,53 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def user_logout(self, user_uid, request):
         pass
 
-    def room_join(self, user_uid, request):
-        room_info = room.controller.join(room_uid=request.room_uid,
+    def group_join(self, user_uid, request):
+        group_info = group.controller.join(group_uid=request.group_uid,
                                          user_uid=request.user_uid,
                                          invitee_uids=request.invitee_uids)
-        if room_info is not None:
+        if group_info is not None:
             error_code = 0
             error_message = "OK"
         else:
             error_code = 100
-            error_message = "Cannot join room"
+            error_message = "Cannot join group"
 
-        ans = net.protocols.Room_JoinAns()
+        ans = net.protocols.group_JoinAns()
         ans.request = request
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
         self.write_message(ans_json)
 
-    def room_leave(self, user_uid, request):
-        room_info = room.controller.leave(room_uid=request.room_uid,
+    def group_leave(self, user_uid, request):
+        group_info = group.controller.leave(group_uid=request.group_uid,
                                           user_uid=request.user_uid)
-        if room_info is not None:
+        if group_info is not None:
             error_code = 0
             error_message = "OK"
         else:
             error_code = 100
-            error_message = "Cannot leave room"
+            error_message = "Cannot leave group"
 
-        ans = net.protocols.Room_LeaveAns()
+        ans = net.protocols.group_LeaveAns()
         ans.request = request
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
         self.write_message(ans_json)
 
-    def room_invite(self, user_uid, request):
-        room_info = room.controller.invite(room_uid=request.room_uid,
+    def group_invite(self, user_uid, request):
+        group_info = group.controller.invite(group_uid=request.group_uid,
                                            user_uid=request.user_uid,
                                            invitee_uids=request.invitee_uids)
-        if room_info is not None:
+        if group_info is not None:
             error_code = 0
             error_message = "OK"
         else:
             error_code = 100
             error_message = "Cannot invite users"
 
-        ans = net.protocols.Room_InviteAns()
+        ans = net.protocols.group_InviteAns()
         ans.request = request
         ans.error_code = error_code
         ans.error_message = error_message
@@ -150,7 +150,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message(ans_json)
 
     def message_send(self, user_uid, request):
-        message_info = message.controller.create(request.room_uid,
+        message_info = message.controller.create(request.group_uid,
                                                  user_uid=request.user_uid,
                                                  message=request.message)
         if message_info is not None:
@@ -171,7 +171,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message(ans_json)
 
     def message_read(self, user_uid, request):
-        message_info = message.controller.read(request.room_uid,
+        message_info = message.controller.read(request.group_uid,
                                                user_uid=request.user_uid,
                                                message_uids=request.message_uids)
         if message_info is not None:

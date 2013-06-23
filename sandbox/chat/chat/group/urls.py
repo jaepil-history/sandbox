@@ -4,5 +4,5 @@ import handlers
 
 
 handlers = [
-    (r"/v1/room", handlers.RoomHandler)
+    (r"/v1/group", handlers.groupHandler)
 ]

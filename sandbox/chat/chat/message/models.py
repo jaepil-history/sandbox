@@ -15,7 +15,7 @@ from mongoengine import whitelist
 
 class Message(Document):
     uid = IntField(required=True)
-    room_uid = StringField(required=True, max_length=512)
+    #group_uid = StringField(required=True, max_length=512)
     user_uid = StringField(required=True, max_length=512)
     message = StringField(required=True, max_length=1024)
     countdown = IntField(required=True)
@@ -23,9 +23,10 @@ class Message(Document):
     expires_at = IntField(required=True)
 
     meta = {
-        # "indexes": [
-        #     {"fields": ["uid"], "unique": True}
-        # ],
+        "indexes": [
+            {"fields": ["uid"], "unique": True},
+            {"fields": ["issued_at"], "expireAfterSeconds": 1 * 60 * 60 * 24 * 7}
+        ],
         "roles": {
             "json": {
                 "_default": blacklist("id")

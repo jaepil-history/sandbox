@@ -30,7 +30,7 @@ class User(Document):
     uid = StringField(required=True, max_length=512)
     name = StringField(required=True, max_length=255)
     devices = ListField(EmbeddedDocumentField(DeviceInfo))
-    joined_rooms = ListField(StringField(max_length=512))
+    joined_groups = ListField(StringField(max_length=512))
     dt_created = IntField(required=True)
     dt_last_login = IntField(required=True)
 

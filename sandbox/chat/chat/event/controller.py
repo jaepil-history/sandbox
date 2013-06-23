@@ -3,7 +3,7 @@
 import net.websocket.controller
 
 
-def on_message_send(room_uid, user_uid, member_uids, message):
+def on_message_send(user_uid, member_uids, message):
     online, offline = net.websocket.controller.find(user_uids=member_uids)
 
     for uid, connection in online:
@@ -13,33 +13,33 @@ def on_message_send(room_uid, user_uid, member_uids, message):
         pass
 
 
-def on_message_read(room_uid, user_uid, member_uids, message_uids):
+def on_message_read(user_uid, member_uids, message_uids):
     pass
 
 
-def on_input_started(room_uid, user_uid):
+def on_input_started(group_uid, user_uid):
     pass
 
 
-def on_input_stopped(room_uid, user_uid):
+def on_input_stopped(group_uid, user_uid):
     pass
 
 
-def on_user_invited(room_uid, user_uid, invitee_uids):
+def on_user_invited(group_uid, user_uid, invitee_uids):
     pass
 
 
-def on_user_kicked(room_uid, user_uid, target_user_uids):
+def on_user_kicked(group_uid, user_uid, target_user_uids):
     pass
 
 
-def on_user_banned(room_uid, user_uid, target_user_uids):
+def on_user_banned(group_uid, user_uid, target_user_uids):
     pass
 
 
-def on_user_joined(room_uid, user_uid):
+def on_user_joined(group_uid, user_uid):
     pass
 
 
-def on_user_leaved(room_uid, user_uid):
+def on_user_leaved(group_uid, user_uid):
     pass
