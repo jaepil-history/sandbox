@@ -4,13 +4,14 @@
 
 import json
 import sys
+import socket
 
 from tornado import gen
 from tornado import httpclient
 from tornado import ioloop
 from tornado import websocket
 from tornado import httputil
-
+from tornado import iostream
 from settings import base
 
 import net.protocols
@@ -70,6 +71,28 @@ def run_websocket(url, user_uid, user_name):
         if msg is None:
             sys.exit(1)
         print msg
+
+
+def run_tcpsocket(user_uid, user_name):
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
+    stream = iostream.IOStream(client)
+    stream.connect(("chat.appengine.local.appspand.com", 20001))
+
+    login_req = net.protocols.User_LoginReq()
+    login_req.user_uid = user_uid
+    login_req.user_name = user_name
+    login_req.seq = 1
+
+    req = net.protocols.to_json(user_uid=user_uid, message=login_req)
+    req += "\r\n\r\n"
+    print req
+
+    stream.write(req)
+
+    def on_received(data):
+        print data
+
+    stream.read_until_close(callback=lambda data: None, streaming_callback=on_received)
 
 
 def user_login(user_uid, user_name):
@@ -132,7 +155,8 @@ def main():
     #client = WebSocketClient()
     #client.connect(url=websocket_url)
     #client.login(user_uid=user_uid, user_name=user_name)
-    run_websocket(url=websocket_url, user_uid=user_uid, user_name=user_name)
+    run_tcpsocket(user_uid=user_uid, user_name=user_name)
+    #run_websocket(url=websocket_url, user_uid=user_uid, user_name=user_name)
     #websocket_connect(url=websocket_url)
     print "client started..."
 
