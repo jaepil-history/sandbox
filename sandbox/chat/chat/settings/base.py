@@ -15,7 +15,8 @@ def parse_options(args=None):
 
     # Server Identity
     options.define("host", default="localhost", type=str, help="Server hostname")
-    options.define("port", default=8888, type=int, help="Server port")
+    options.define("port_http", default=8080, type=int, help="Server port for http protocol")
+    options.define("port_tcp", default=20001, type=int, help="Server port for tcp protocol")
 
     # Celery
     options.define("celery_broker_url", type=str, help="URL for backend of Celery")
@@ -56,7 +57,7 @@ def parse_options(args=None):
         options.parse_command_line(args)
 
     opts = options.options
-    for required in ("host", "port", "mongodb_connection_uri"):
+    for required in ("host", "port_http", "port_tcp", "mongodb_connection_uri"):
         if not opts.__getattr__(required):
             raise Exception("%s required" % required)
 

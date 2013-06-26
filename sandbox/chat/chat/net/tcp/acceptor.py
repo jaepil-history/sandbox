@@ -2,19 +2,19 @@
 
 import json
 
-import tornado.websocket
+from tornado.tcpserver import TCPServer
 
 import message.controller
 import group.controller
 import user.controller
-import net.websocket.controller
 
 import net
 import net.protocols
-from net.websocket.link import WebSocketLink
+import net.tcp.controller
+from net.tcp.link import TCPLink
 
 
-class WebSocketHandler(tornado.websocket.WebSocketHandler):
+class Acceptor(TCPServer):
     MessageDispatcher = {
         "User_LoginReq": net.protocols.User_LoginReq,
         "group_JoinReq": net.protocols.group_JoinReq,
@@ -24,23 +24,46 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         "Message_ReadReq": net.protocols.Message_ReadReq
     }
 
-    def open(self):
-        self.user_uid = None
+    streams = set()
 
-        link = WebSocketLink(self)
-        self.link_id = link.hash()
+    def __init__(self, *args, **kwargs):
+        super(Acceptor, self).__init__(*args, **kwargs)
+
+    def handle_stream(self, stream, address):
+        link = TCPLink(stream=stream, address=address)
+        link_id = link.hash()
+
+        stream.link_id = link_id
+        stream.set_close_callback(callback=lambda: self.on_closed(link))
+
+        self.on_opened(link)
+
+    def on_opened(self, link):
+        link.user_uid = None
+
+        print "Link(%d): on opened" % link.hash()
 
         net.LinkManager.instance().add(link_id=link.hash(), link=link)
 
-        print "websocket opened:", self.link_id
+        on_received = lambda data: self.on_received(link, data)
+        # link.stream.read_until_close(callback=lambda data: None,
+        #                              streaming_callback=on_received)
+        link.stream.read_until(b"\r\n\r\n", callback=on_received)
 
-    def on_message(self, message):
-        link = net.LinkManager.instance().find(link_id=self.link_id)
-        if link is None:
-            print "link not found:", self.link_id
+    def on_received(self, link, data):
+        print "Link(%d): on received - %s" % (link.hash(), data)
+        #link.send(data)
+        self.on_message(link, data)
 
-        print "websocket:", message
+    def on_closed(self, link):
+        net.LinkManager.instance().remove(link_id=link.hash())
 
+        print "Link(%d): on closed" % link.hash()
+
+        if link.user_uid:
+            net.tcp.controller.remove_user(user_uid=link.user_uid, connection=link)
+
+    def on_message(self, link, message):
         msg = json.loads(message)
         if "cmd" not in msg or "user_uid" not in msg or "payload" not in msg:
             raise AttributeError("Invalid command format")
@@ -48,38 +71,31 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         cmd = msg["cmd"]
         user_uid = msg["user_uid"]
 
-        if cmd not in WebSocketHandler.MessageDispatcher:
+        if cmd not in Acceptor.MessageDispatcher:
             raise KeyError("Unknown command name")
 
-        cls = WebSocketHandler.MessageDispatcher[cmd]
+        cls = Acceptor.MessageDispatcher[cmd]
         req = net.protocols.from_json(cls=cls, raw_data=msg)
 
         if cmd == "User_LoginReq":
-            self.user_login(user_uid=user_uid, request=req)
+            self.user_login(link=link, user_uid=user_uid, request=req)
         elif cmd == "group_JoinReq":
-            self.group_join(user_uid=user_uid, request=req)
+            self.group_join(link=link, user_uid=user_uid, request=req)
         elif cmd == "group_LeaveReq":
-            self.group_leave(user_uid=user_uid, request=req)
+            self.group_leave(link=link, user_uid=user_uid, request=req)
         elif cmd == "group_InviteReq":
-            self.group_invite(user_uid=user_uid, request=req)
+            self.group_invite(link=link, user_uid=user_uid, request=req)
         elif cmd == "Message_SendReq":
-            self.message_send(user_uid=user_uid, request=req)
+            self.message_send(link=link, user_uid=user_uid, request=req)
         elif cmd == "Message_ReadReq":
-            self.message_read(user_uid=user_uid, request=req)
+            self.message_read(link=link, user_uid=user_uid, request=req)
         else:
-            #self.unknown_cmd(user_uid=user_uid, request=req)
             pass
 
-    def on_close(self):
-        print "websocket closed:", self.link_id
-        net.LinkManager.instance().remove(link_id=self.link_id)
+    def user_login(self, link, user_uid, request):
+        link.user_uid = request.user_uid
 
-        net.websocket.controller.remove_user(user_uid=self.user_uid, connection=self)
-
-    def user_login(self, user_uid, request):
-        self.user_uid = request.user_uid
-
-        if net.websocket.controller.add_user(user_uid=self.user_uid, connection=self):
+        if net.tcp.controller.add_user(user_uid=link.user_uid, connection=link):
             error_code = 0
             error_message = "OK"
         else:
@@ -90,13 +106,13 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         ans.request = request
         ans.error_code = error_code
         ans.error_message = error_message
-        ans_json = net.protocols.to_json(user_uid=self.user_uid, message=ans)
-        self.write_message(ans_json)
+        ans_json = net.protocols.to_json(user_uid=link.user_uid, message=ans)
+        link.send(ans_json)
 
-    def user_logout(self, user_uid, request):
+    def user_logout(self, link, user_uid, request):
         pass
 
-    def group_join(self, user_uid, request):
+    def group_join(self, link, user_uid, request):
         group_info = group.controller.join(group_uid=request.group_uid,
                                            user_uid=request.user_uid,
                                            invitee_uids=request.invitee_uids)
@@ -112,9 +128,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
-        self.write_message(ans_json)
+        link.send(ans_json)
 
-    def group_leave(self, user_uid, request):
+    def group_leave(self, link, user_uid, request):
         group_info = group.controller.leave(group_uid=request.group_uid,
                                             user_uid=request.user_uid)
         if group_info is not None:
@@ -129,9 +145,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
-        self.write_message(ans_json)
+        link.send(ans_json)
 
-    def group_invite(self, user_uid, request):
+    def group_invite(self, link, user_uid, request):
         group_info = group.controller.invite(group_uid=request.group_uid,
                                              user_uid=request.user_uid,
                                              invitee_uids=request.invitee_uids)
@@ -147,9 +163,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
-        self.write_message(ans_json)
+        link.send(ans_json)
 
-    def message_send(self, user_uid, request):
+    def message_send(self, link, user_uid, request):
         message_info = message.controller.send(src_uid=request.user_uid,
                                                dest_uid=request.group_uid,
                                                message=request.message,
@@ -169,9 +185,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
-        self.write_message(ans_json)
+        link.send(ans_json)
 
-    def message_read(self, user_uid, request):
+    def message_read(self, link, user_uid, request):
         message_info = message.controller.read(src_uid=request.user_uid,
                                                dest_uid=request.group_uid,
                                                message_uids=request.message_uids,
@@ -188,4 +204,4 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
-        self.write_message(ans_json)
+        link.send(ans_json)

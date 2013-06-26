@@ -1,5 +1,6 @@
 # Copyright (c) 2013 Appspand, Inc.
 
+import net.tcp.controller
 import net.websocket.controller
 
 
@@ -8,6 +9,14 @@ def on_message_send(user_uid, member_uids, message):
 
     for uid, connection in online:
         connection.write_message(message)
+    for uid in offline:
+        # TODO: send message via push notification
+        pass
+
+    online, offline = net.tcp.controller.find(user_uids=member_uids)
+
+    for uid, connection in online:
+        connection.send(message)
     for uid in offline:
         # TODO: send message via push notification
         pass
