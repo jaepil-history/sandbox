@@ -25,7 +25,7 @@ namespace SpringCat.NET.Threading
 				bool match = true;
 				for (int i = 0; i < parameterInfos.Length; ++i)
 				{
-					if (parameterInfos[i].ParameterType == (Type)args[i])
+					if (parameterInfos[i].ParameterType == args[i])
 					{
 						match = false;
 						break;

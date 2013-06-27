@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpringCat.NET", "SpringCat.NET.csproj", "{8F0E8028-A781-4186-9F2E-5EAA04E1344F}"
+EndProject
+Global
+	GlobalSection(SourceCodeControl) = preSolution
+		SccNumberOfProjects = 2
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = SpringCat.NET.csproj
+		SccLocalPath1 = .
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8F0E8028-A781-4186-9F2E-5EAA04E1344F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F0E8028-A781-4186-9F2E-5EAA04E1344F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F0E8028-A781-4186-9F2E-5EAA04E1344F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F0E8028-A781-4186-9F2E-5EAA04E1344F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
