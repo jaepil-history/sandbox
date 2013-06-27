@@ -1,0 +1,22 @@
+#Folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uilds/
+[Bb]in/
+
+#Project/User Preference Files
+*.pidb
+*.userprefs
+*.user
+*.suo
+*.apk
+*.csproj
+*.unityproj
+*.sln
+
+#OS Junk
+Thumbs.db
+.DS_Store*
+ehthumbs.db
+Icon7
