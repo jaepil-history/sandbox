@@ -87,3 +87,7 @@ class IDGenerator(object):
 
 def get_next_id():
     return IDGenerator.instance(datacenter_id=1, shard_id=1).get_next_id()
+
+
+def get_next_id_str():
+    return str(get_next_id())
