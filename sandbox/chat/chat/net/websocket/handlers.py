@@ -17,9 +17,9 @@ from net.websocket.link import WebSocketLink
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
     MessageDispatcher = {
         "User_LoginReq": net.protocols.User_LoginReq,
-        "group_JoinReq": net.protocols.group_JoinReq,
-        "group_LeaveReq": net.protocols.group_LeaveReq,
-        "group_InviteReq": net.protocols.group_InviteReq,
+        "Group_JoinReq": net.protocols.Group_JoinReq,
+        "Group_LeaveReq": net.protocols.Group_LeaveReq,
+        "Group_InviteReq": net.protocols.Group_InviteReq,
         "Message_SendReq": net.protocols.Message_SendReq,
         "Message_ReadReq": net.protocols.Message_ReadReq
     }
@@ -56,11 +56,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
         if cmd == "User_LoginReq":
             self.user_login(user_uid=user_uid, request=req)
-        elif cmd == "group_JoinReq":
+        elif cmd == "Group_JoinReq":
             self.group_join(user_uid=user_uid, request=req)
-        elif cmd == "group_LeaveReq":
+        elif cmd == "Group_LeaveReq":
             self.group_leave(user_uid=user_uid, request=req)
-        elif cmd == "group_InviteReq":
+        elif cmd == "Group_InviteReq":
             self.group_invite(user_uid=user_uid, request=req)
         elif cmd == "Message_SendReq":
             self.message_send(user_uid=user_uid, request=req)
@@ -107,7 +107,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             error_code = 100
             error_message = "Cannot join group"
 
-        ans = net.protocols.group_JoinAns()
+        ans = net.protocols.Group_JoinAns()
         ans.request = request
         ans.error_code = error_code
         ans.error_message = error_message
@@ -124,7 +124,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             error_code = 100
             error_message = "Cannot leave group"
 
-        ans = net.protocols.group_LeaveAns()
+        ans = net.protocols.Group_LeaveAns()
         ans.request = request
         ans.error_code = error_code
         ans.error_message = error_message
@@ -142,7 +142,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             error_code = 100
             error_message = "Cannot invite users"
 
-        ans = net.protocols.group_InviteAns()
+        ans = net.protocols.Group_InviteAns()
         ans.request = request
         ans.error_code = error_code
         ans.error_message = error_message
@@ -150,10 +150,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message(ans_json)
 
     def message_send(self, user_uid, request):
-        message_info = message.controller.send(src_uid=request.user_uid,
-                                               dest_uid=request.group_uid,
+        message_info = message.controller.send(src_uid=request.sender_uid,
+                                               dest_uid=request.target_uid,
                                                message=request.message,
-                                               is_group=True)
+                                               is_group=request.is_group)
         if message_info is not None:
             message_uid = message_info.uid
             error_code = 0
@@ -172,10 +172,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message(ans_json)
 
     def message_read(self, user_uid, request):
-        message_info = message.controller.read(src_uid=request.user_uid,
-                                               dest_uid=request.group_uid,
+        message_info = message.controller.read(src_uid=request.sender_uid,
+                                               dest_uid=request.target_uid,
                                                message_uids=request.message_uids,
-                                               is_group=True)
+                                               is_group=request.is_group)
         if message_info is not None:
             error_code = 0
             error_message = "OK"

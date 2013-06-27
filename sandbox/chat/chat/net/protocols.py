@@ -3,7 +3,7 @@
 import json
 
 from schematics.models import Model
-from schematics.types import IntType, LongType, StringType
+from schematics.types import BooleanType, IntType, LongType, StringType
 from schematics.types.compound import ModelType, DictType, ListType
 
 
@@ -59,52 +59,54 @@ class User_LoginAns(Message):
     error_message = StringType(required=True)
 
 
-# group
-class group_JoinReq(Message):
+# Group
+class Group_JoinReq(Message):
     group_uid = StringType(max_length=512)
     user_uid = StringType(required=True, max_length=512)
     invitee_uids = ListType(StringType(max_length=512))
 
 
-class group_JoinAns(Message):
-    request = ModelType(group_JoinReq)
+class Group_JoinAns(Message):
+    request = ModelType(Group_JoinReq)
     error_code = IntType(required=True)
     error_message = StringType(required=True)
 
 
-class group_LeaveReq(Message):
+class Group_LeaveReq(Message):
     group_uid = StringType(required=True, max_length=512)
     user_uid = StringType(required=True, max_length=512)
 
 
-class group_LeaveAns(Message):
-    request = ModelType(group_LeaveReq)
+class Group_LeaveAns(Message):
+    request = ModelType(Group_LeaveReq)
     error_code = IntType(required=True)
     error_message = StringType(required=True)
 
 
-class group_InviteReq(Message):
+class Group_InviteReq(Message):
     group_uid = StringType(required=True, max_length=512)
     user_uid = StringType(required=True, max_length=512)
     invitee_uids = ListType(StringType(max_length=512), required=True)
 
 
-class group_InviteAns(Message):
-    request = ModelType(group_InviteReq)
+class Group_InviteAns(Message):
+    request = ModelType(Group_InviteReq)
     error_code = IntType(required=True)
     error_message = StringType(required=True)
 
 
 # Message
 class Message_NewNoti(Message):
-    group_uid = StringType(required=True, max_length=512)
     sender_uid = StringType(required=True, max_length=512)
+    target_uid = StringType(required=True, max_length=512)
+    is_group = BooleanType(required=True)
     message = StringType(required=True, max_length=1024)
 
 
 class Message_SendReq(Message):
-    group_uid = StringType(required=True, max_length=512)
-    user_uid = StringType(required=True, max_length=512)
+    sender_uid = StringType(required=True, max_length=512)
+    target_uid = StringType(required=True, max_length=512)
+    is_group = BooleanType(required=True)
     message = StringType(required=True, max_length=1024)
 
 
@@ -116,8 +118,9 @@ class Message_SendAns(Message):
 
 
 class Message_ReadReq(Message):
-    group_uid = StringType(required=True, max_length=512)
-    user_uid = StringType(required=True, max_length=512)
+    sender_uid = StringType(required=True, max_length=512)
+    target_uid = StringType(required=True, max_length=512)
+    is_group = BooleanType(required=True)
     message_uids = ListType(StringType(max_length=512), required=True)
 
 

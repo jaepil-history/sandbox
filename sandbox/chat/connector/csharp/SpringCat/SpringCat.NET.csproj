@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8F0E8028-A781-4186-9F2E-5EAA04E1344F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SpringCat.NET</RootNamespace>
+    <AssemblyName>SpringCat.NET</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Logging\Log.cs" />
+    <Compile Include="Network\ActiveLinkHandles.cs" />
+    <Compile Include="Network\AsyncIOEngine.cs" />
+    <Compile Include="Network\Buffer.cs" />
+    <Compile Include="Network\Consts.cs" />
+    <Compile Include="Network\TCP\Acceptor.cs" />
+    <Compile Include="Network\TCP\AcceptorTask.cs" />
+    <Compile Include="Network\TCP\AsyncResultConnect.cs" />
+    <Compile Include="Network\TCP\AsyncResultDisconnect.cs" />
+    <Compile Include="Network\TCP\AsyncResultRecv.cs" />
+    <Compile Include="Network\TCP\AsyncResultSend.cs" />
+    <Compile Include="Network\TCP\Connector.cs" />
+    <Compile Include="Network\TCP\IOEngine.cs" />
+    <Compile Include="Network\TCP\IOHandler.cs" />
+    <Compile Include="Network\TCP\Link.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Threading\RWThreadSafeObject.cs" />
+    <Compile Include="Threading\ThreadSafeObject.cs" />
+    <Compile Include="Wave\Acceptor.cs" />
+    <Compile Include="Wave\BitSet.cs" />
+    <Compile Include="Wave\Connector.cs" />
+    <Compile Include="Wave\Dispatcher.cs" />
+    <Compile Include="Wave\Internal.cs" />
+    <Compile Include="Wave\IObjectBase.cs" />
+    <Compile Include="Wave\Link.cs" />
+    <Compile Include="Wave\PacketHandler.cs" />
+    <Compile Include="Wave\ProtocolParser.cs" />
+    <Compile Include="Wave\TypeInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
