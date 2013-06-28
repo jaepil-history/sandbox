@@ -68,4 +68,10 @@ namespace connector.Protocols
 		public Int32 error_code;
 		public string error_message;
 	}
+
+	public class Message_NewNoti : Document<Message_NewNoti>
+	{
+		public string sender_uid;
+		public string message;
+	}
 }
