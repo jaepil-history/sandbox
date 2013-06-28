@@ -3,7 +3,10 @@
 # Copyright (c) 2013 Appspand, Inc.
 
 import signal
+import sys
 import time
+
+import daemonize
 
 import mongoengine
 
@@ -94,11 +97,6 @@ def init_server(config):
 
 
 def run_server(config):
-    # Init signals handler for TERM and INT signals
-    # (and so KeyboardInterrupt)
-    signal.signal(signal.SIGTERM, sig_handler)
-    signal.signal(signal.SIGINT, sig_handler)
-
     ioloop.IOLoop.instance().start()
 
 
@@ -115,4 +113,15 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) == 2 and sys.argv[1] == "--daemon":
+        daemon = daemonize.Daemonize(app="appspand.chat",
+                                     pid="/tmp/appspand.chat.pid",
+                                     action=main)
+        daemon.start()
+    else:
+        # Init signals handler for TERM and INT signals
+        # (and so KeyboardInterrupt)
+        signal.signal(signal.SIGTERM, sig_handler)
+        signal.signal(signal.SIGINT, sig_handler)
+
+        main()
