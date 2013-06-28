@@ -1,5 +1,6 @@
 # Copyright (c) 2013 Appspand, Inc.
 
+import net.protocols
 import net.tcp.controller
 import net.websocket.controller
 
@@ -7,8 +8,13 @@ import net.websocket.controller
 def on_message_send(user_uid, member_uids, message):
     online, offline = net.websocket.controller.find(user_uids=member_uids)
 
+    noti = net.protocols.Message_NewNoti()
+    noti.sender_uid = user_uid
+    noti.message = message.message
+    noti_str = net.protocols.to_json(user_uid=user_uid, message=noti)
+
     for uid, connection in online:
-        connection.write_message(message)
+        connection.write_message(noti_str)
     for uid in offline:
         # TODO: send message via push notification
         pass
@@ -16,7 +22,7 @@ def on_message_send(user_uid, member_uids, message):
     online, offline = net.tcp.controller.find(user_uids=member_uids)
 
     for uid, connection in online:
-        connection.send(message)
+        connection.send(noti_str)
     for uid in offline:
         # TODO: send message via push notification
         pass

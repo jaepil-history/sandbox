@@ -98,8 +98,8 @@ class Group_InviteAns(Message):
 # Message
 class Message_NewNoti(Message):
     sender_uid = StringType(required=True, max_length=512)
-    target_uid = StringType(required=True, max_length=512)
-    is_group = BooleanType(required=True)
+    #target_uid = StringType(required=True, max_length=512)
+    #is_group = BooleanType(required=True)
     message = StringType(required=True, max_length=1024)
 
 
@@ -126,5 +126,19 @@ class Message_ReadReq(Message):
 
 class Message_ReadAns(Message):
     request = ModelType(Message_ReadReq)
+    error_code = IntType(required=True)
+    error_message = StringType(required=True)
+
+
+class Message_GetReq(Message):
+    user_uid = StringType(required=True, max_length=512)
+    target_uid = StringType(required=True, max_length=512)
+    is_group = BooleanType(required=True)
+    since_uid = StringType()
+    count = IntType()
+
+
+class Message_GetAns(Message):
+    request = ModelType(Message_GetReq)
     error_code = IntType(required=True)
     error_message = StringType(required=True)

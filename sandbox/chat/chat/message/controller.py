@@ -18,7 +18,9 @@ def _find_group(group_uid):
 
 
 def send(src_uid, dest_uid, message, is_group=None):
+    group_uid = None
     if is_group:
+        group_uid = dest_uid
         group_info = _find_group(group_uid=dest_uid)
         dest_uids = group_info.members
         countdown = len(dest_uids) - 1
@@ -29,7 +31,8 @@ def send(src_uid, dest_uid, message, is_group=None):
     message_uid = idgen.get_next_id()
     issued_at = timestamp.get_timestamp()
     expires_at = 0
-    message_info = models.Message(uid=message_uid, user_uid=src_uid,
+    message_info = models.Message(uid=message_uid,
+                                  sender_uid=src_uid, group_uid=group_uid,
                                   message=message, countdown=countdown,
                                   issued_at=issued_at, expires_at=expires_at)
     message_info.save()
@@ -50,7 +53,7 @@ def send(src_uid, dest_uid, message, is_group=None):
 
     event.controller.on_message_send(user_uid=src_uid,
                                      member_uids=dest_uids,
-                                     message=message)
+                                     message=message_info)
 
     return message_info
 
@@ -102,7 +105,7 @@ def read(src_uid, dest_uid, message_uids, is_group=None):
     return messages
 
 
-def get(src_uid, dest_uid, is_group=False):
+def get(src_uid, dest_uid, since_uid=None, count=None, is_group=False):
     queue_info = queue.controller.find_one(user_uid=src_uid)
     if queue_info is None:
         queue_info = queue.controller.create(user_uid=src_uid)

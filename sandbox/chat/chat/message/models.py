@@ -15,8 +15,8 @@ from mongoengine import whitelist
 
 class Message(Document):
     uid = IntField(required=True)
-    #group_uid = StringField(required=True, max_length=512)
-    user_uid = StringField(required=True, max_length=512)
+    sender_uid = StringField(required=True, max_length=512)
+    group_uid = StringField(max_length=512)
     message = StringField(required=True, max_length=1024)
     countdown = IntField(required=True)
     issued_at = IntField(required=True)

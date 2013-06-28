@@ -21,7 +21,8 @@ class Acceptor(TCPServer):
         "Group_LeaveReq": net.protocols.Group_LeaveReq,
         "Group_InviteReq": net.protocols.Group_InviteReq,
         "Message_SendReq": net.protocols.Message_SendReq,
-        "Message_ReadReq": net.protocols.Message_ReadReq
+        "Message_ReadReq": net.protocols.Message_ReadReq,
+        "Message_GetReq": net.protocols.Message_GetReq
     }
 
     streams = set()
@@ -92,6 +93,8 @@ class Acceptor(TCPServer):
             self.message_send(link=link, user_uid=user_uid, request=req)
         elif cmd == "Message_ReadReq":
             self.message_read(link=link, user_uid=user_uid, request=req)
+        elif cmd == "Message_GetReq":
+            self.message_get(link=link, user_uid=user_uid, request=req)
         else:
             pass
 
@@ -203,6 +206,26 @@ class Acceptor(TCPServer):
             error_message = "Cannot read messages"
 
         ans = net.protocols.Message_ReadAns()
+        ans.request = request
+        ans.error_code = error_code
+        ans.error_message = error_message
+        ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
+        link.send(ans_json)
+
+    def message_get(self, link, user_uid, request):
+        message_info = message.controller.get(src_uid=request.sender_uid,
+                                              dest_uid=request.target_uid,
+                                              since_uid=request.since_uid,
+                                              count=request.count,
+                                              is_group=request.is_group)
+        if message_info is not None:
+            error_code = 0
+            error_message = "OK"
+        else:
+            error_code = 100
+            error_message = "Cannot read messages"
+
+        ans = net.protocols.Message_GetAns()
         ans.request = request
         ans.error_code = error_code
         ans.error_message = error_message

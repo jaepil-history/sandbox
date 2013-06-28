@@ -77,10 +77,25 @@ class MessageHandler(tornado.web.RequestHandler):
 
     def message_get(self):
         user_uid = self.get_argument("user_uid")
+        group_uid = self.get_argument("group_uid", None)
         dest_uid = self.get_argument("dest_uid", None)
+        since_uid = self.get_argument("since_uid", None)
+        count = self.get_argument("count", None)
+
+        if group_uid is None and dest_uid is None:
+            # TODO: Bad request
+            raise KeyError("Invalid parameter")
+
+        is_group = False
+        if group_uid is not None:
+            dest_uid = group_uid
+            is_group = True
 
         message_infos = controller.get(src_uid=user_uid,
-                                       dest_uid=dest_uid)
+                                       dest_uid=dest_uid,
+                                       since_uid=since_uid,
+                                       count=count,
+                                       is_group=is_group)
 
         self.write("{\"messages\": [")
         self.write(", ".join(m.to_json() for m in message_infos))
