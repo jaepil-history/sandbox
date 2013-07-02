@@ -8,8 +8,39 @@ from util import timestamp
 
 import event.controller
 import user.controller
+from settings import base
 
 import models
+
+
+config = base.get_options()
+
+
+def _save(group_info):
+    if config.redis_enabled:
+        redis = cache.get_connection()
+        key = ("group.%s" % group_info.uid)
+        json = group_info.to_json()
+        redis.set(name=key, value=json)
+    else:
+        group_info.save()
+
+    return group_info
+
+
+def _load(group_uid):
+    group_info = None
+
+    if config.redis_enabled:
+        redis = cache.get_connection()
+        key = ("group.%s" % group_uid)
+        json = redis.get(name=key)
+        if json is not None:
+            group_info = models.Group.from_json(json)
+    else:
+        group_info = models.Group.objects(uid=group_uid).first()
+
+    return group_info
 
 
 def create(owner_uid, invitee_uids, title=None):
@@ -17,17 +48,14 @@ def create(owner_uid, invitee_uids, title=None):
     #uid = hashlib.sha1("%s-%d" % (owner_uid, now)).hexdigest()
     uid = ("%d" % idgen.get_next_id())
 
-    members = [owner_uid] + invitee_uids
+    members = [owner_uid].append(invitee_uids)
     group_info = models.Group(uid=uid,
-                            title=title,
-                            owner=owner_uid,
-                            members=members,
-                            dt_created=now)
+                              title=title,
+                              owner=owner_uid,
+                              members=members,
+                              dt_created=now)
 
-    redis = cache.get_connection()
-    key = ("group.%s" % uid)
-    json = group_info.to_json()
-    redis.set(name=key, value=json)
+    _save(group_info=group_info)
 
     event.controller.on_user_invited(group_uid=uid,
                                      user_uid=owner_uid,
@@ -37,13 +65,7 @@ def create(owner_uid, invitee_uids, title=None):
 
 
 def find(group_uid):
-    redis = cache.get_connection()
-    key = ("group.%s" % group_uid)
-    json = redis.get(name=key)
-
-    group_info = models.Group.from_json(json)
-
-    return group_info
+    return _load(group_uid=group_uid)
 
 
 def invite(group_uid, user_uid, invitee_uids):
@@ -58,10 +80,7 @@ def invite(group_uid, user_uid, invitee_uids):
             if uid not in group_info.members:
                 group_info.members.append(uid)
 
-    redis = cache.get_connection()
-    key = ("group.%s" % group_info.uid)
-    json = group_info.to_json()
-    redis.set(name=key, value=json)
+    _save(group_info=group_info)
 
     event.controller.on_user_invited(group_uid=group_uid,
                                      user_uid=user_uid,
@@ -91,10 +110,7 @@ def join(group_uid, user_uid, invitee_uids):
         #     if uid not in group_info.members:
         #         group_info.members.append(uid)
 
-    redis = cache.get_connection()
-    key = ("group.%s" % group_info.uid)
-    json = group_info.to_json()
-    redis.set(name=key, value=json)
+    _save(group_info=group_info)
 
     event.controller.on_user_joined(group_uid=group_uid,
                                     user_uid=user_uid)
@@ -112,10 +128,7 @@ def leave(group_uid, user_uid):
 
     group_info.members.remove(user_uid)
 
-    redis = cache.get_connection()
-    key = ("group.%s" % group_info.uid)
-    json = group_info.to_json()
-    redis.set(name=key, value=json)
+    _save(group_info=group_info)
 
     event.controller.on_user_leaved(group_uid=group_uid,
                                     user_uid=user_uid)

@@ -21,9 +21,9 @@ class Group(Document):
     dt_created = IntField(required=True)
 
     meta = {
-        # "indexes": [
-        #     {"fields": ["uid"], "unique": True}
-        # ],
+        "indexes": [
+            {"fields": ["uid"], "unique": True}
+        ],
         "roles": {
             "json": {
                 "_default": blacklist("id", "dt_created")
