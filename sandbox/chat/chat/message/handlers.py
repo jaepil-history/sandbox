@@ -43,8 +43,8 @@ class MessageHandler(tornado.web.RequestHandler):
             dest_uid = group_uid
             is_group = True
 
-        message_info = controller.send(src_uid=user_uid,
-                                       dest_uid=dest_uid,
+        message_info = controller.send(sender_uid=user_uid,
+                                       target_uid=dest_uid,
                                        message=message,
                                        is_group=is_group)
 
@@ -54,7 +54,7 @@ class MessageHandler(tornado.web.RequestHandler):
         user_uid = self.get_argument("user_uid")
         group_uid = self.get_argument("group_uid", None)
         dest_uid = self.get_argument("dest_uid", None)
-        message_uids = self.get_argument("message_uids", None)
+        message_uids = self.get_argument("message_uids")
         parsed_message_uids = re.split(r"\s*[,]\s*", message_uids.strip())
 
         if group_uid is None and dest_uid is None:

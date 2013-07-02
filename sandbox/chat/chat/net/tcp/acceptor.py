@@ -172,8 +172,8 @@ class Acceptor(TCPServer):
         link.send(ans_json)
 
     def message_send(self, link, user_uid, request):
-        message_info = message.controller.send(src_uid=request.sender_uid,
-                                               dest_uid=request.target_uid,
+        message_info = message.controller.send(sender_uid=request.sender_uid,
+                                               target_uid=request.target_uid,
                                                message=request.message,
                                                is_group=request.is_group)
         if message_info is not None:

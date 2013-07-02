@@ -17,42 +17,42 @@ def _find_group(group_uid):
     return group_info
 
 
-def send(src_uid, dest_uid, message, is_group=None):
+def send(sender_uid, target_uid, message, is_group=None):
     group_uid = None
     if is_group:
-        group_uid = dest_uid
-        group_info = _find_group(group_uid=dest_uid)
-        dest_uids = group_info.members
-        countdown = len(dest_uids) - 1
+        group_uid = target_uid
+        group_info = _find_group(group_uid=target_uid)
+        target_uids = group_info.members
+        countdown = len(target_uids) - 1
     else:
-        dest_uids = [dest_uid]
+        target_uids = [target_uid]
         countdown = 1
 
     message_uid = idgen.get_next_id()
     issued_at = timestamp.get_timestamp()
     expires_at = 0
     message_info = models.Message(uid=message_uid,
-                                  sender_uid=src_uid, group_uid=group_uid,
+                                  sender_uid=sender_uid, group_uid=group_uid,
                                   message=message, countdown=countdown,
                                   issued_at=issued_at, expires_at=expires_at)
     message_info.save()
 
-    for user_uid in dest_uids:
+    for user_uid in target_uids:
         queue_info = queue.controller.find_one(user_uid=user_uid)
         if queue_info is None:
             queue_info = queue.controller.create(user_uid=user_uid)
         queue_info.message_uids.append(message_uid)
         queue_info.save()
 
-    if src_uid not in dest_uids:
-        queue_info = queue.controller.find_one(user_uid=src_uid)
+    if sender_uid not in target_uids:
+        queue_info = queue.controller.find_one(user_uid=sender_uid)
         if queue_info is None:
-            queue_info = queue.controller.create(user_uid=src_uid)
+            queue_info = queue.controller.create(user_uid=sender_uid)
         queue_info.message_uids.append(message_uid)
         queue_info.save()
 
-    event.controller.on_message_send(user_uid=src_uid,
-                                     member_uids=dest_uids,
+    event.controller.on_message_send(sender_uid=sender_uid,
+                                     member_uids=target_uids,
                                      message=message_info)
 
     return message_info
