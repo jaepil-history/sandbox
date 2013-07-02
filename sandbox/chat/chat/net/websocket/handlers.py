@@ -40,7 +40,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         if link is None:
             print "link not found:", self.link_id
 
-        print "websocket:", message
+        print "websocket:", message.encode("utf-8")
 
         msg = json.loads(message)
         if "cmd" not in msg or "user_uid" not in msg or "payload" not in msg:
