@@ -100,6 +100,7 @@ class Message_NewNoti(Message):
     sender_uid = StringType(required=True, max_length=512)
     #target_uid = StringType(required=True, max_length=512)
     #is_group = BooleanType(required=True)
+    message_uid = StringType(required=True)
     message = StringType(required=True, max_length=1024)
 
 
@@ -118,8 +119,8 @@ class Message_SendAns(Message):
 
 
 class Message_ReadReq(Message):
+    user_uid = StringType(required=True, max_length=512)
     sender_uid = StringType(required=True, max_length=512)
-    target_uid = StringType(required=True, max_length=512)
     is_group = BooleanType(required=True)
     message_uids = ListType(StringType(max_length=512), required=True)
 

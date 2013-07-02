@@ -175,8 +175,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message(ans_json)
 
     def message_read(self, user_uid, request):
-        message_info = message.controller.read(src_uid=request.sender_uid,
-                                               dest_uid=request.target_uid,
+        message_info = message.controller.read(user_uid=request.user_uid,
+                                               sender_uid=request.sender_uid,
                                                message_uids=request.message_uids,
                                                is_group=request.is_group)
         if message_info is not None:

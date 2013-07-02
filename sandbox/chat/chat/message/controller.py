@@ -73,16 +73,16 @@ def find(message_uids):
     return messages
 
 
-def read(src_uid, dest_uid, message_uids, is_group=None):
+def read(user_uid, sender_uid, message_uids, is_group=None):
     if is_group:
-        group_info = _find_group(group_uid=dest_uid)
+        group_info = _find_group(group_uid=sender_uid)
         dest_uids = group_info.members
     else:
-        dest_uids = [dest_uid]
+        dest_uids = [sender_uid]
 
-    queue_info = queue.controller.find_one(user_uid=src_uid)
+    queue_info = queue.controller.find_one(user_uid=user_uid)
     if queue_info is None:
-        queue_info = queue.controller.create(user_uid=src_uid)
+        queue_info = queue.controller.create(user_uid=user_uid)
 
     for message_uid in message_uids:
         if message_uid in queue_info.message_uids:
@@ -98,7 +98,7 @@ def read(src_uid, dest_uid, message_uids, is_group=None):
         else:
             message_info.delete()
 
-    event.controller.on_message_read(user_uid=src_uid,
+    event.controller.on_message_read(user_uid=user_uid,
                                      member_uids=dest_uids,
                                      message_uids=message_uids)
 

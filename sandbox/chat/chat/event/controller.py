@@ -8,6 +8,7 @@ import net.websocket.controller
 def on_message_send(sender_uid, member_uids, message):
     noti = net.protocols.Message_NewNoti()
     noti.sender_uid = sender_uid
+    noti.message_uid = str(message.uid)
     noti.message = message.message
     noti_str = net.protocols.to_json(user_uid=sender_uid, message=noti)
 
@@ -16,11 +17,14 @@ def on_message_send(sender_uid, member_uids, message):
     for uid, connection in online:
         connection.write_message(noti_str)
 
+    print "online:", len(online), "offline:", len(offline)
+
     online, offline = net.tcp.controller.find(user_uids=member_uids)
 
     for uid, connection in online:
         connection.send(noti_str)
 
+    print "online:", len(online), "offline:", len(offline)
     # TODO: call callback url for push notification
 
 
