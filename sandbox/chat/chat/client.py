@@ -19,7 +19,8 @@ import net.protocols
 
 #config = base.parse_options()
 
-base_host = "chat.appengine.local.appspand.com:8080"
+#base_host = "chat.appengine.local.appspand.com:8080"
+base_host = "chat.appengine.appspand.com:8080"
 websocket_url = "ws://" + base_host + "/v1/ws"
 base_api_url = "http://" + base_host + "/v1"
 
@@ -54,12 +55,11 @@ class WebSocketClient(object):
 @gen.coroutine
 def run_websocket(url, user_uid, user_name):
     print "websocket:", url
-    connection = yield websocket.websocket_connect(url=url, connect_timeout=0.01)
+    connection = yield websocket.websocket_connect(url=url)
 
     login_req = net.protocols.User_LoginReq()
     login_req.user_uid = user_uid
     login_req.user_name = user_name
-    login_req.seq = 1
 
     req = net.protocols.to_json(user_uid=user_uid, message=login_req)
     print req
@@ -155,8 +155,8 @@ def main():
     #client = WebSocketClient()
     #client.connect(url=websocket_url)
     #client.login(user_uid=user_uid, user_name=user_name)
-    run_tcpsocket(user_uid=user_uid, user_name=user_name)
-    #run_websocket(url=websocket_url, user_uid=user_uid, user_name=user_name)
+    #run_tcpsocket(user_uid=user_uid, user_name=user_name)
+    run_websocket(url=websocket_url, user_uid=user_uid, user_name=user_name)
     #websocket_connect(url=websocket_url)
     print "client started..."
 
