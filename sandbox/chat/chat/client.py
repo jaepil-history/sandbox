@@ -76,7 +76,7 @@ def run_websocket(url, user_uid, user_name):
 def run_tcpsocket(user_uid, user_name):
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
     stream = iostream.IOStream(client)
-    stream.connect(("chat.appengine.local.appspand.com", 20001))
+    stream.connect(("chat.appengine.appspand.com", 20001))
 
     login_req = net.protocols.User_LoginReq()
     login_req.user_uid = user_uid
