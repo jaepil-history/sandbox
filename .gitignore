@@ -45,3 +45,7 @@ local_settings.py
 
 # Sublime
 *.sublime-*
+
+# Android
+.gradle
+
