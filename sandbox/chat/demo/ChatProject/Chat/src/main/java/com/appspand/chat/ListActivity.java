@@ -1,9 +1,14 @@
 package com.appspand.chat;
 
+import java.util.List;
 import java.util.Locale;
 
 import android.app.ActionBar;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -17,6 +22,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.content.Intent;
 
@@ -32,6 +39,9 @@ public class ListActivity extends FragmentActivity implements ActionBar.TabListe
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     SectionsPagerAdapter mSectionsPagerAdapter;
+
+    private FriendFragment mFriendFragment;
+    private MessageFragment mMessageFragment;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -84,6 +94,45 @@ public class ListActivity extends FragmentActivity implements ActionBar.TabListe
         getMenuInflater().inflate(R.menu.list, menu);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case com.appspand.chat.R.id.menu_add:
+                //pop up add button
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+                alert.setTitle("Add Friend");
+                alert.setMessage("");
+
+                // Set an EditText view to get user input
+                final EditText input = new EditText(this);
+                alert.setView(input);
+
+                alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String value = input.getText().toString();
+                        mFriendFragment.onAddFriend( value);
+
+                    }
+                });
+
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Canceled.
+                    }
+                });
+
+                alert.show();
+
+                return true;
+        }
+
+        return false;
+    }
     
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
@@ -115,17 +164,29 @@ public class ListActivity extends FragmentActivity implements ActionBar.TabListe
             // getItem is called to instantiate the fragment for the given page.
             // Return a DummySectionFragment (defined as a static inner class
             // below) with the page number as its lone argument.
-            Fragment fragment = new DummySectionFragment();
-            Bundle args = new Bundle();
-            args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-            fragment.setArguments(args);
-            return fragment;
+
+            switch ( position ) {
+                case 0:
+                    mFriendFragment = new FriendFragment();
+                    Bundle args = new Bundle();
+                    args.putInt(FriendFragment.ARG_SECTION_NUMBER, position + 1);
+                    mFriendFragment.setArguments(args);
+                    return mFriendFragment;
+                case 1:
+                    mMessageFragment = new MessageFragment();
+                    Bundle args2 = new Bundle();
+                    args2.putInt(MessageFragment.ARG_SECTION_NUMBER, position + 1);
+                    mMessageFragment.setArguments(args2);
+                    return mMessageFragment;
+            }
+            return null;
+
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 3;
+            // Show 2 total pages.
+            return 2;
         }
 
         @Override
@@ -136,35 +197,10 @@ public class ListActivity extends FragmentActivity implements ActionBar.TabListe
                     return getString(R.string.title_section1).toUpperCase(l);
                 case 1:
                     return getString(R.string.title_section2).toUpperCase(l);
-                case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
             }
             return null;
         }
     }
 
-    /**
-     * A dummy fragment representing a section of the app, but that simply
-     * displays dummy text.
-     */
-    public static class DummySectionFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        public static final String ARG_SECTION_NUMBER = "section_number";
-
-        public DummySectionFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_list_dummy, container, false);
-            TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
-            dummyTextView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-    }
 
 }
