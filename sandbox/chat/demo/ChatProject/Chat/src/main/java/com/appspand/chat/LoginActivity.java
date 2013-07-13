@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -22,11 +24,9 @@ import android.widget.TextView;
  * well.
  */
 public class LoginActivity extends Activity implements AsyncResponse {
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String DEBUG_TAG  = "[LOG_ANDROID]";
+    // Debugging
+    private static final String TAG = LoginActivity.class.getSimpleName();
+    private static final boolean D = true;
 
     /**
      * The default email to populate the email field with.
@@ -51,7 +51,7 @@ public class LoginActivity extends Activity implements AsyncResponse {
 
     public void processFinish(final Boolean success){
         //this you will received result fired from async class of onPostExecute(result) method.
-        Log.d(DEBUG_TAG, "loging complete");
+        if (D) Log.d(TAG, "loging complete");
         Intent intent = new Intent ( this, ListActivity.class );
         startActivity ( intent );
         finish();
@@ -71,6 +71,10 @@ public class LoginActivity extends Activity implements AsyncResponse {
         mLoginStatusView = findViewById(R.id.login_status);
         mLoginStatusMessageView = (TextView) findViewById(R.id.login_status_message);
 
+//        Intent chatService = new Intent(this, ChatService.class);
+//        chatService.putExtra(ChatService.PARAM_SEND_MSG, "init");
+//        startService(chatService);
+
         findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,6 +83,32 @@ public class LoginActivity extends Activity implements AsyncResponse {
         });
     }
 
+    public class ChatServiceResultReceiver extends BroadcastReceiver
+    {
+        public final static String ACTION_TEXT_CAPITALIZED= "com.appspand.chat.intent.action.ACTION_TEXT_CAPITALIZED";
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+//            String resultText =intent.getStringExtra(ChatService.OUTPUT_TEXT);
+//            textViewResult.setText(resultText);
+        }
+    };
+
+    @Override
+    protected void onPause() {
+        if (D) Log.i(TAG,"onPause()");
+		/* we should unregister BroadcastReceiver here*/
+//        unregisterReceiver(capitalizeResultReceiver);
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        if (D) Log.i(TAG, "onResume()");
+		/* we register BroadcastReceiver here*/
+//        registerReceiver();
+        super.onResume();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
