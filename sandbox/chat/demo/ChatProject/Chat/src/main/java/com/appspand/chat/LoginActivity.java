@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,22 +41,28 @@ public class LoginActivity extends Activity implements AsyncResponse {
 
     // Values for email and password at the time of the login attempt.
     private String mEmail;
-    private String mPassword;
 
     // UI references.
     private EditText mEmailView;
-    private EditText mPasswordView;
     private View mLoginFormView;
     private View mLoginStatusView;
     private TextView mLoginStatusMessageView;
 
+    private SharedPreferences mSharedPref; //Preference
+
     public void processFinish(final Boolean success){
         //this you will received result fired from async class of onPostExecute(result) method.
-        Log.d(DEBUG_TAG, "loging complete");
+        Log.d(DEBUG_TAG, "login complete");
+
+        SharedPreferences.Editor editor = mSharedPref.edit();
+        editor.putString("id", mEmail);
+        editor.commit();
+
         Intent intent = new Intent ( this, ListActivity.class );
         startActivity ( intent );
         finish();
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +77,8 @@ public class LoginActivity extends Activity implements AsyncResponse {
         mLoginFormView = findViewById(R.id.login_form);
         mLoginStatusView = findViewById(R.id.login_status);
         mLoginStatusMessageView = (TextView) findViewById(R.id.login_status_message);
+
+        mSharedPref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
 
         findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -185,6 +194,9 @@ public class LoginActivity extends Activity implements AsyncResponse {
             } catch (InterruptedException e) {
                 return false;
             }
+
+            //check exist id
+
 
             //id check
             /*
