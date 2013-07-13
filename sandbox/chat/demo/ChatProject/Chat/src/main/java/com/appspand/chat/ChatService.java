@@ -1,9 +1,12 @@
 package com.appspand.chat;
 
 import android.app.IntentService;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.SystemClock;
 import android.text.format.DateFormat;
 
@@ -12,10 +15,13 @@ import android.util.Log;
 /**
  * Created by jaepil on 7/11/13.
  */
-public class ChatService extends IntentService {
+public class ChatService extends Service {
     // Debugging
     private static final String TAG = ChatService.class.getSimpleName();
     private static final boolean D = true;
+
+    // Socket
+    private Thread mNetworkThread = null;
 
     // Actions
     public static final String ACTION_LOGIN = "com.appspand.chat.LOGIN";
@@ -48,11 +54,100 @@ public class ChatService extends IntentService {
 
     public ChatService()
     {
-        super(ChatService.class.getSimpleName());
+        //super(ChatService.class.getSimpleName());
 
         mState = STATE_NONE;
     }
 
+    private final IBinder mBinder = new LocalBinder();
+
+    public class LocalBinder extends Binder
+    {
+        ChatService getService()
+        {
+            return ChatService.this;
+        }
+    }
+
+    @Override
+    public void onCreate()
+    {
+        if (D) Log.d(TAG, "onCreate");
+
+        if (mNetworkThread == null)
+        {
+            synchronized (this)
+            {
+                if (mNetworkThread == null)
+                {
+                    mNetworkThread = new Thread(TAG)
+                    {
+                        public void run()
+                        {
+                            try
+                            {
+                                while (!Thread.interrupted())
+                                {
+                                    Thread.sleep(1000);
+                                    if (D) Log.d(TAG, "onThreadTick");
+                                }
+                            }
+                            catch (InterruptedException e)
+                            {
+                            }
+                        }
+                    };
+
+                    mNetworkThread.start();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        if (D) Log.d(TAG, "onDestroy");
+
+        if (mNetworkThread != null)
+        {
+            mNetworkThread.interrupt();
+            mNetworkThread = null;
+        }
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId)
+    {
+        if (D) Log.d(TAG, "onStartCommand");
+
+        super.onStartCommand(intent, flags, startId);
+
+        return START_STICKY;
+    }
+
+    @Override
+    public IBinder onBind(Intent intent)
+    {
+        if (D) Log.d(TAG, "onBind");
+
+        return mBinder;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent)
+    {
+        if (D) Log.d(TAG, "onUnbind");
+
+        return true;
+    }
+
+    @Override
+    public void onRebind(Intent intent)
+    {
+        if (D) Log.d(TAG, "onRebind");
+    }
+/*
     @Override
     protected void onHandleIntent(Intent intent)
     {
@@ -83,5 +178,5 @@ public class ChatService extends IntentService {
         SystemClock.sleep(30000); // 30 seconds
 //        String resultTxt = msg + " "
 //                + DateFormat.format("MM/dd/yy h:mmaa", System.currentTimeMillis());
-    }
+    }*/
 }

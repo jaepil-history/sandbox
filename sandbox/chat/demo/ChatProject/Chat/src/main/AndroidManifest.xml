@@ -5,15 +5,21 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="7"
+        android:minSdkVersion="14"
         android:targetSdkVersion="16" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
+        android:name=".ChatApplication"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <service android:name=".ChatService" />
+
+        <service android:name=".ChatService"
+                 android:icon="@drawable/ic_launcher"
+                 android:label="@string/app_name">
+        </service>
+
         <activity
             android:name="LoginActivity"
             android:label="@string/app_name"

@@ -5,12 +5,15 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -63,7 +66,6 @@ public class LoginActivity extends Activity implements AsyncResponse {
         finish();
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,10 +82,6 @@ public class LoginActivity extends Activity implements AsyncResponse {
 
         mSharedPref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
 
-//        Intent chatService = new Intent(this, ChatService.class);
-//        chatService.putExtra(ChatService.PARAM_SEND_MSG, "init");
-//        startService(chatService);
-
         findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,30 +90,21 @@ public class LoginActivity extends Activity implements AsyncResponse {
         });
     }
 
-    public class ChatServiceResultReceiver extends BroadcastReceiver
+    @Override
+    protected void onDestroy()
     {
-        public final static String ACTION_TEXT_CAPITALIZED= "com.appspand.chat.intent.action.ACTION_TEXT_CAPITALIZED";
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-//            String resultText =intent.getStringExtra(ChatService.OUTPUT_TEXT);
-//            textViewResult.setText(resultText);
-        }
-    };
+        super.onDestroy();
+    }
 
     @Override
     protected void onPause() {
         if (D) Log.i(TAG,"onPause()");
-		/* we should unregister BroadcastReceiver here*/
-//        unregisterReceiver(capitalizeResultReceiver);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
         if (D) Log.i(TAG, "onResume()");
-		/* we register BroadcastReceiver here*/
-//        registerReceiver();
         super.onResume();
     }
 
