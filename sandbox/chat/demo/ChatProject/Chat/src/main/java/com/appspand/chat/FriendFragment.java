@@ -28,23 +28,18 @@ public class FriendFragment extends Fragment {
      * fragment.
      */
 
-    private static final String DEBUG_TAG  = "[LOG_FriendFragment]";
+    private static final String DEBUG_TAG  = "[LOG_FRIENDFRAGMENT]";
 
     private DataSource mDatasource;
     private SharedPreferences mSharedPref;
     private String mMyID;
-
     private ArrayAdapter<Friend> mDataAdapter;
-
-
-    public static final String ARG_SECTION_NUMBER = "section_number";
 
     public FriendFragment() {
     }
 
     public void onAddFriend (String friend_id)
     {
-        Log.d(DEBUG_TAG, "onAddFriend");
         Friend insertedFriend = mDatasource.insertFriend( friend_id );
         mDataAdapter.add( insertedFriend );
 
@@ -67,6 +62,7 @@ public class FriendFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         //Generate list View from ArrayList
         displayListView();
     }
@@ -99,7 +95,7 @@ public class FriendFragment extends Fragment {
 
                 //start Chat with SelectedFriend
                 Intent intent = new Intent ( getActivity(), ChatRoomActivity.class );
-                intent.putExtra("friend_id",selectedFriend.toString());
+                intent.putExtra("room_id",selectedFriend.toString());
                 intent.putExtra("my_id",mMyID);
                 startActivity ( intent );
 

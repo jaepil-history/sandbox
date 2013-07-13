@@ -30,6 +30,78 @@ public class DataSource {
         dbHelper.close();
     }
 
+
+    public Message insertMessage(String room_id, String sender_id, String msg, long time) {
+        ContentValues values = new ContentValues();
+        values.put("room_id", room_id);
+        values.put("sender_id", sender_id);
+        values.put("msg", msg);
+        values.put("time", time);
+
+        long insertId = database.insert( "message_list", null,values);
+        Message message = new Message();
+        message.setIdx(insertId);
+        message.setRoomID(room_id);
+        message.setSenderID(sender_id);
+        message.setMsg(msg);
+        message.setTime(time);
+
+        return message;
+    }
+
+    public List<Message> getAllMessage(String room_id) {
+        List<Message> messageList = new ArrayList<Message>();
+        Cursor cursor = null;
+        try {
+            String[] parms={room_id};
+
+            cursor = database.query("message_list", null, "room_id=?", parms, null, null, null);
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                Message message = cursorToMessage(cursor);
+                messageList.add(message);
+                cursor.moveToNext();
+            }
+            return messageList;
+        } finally {
+            closeCursor(cursor);
+        }
+    }
+
+    public List<Message> getLastMessage() {
+        List<Message> messageList = new ArrayList<Message>();
+        Cursor cursor = null;
+        try {
+            cursor = database.rawQuery("SELECT * FROM message_list group by room_id order by time desc", null);
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                Message message = cursorToMessage(cursor);
+                messageList.add(message);
+                cursor.moveToNext();
+            }
+            return messageList;
+        } finally {
+            closeCursor(cursor);
+        }
+    }
+
+    private Message cursorToMessage(Cursor cursor) {
+        Message message = new Message();
+        int idIndex = cursor.getColumnIndex("_id");
+        int roomIDIndex = cursor.getColumnIndex("room_id");
+        int senderIDIndex = cursor.getColumnIndex("sender_id");
+        int msgIDIndex = cursor.getColumnIndex("msg");
+        int timeIDIndex = cursor.getColumnIndex("time");
+
+        message.setIdx(cursor.getLong(idIndex));
+        message.setRoomID(cursor.getString(roomIDIndex));
+        message.setSenderID(cursor.getString(senderIDIndex));
+        message.setMsg(cursor.getString(msgIDIndex));
+        message.setTime(cursor.getLong(timeIDIndex));
+
+        return message;
+    }
+
     public Friend insertFriend(String id) {
         ContentValues values = new ContentValues();
         values.put("user_id", id);
@@ -75,33 +147,5 @@ public class DataSource {
         } catch (Exception e) {
         }
     }
-    /*
-    public void deleteMemo(Memo memo) {
-        long id = memo.getId();
-        database.delete(MySQLiteHelper.TABLE_MEMOS,
-                MySQLiteHelper.COLUMN_ID + " = " + id, null);
-    }
-
-    public List<Memo> getAllMemos() {
-        List<Memo> memos = new ArrayList<Memo>();
-        Cursor cursor = null;
-        try {
-            cursor = database.query(MySQLiteHelper.TABLE_MEMOS,
-                    allColumns, null, null, null, null, null);
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-                Memo memo = cursorToMemo(cursor);
-                memos.add(memo);
-                cursor.moveToNext();
-            }
-            return memos;
-        } finally {
-            closeCursor(cursor);
-        }
-    }
-
-
-
-    */
 
 }

@@ -31,7 +31,7 @@
             android:layout_alignParentLeft="false"
             android:layout_alignParentTop="false"
             android:layout_marginBottom="20dp" android:layout_above="@+id/messageEdit"
-            android:layout_below="@+id/meLabel" android:layout_marginTop="10dp">
+            android:layout_marginTop="10dp">
         <LinearLayout
                 android:id="@+id/messagesContainer"
                 android:orientation="vertical"

@@ -55,7 +55,7 @@ public class LoginActivity extends Activity implements AsyncResponse {
 
     public void processFinish(final Boolean success){
         //this you will received result fired from async class of onPostExecute(result) method.
-        if (D) Log.d(TAG, "loging complete");
+        if (D) Log.d(TAG, "Login Complete");
 
         SharedPreferences.Editor editor = mSharedPref.edit();
         editor.putString("id", mEmail);
@@ -72,7 +72,6 @@ public class LoginActivity extends Activity implements AsyncResponse {
         setContentView(R.layout.activity_login);
 
         // Set up the login form.
-        mEmail = getIntent().getStringExtra(EXTRA_EMAIL);
         mEmailView = (EditText) findViewById(R.id.email);
         mEmailView.setText(mEmail);
 
@@ -213,20 +212,6 @@ public class LoginActivity extends Activity implements AsyncResponse {
             } catch (InterruptedException e) {
                 return false;
             }
-
-            //check exist id
-
-
-            //id check
-            /*
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return true; //pieces[1].equals(mPassword);
-                }
-            }
-            */
 
             // TODO: register the new account here.
             return true;

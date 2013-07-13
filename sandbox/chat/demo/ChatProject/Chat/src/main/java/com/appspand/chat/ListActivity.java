@@ -89,6 +89,15 @@ public class ListActivity extends FragmentActivity implements ActionBar.TabListe
     }
 
     @Override
+    public void onWindowFocusChanged (boolean hasFocus)
+    {
+        if ( hasFocus == true )
+        {
+            mMessageFragment.displayListView();
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.list, menu);
@@ -168,15 +177,9 @@ public class ListActivity extends FragmentActivity implements ActionBar.TabListe
             switch ( position ) {
                 case 0:
                     mFriendFragment = new FriendFragment();
-                    Bundle args = new Bundle();
-                    args.putInt(FriendFragment.ARG_SECTION_NUMBER, position + 1);
-                    mFriendFragment.setArguments(args);
                     return mFriendFragment;
                 case 1:
                     mMessageFragment = new MessageFragment();
-                    Bundle args2 = new Bundle();
-                    args2.putInt(MessageFragment.ARG_SECTION_NUMBER, position + 1);
-                    mMessageFragment.setArguments(args2);
                     return mMessageFragment;
             }
             return null;
