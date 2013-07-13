@@ -13,16 +13,25 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.sql.Date;
+import java.text.DateFormat;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TimeZone;
+
+import static java.lang.System.currentTimeMillis;
+
 public class ChatRoomActivity extends Activity {
 
     private String mMyID;
-    private String mOtherID;
+    private String mRoomID;
 
     private EditText mMessageText;
     private ViewGroup mMessagesContainer;
     private ScrollView mScrollContainer;
 
-    //private MyChatController myChatController;
+    private DataSource mDatasource;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +41,11 @@ public class ChatRoomActivity extends Activity {
         Bundle extras = getIntent().getExtras();
 
         mMyID = extras.getString("my_id");
-        mOtherID = extras.getString("friend_id");
+        mRoomID = extras.getString("room_id");
+
+        String databaseName = mMyID + ".db";
+        mDatasource = new DataSource(this, databaseName);
+        mDatasource.open();
 
         // UI stuff
         mMessagesContainer = (ViewGroup) findViewById(R.id.messagesContainer);
@@ -43,8 +56,28 @@ public class ChatRoomActivity extends Activity {
 
         mMessageText = (EditText) findViewById(R.id.messageEdit);
 
-    }
 
+        //Load history
+        List<Message> values = mDatasource.getAllMessage(mRoomID);
+        Iterator<Message> iter = values.iterator();
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        while(iter.hasNext()) {
+            Message msg = iter.next();
+            String finalMessage = msg.getSenderID() + "(" + msg.getStringTime() + ") : " + msg.getMsg();
+            final TextView textView = new TextView(ChatRoomActivity.this);
+            textView.setTextColor(Color.BLACK);
+            textView.setText(finalMessage);
+            textView.setLayoutParams(params);
+            mMessagesContainer.addView(textView);
+        }
+
+        mScrollContainer.post(new Runnable(){
+            public void run(){
+                mScrollContainer.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        });
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -55,29 +88,26 @@ public class ChatRoomActivity extends Activity {
 
     private void sendMessage() {
         if (mMessageText != null) {
-            String messageString = mMyID + ": " + mMessageText.getText().toString();
-            //myChatController.sendMessage(messageString);
+            String msg = mMessageText.getText().toString();
+            long time = currentTimeMillis();
+            DateFormat df = DateFormat.getTimeInstance();
+            df.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+            String gmtTime = df.format(time);
+            String finalMessage = mMyID + "(" + gmtTime + ") : " + msg;
+
+            mDatasource.insertMessage( mRoomID, mMyID, msg, time );
             mMessageText.setText("");
-            showMessage(messageString, true);
+            showMessage(finalMessage);
         }
     }
 
-    private void showMessage(String message, boolean leftSide) {
+    private void showMessage(String message) {
         final TextView textView = new TextView(ChatRoomActivity.this);
         textView.setTextColor(Color.BLACK);
         textView.setText(message);
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-        if (!leftSide) {
-            //bgRes = R.drawable.right_message_bg;
-            params.gravity = Gravity.RIGHT;
-        }
-
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         textView.setLayoutParams(params);
-
-        //textView.setBackgroundResource(bgRes);
 
         runOnUiThread(new Runnable() {
             @Override
