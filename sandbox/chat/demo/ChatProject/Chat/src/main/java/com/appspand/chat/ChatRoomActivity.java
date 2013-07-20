@@ -13,6 +13,10 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.sql.Date;
 import java.text.DateFormat;
 import java.util.Iterator;
@@ -77,6 +81,54 @@ public class ChatRoomActivity extends Activity {
                 mScrollContainer.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
+
+        ChatApplication application = (ChatApplication)getApplication();
+        application.getChatConnector().getMessages(mMyID, mRoomID, false, 0, 100,
+                new ChatConnector.AsyncResult() {
+                    @Override
+                    public void handle(String response) {
+                        try {
+                            JSONObject command = new JSONObject(response);
+                            JSONObject loginAns = command.getJSONObject("payload");
+                            int errorCode = loginAns.getInt("error_code");
+                            if (errorCode != 0) {
+                                return;
+                            }
+
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                            String message_info_str = loginAns.getString("message_info");
+                            JSONObject message_info = new JSONObject(message_info_str);
+                            JSONArray messages = message_info.getJSONArray("messages");
+
+                            for (int i = 0; i < messages.length(); ++i) {
+                                JSONObject obj = messages.getJSONObject(i);
+                                String senderID = obj.getString("sender_uid");
+                                int issuedAt = obj.getInt("issued_at");
+                                String message = obj.getString("message");
+
+                                DateFormat df = DateFormat.getTimeInstance();
+                                df.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+                                String time = df.format(issuedAt);
+
+                                String finalMessage = senderID + "(" + time + ") : " + message;
+                                final TextView textView = new TextView(ChatRoomActivity.this);
+                                textView.setTextColor(Color.BLACK);
+                                textView.setText(finalMessage);
+                                textView.setLayoutParams(params);
+                                mMessagesContainer.addView(textView);
+                            }
+
+                            mScrollContainer.post(new Runnable(){
+                                public void run(){
+                                    mScrollContainer.fullScroll(ScrollView.FOCUS_DOWN);
+                                }
+                            });
+                        } catch (JSONException e) {
+                        }
+                    }
+                }
+        );
     }
 
     @Override
@@ -94,6 +146,24 @@ public class ChatRoomActivity extends Activity {
             df.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
             String gmtTime = df.format(time);
             String finalMessage = mMyID + "(" + gmtTime + ") : " + msg;
+
+            ChatApplication application = (ChatApplication)getApplication();
+            application.getChatConnector().sendMessage(mMyID, mRoomID, false, msg,
+                    new ChatConnector.AsyncResult() {
+                        @Override
+                        public void handle(String response) {
+                            try {
+                                JSONObject command = new JSONObject(response);
+                                JSONObject loginAns = command.getJSONObject("payload");
+                                int errorCode = loginAns.getInt("error_code");
+                                if (errorCode == 0) {
+                                    //
+                                }
+                            } catch (JSONException e) {
+                            }
+                        }
+                    }
+            );
 
             mDatasource.insertMessage( mRoomID, mMyID, msg, time );
             mMessageText.setText("");

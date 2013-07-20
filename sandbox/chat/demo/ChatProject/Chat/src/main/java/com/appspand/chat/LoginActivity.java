@@ -23,6 +23,9 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Activity which displays a login screen to the user, offering registration as
  * well.
@@ -40,7 +43,7 @@ public class LoginActivity extends Activity implements AsyncResponse {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
+//    private UserLoginTask mAuthTask = null;
 
     // Values for email and password at the time of the login attempt.
     private String mEmail;
@@ -120,9 +123,9 @@ public class LoginActivity extends Activity implements AsyncResponse {
      * errors are presented and no actual login attempt is made.
      */
     public void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
+//        if (mAuthTask != null) {
+//            return;
+//        }
 
         // Reset errors.
         mEmailView.setError(null);
@@ -149,9 +152,26 @@ public class LoginActivity extends Activity implements AsyncResponse {
             // perform the user login attempt.
             mLoginStatusMessageView.setText(R.string.login_progress_signing_in);
             showProgress(true);
-            mAuthTask = new UserLoginTask();
-            mAuthTask.delegate = this;
-            mAuthTask.execute((Void) null);
+
+            ChatApplication application = (ChatApplication)getApplication();
+            application.getChatConnector().login(mEmail, mEmail, new ChatConnector.AsyncResult() {
+                @Override
+                public void handle(String response) {
+                    try {
+                        JSONObject command = new JSONObject(response);
+                        JSONObject loginAns = command.getJSONObject("payload");
+                        int errorCode = loginAns.getInt("error_code");
+
+                        showProgress(false);
+                        processFinish(errorCode == 0);
+                    } catch (JSONException e) {
+                    }
+                }
+            });
+
+//            mAuthTask = new UserLoginTask();
+//            mAuthTask.delegate = this;
+//            mAuthTask.execute((Void) null);
         }
     }
 
@@ -199,41 +219,41 @@ public class LoginActivity extends Activity implements AsyncResponse {
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-        public AsyncResponse delegate=null;
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            // TODO: register the new account here.
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                delegate.processFinish(success);
-                finish();
-            } else {
-                //error
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
-    }
+//    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+//        public AsyncResponse delegate=null;
+//
+//        @Override
+//        protected Boolean doInBackground(Void... params) {
+//            // TODO: attempt authentication against a network service.
+//
+//            try {
+//                // Simulate network access.
+//                Thread.sleep(2000);
+//            } catch (InterruptedException e) {
+//                return false;
+//            }
+//
+//            // TODO: register the new account here.
+//            return true;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(final Boolean success) {
+//            mAuthTask = null;
+//            showProgress(false);
+//
+//            if (success) {
+//                delegate.processFinish(success);
+//                finish();
+//            } else {
+//                //error
+//            }
+//        }
+//
+//        @Override
+//        protected void onCancelled() {
+//            mAuthTask = null;
+//            showProgress(false);
+//        }
+//    }
 }

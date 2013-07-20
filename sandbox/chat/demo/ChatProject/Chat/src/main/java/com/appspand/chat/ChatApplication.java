@@ -74,6 +74,7 @@ public class ChatApplication extends Application
     }
 
     private ChatService mChatService = null;
+    private ChatConnector mChatConnector = null;
     private boolean mIsBound = false;
     private ServiceConnection mServiceConnection = new ServiceConnection()
     {
@@ -87,6 +88,7 @@ public class ChatApplication extends Application
             // service that we know is running in our own process, we can
             // cast its IBinder to a concrete class and directly access it.
             mChatService = ((ChatService.LocalBinder)service).getService();
+            mChatConnector = ((ChatService.LocalBinder)service).getChannel();
 
 //            // Tell the user about this for our demo.
 //            Toast.makeText(Binding.this, R.string.local_service_connected,
@@ -102,10 +104,21 @@ public class ChatApplication extends Application
             // Because it is running in our same process, we should never
             // see this happen.
             mChatService = null;
+            mChatConnector = null;
 //            Toast.makeText(Binding.this, R.string.local_service_disconnected,
 //                    Toast.LENGTH_SHORT).show();
         }
     };
+
+    public ChatService getChatService()
+    {
+        return mChatService;
+    }
+
+    public ChatConnector getChatConnector()
+    {
+        return mChatConnector;
+    }
 
     private void doStartService()
     {

@@ -1,14 +1,9 @@
 package com.appspand.chat;
 
-import android.app.IntentService;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.SystemClock;
-import android.text.format.DateFormat;
 
 import android.util.Log;
 
@@ -21,51 +16,56 @@ public class ChatService extends Service {
     private static final boolean D = true;
 
     // Socket
-    private Thread mNetworkThread = null;
+    private static final String SERVER_URL = "ws://chat.appengine.jaepil.appspand.com:8080/v1/ws";
 
-    // Actions
-    public static final String ACTION_LOGIN = "com.appspand.chat.LOGIN";
-    public static final String ACTION_LOGOUT = "com.appspand.chat.LOGOUT";
-    public static final String ACTION_INVITE_USER = "com.appspand.chat.INVITE_USER";
-    public static final String ACTION_SEND_MESSAGE = "com.appspand.chat.SEND_MESSAGE";
+    private ChatConnector mChatConnector = null;
 
-    // Extras
-    public static final String EXTRAS_USER_ID = "user_id";
-    public static final String EXTRAS_INVITEE_ID_LIST = "invitee_id_list";
-    public static final String EXTRAS_SENDER_ID = "sender_id";
-    public static final String EXTRAS_TARGET_ID = "target_id";
-    public static final String EXTRAS_TARGET_ID_LIST = "target_id_list";
-    public static final String EXTRAS_IS_GROUP = "is_group";
-    public static final String EXTRAS_GROUP_ID = "group_id";
-    public static final String EXTRAS_GROUP_ID_LIST = "group_id_list";
-
-    public static final String EXTRAS_CHAT_MESSAGE = "chat_message";
-    public static final String EXTRAS_MESSAGE_ID = "message_id";
-    public static final String EXTRAS_MESSAGE_ID_LIST = "message_id_list";
-
-    // Constants that indicate the current connection state
-    public static final int STATE_NONE = 0;
-    public static final int STATE_CONNECTING = 10;
-    public static final int STATE_CONNECTED = 20;
-    public static final int STATE_LOGGING_IN = 30;
-    public static final int STATE_LOGGED_IN = 40;
-
-    private int mState;
-
+//    // Actions
+//    public static final String ACTION_LOGIN = "com.appspand.chat.LOGIN";
+//    public static final String ACTION_LOGOUT = "com.appspand.chat.LOGOUT";
+//    public static final String ACTION_INVITE_USER = "com.appspand.chat.INVITE_USER";
+//    public static final String ACTION_SEND_MESSAGE = "com.appspand.chat.SEND_MESSAGE";
+//
+//    // Extras
+//    public static final String EXTRAS_USER_ID = "user_id";
+//    public static final String EXTRAS_INVITEE_ID_LIST = "invitee_id_list";
+//    public static final String EXTRAS_SENDER_ID = "sender_id";
+//    public static final String EXTRAS_TARGET_ID = "target_id";
+//    public static final String EXTRAS_TARGET_ID_LIST = "target_id_list";
+//    public static final String EXTRAS_IS_GROUP = "is_group";
+//    public static final String EXTRAS_GROUP_ID = "group_id";
+//    public static final String EXTRAS_GROUP_ID_LIST = "group_id_list";
+//
+//    public static final String EXTRAS_CHAT_MESSAGE = "chat_message";
+//    public static final String EXTRAS_MESSAGE_ID = "message_id";
+//    public static final String EXTRAS_MESSAGE_ID_LIST = "message_id_list";
+//
+//    // Constants that indicate the current connection state
+//    public static final int STATE_NONE = 0;
+//    public static final int STATE_CONNECTING = 10;
+//    public static final int STATE_CONNECTED = 20;
+//    public static final int STATE_LOGGING_IN = 30;
+//    public static final int STATE_LOGGED_IN = 40;
+//
+//    private int mState;
+//
     public ChatService()
     {
-        //super(ChatService.class.getSimpleName());
-
-        mState = STATE_NONE;
+//        mState = STATE_NONE;
     }
 
     private final IBinder mBinder = new LocalBinder();
 
     public class LocalBinder extends Binder
     {
-        ChatService getService()
+        public ChatService getService()
         {
             return ChatService.this;
+        }
+
+        public ChatConnector getChannel()
+        {
+            return getService().mChatConnector;
         }
     }
 
@@ -74,34 +74,8 @@ public class ChatService extends Service {
     {
         if (D) Log.d(TAG, "onCreate");
 
-        if (mNetworkThread == null)
-        {
-            synchronized (this)
-            {
-                if (mNetworkThread == null)
-                {
-                    mNetworkThread = new Thread(TAG)
-                    {
-                        public void run()
-                        {
-                            try
-                            {
-                                while (!Thread.interrupted())
-                                {
-                                    Thread.sleep(1000);
-                                    if (D) Log.d(TAG, "onThreadTick");
-                                }
-                            }
-                            catch (InterruptedException e)
-                            {
-                            }
-                        }
-                    };
-
-                    mNetworkThread.start();
-                }
-            }
-        }
+        mChatConnector = new ChatConnector(SERVER_URL);
+        mChatConnector.open();
     }
 
     @Override
@@ -109,11 +83,7 @@ public class ChatService extends Service {
     {
         if (D) Log.d(TAG, "onDestroy");
 
-        if (mNetworkThread != null)
-        {
-            mNetworkThread.interrupt();
-            mNetworkThread = null;
-        }
+        mChatConnector.close();
     }
 
     @Override
