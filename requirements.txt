@@ -1,3 +1,6 @@
+# Zookeeper
+kazoo==1.1
+
 # Django
 Django==1.5.1
 
