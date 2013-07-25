@@ -1,8 +1,13 @@
 package com.appspand.chat;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
@@ -26,6 +31,10 @@ import java.util.TimeZone;
 import static java.lang.System.currentTimeMillis;
 
 public class ChatRoomActivity extends Activity {
+    private static final String TAG = ChatRoomActivity.class.getSimpleName();
+    private static final boolean D = true;
+
+    private BroadcastReceiver mReceiver = null;
 
     private String mMyID;
     private String mRoomID;
@@ -35,7 +44,6 @@ public class ChatRoomActivity extends Activity {
     private ScrollView mScrollContainer;
 
     private DataSource mDatasource;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +137,58 @@ public class ChatRoomActivity extends Activity {
                     }
                 }
         );
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        IntentFilter intentFilter = new IntentFilter("android.intent.action.MAIN");
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String payload = intent.getStringExtra("onNewMessage");
+                if (D) Log.d(TAG, payload);
+
+                try {
+                    JSONObject commandJson = new JSONObject(payload);
+                    JSONObject payloadJson = commandJson.getJSONObject("payload");
+
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                    String senderID = payloadJson.getString("sender_uid");
+                    String message = payloadJson.getString("message");
+                    int issuedAt = 0;
+
+                    DateFormat df = DateFormat.getTimeInstance();
+                    df.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+                    String time = df.format(issuedAt);
+
+                    String finalMessage = senderID + "(" + time + ") : " + message;
+                    final TextView textView = new TextView(ChatRoomActivity.this);
+                    textView.setTextColor(Color.BLACK);
+                    textView.setText(finalMessage);
+                    textView.setLayoutParams(params);
+                    mMessagesContainer.addView(textView);
+
+                    mScrollContainer.post(new Runnable(){
+                        public void run(){
+                            mScrollContainer.fullScroll(ScrollView.FOCUS_DOWN);
+                        }
+                    });
+                } catch (JSONException e) {
+                }
+            }
+        };
+
+        this.registerReceiver(mReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        this.unregisterReceiver(this.mReceiver);
     }
 
     @Override

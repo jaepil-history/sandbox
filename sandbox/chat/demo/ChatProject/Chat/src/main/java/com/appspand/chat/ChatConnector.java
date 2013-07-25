@@ -48,9 +48,13 @@ public class ChatConnector {
                     try {
                         JSONObject command = new JSONObject(payload);
                         String cmd = command.getString("cmd");
-                        AsyncResult handler = mAsyncResultHandlers.remove(cmd);
-                        if (handler != null) {
-                            handler.handle(payload);
+                        if (cmd.equals("Message_NewNoti")) {
+                            onNewMessage(payload);
+                        } else {
+                            AsyncResult handler = mAsyncResultHandlers.remove(cmd);
+                            if (handler != null) {
+                                handler.handle(payload);
+                            }
                         }
                     }
                     catch (JSONException e)
@@ -72,6 +76,8 @@ public class ChatConnector {
     {
         mConnection.disconnect();
     }
+
+    protected void onNewMessage(String payload) {}
 
     public void sendMessage(String message)
     {
@@ -151,6 +157,32 @@ public class ChatConnector {
             if (!mAsyncResultHandlers.containsKey("Message_GetAns"))
             {
                 mAsyncResultHandlers.put("Message_GetAns", asyncResult);
+            }
+            sendMessage(command.toString());
+        }
+        catch (JSONException e) {
+        }
+        finally {
+        }
+    }
+
+    public void markAsReadMessages(String userUid, String senderUid, boolean isGroup,
+                                   long[] messageUids, AsyncResult asyncResult) {
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("user_uid", userUid);
+            payload.put("sender_uid", senderUid);
+            payload.put("is_group", isGroup);
+            payload.put("message_uids", messageUids);
+
+            JSONObject command = new JSONObject();
+            command.put("cmd", "Message_ReadReq");
+            command.put("user_uid", userUid);
+            command.put("payload", payload);
+
+            if (!mAsyncResultHandlers.containsKey("Message_ReadAns"))
+            {
+                mAsyncResultHandlers.put("Message_ReadAns", asyncResult);
             }
             sendMessage(command.toString());
         }

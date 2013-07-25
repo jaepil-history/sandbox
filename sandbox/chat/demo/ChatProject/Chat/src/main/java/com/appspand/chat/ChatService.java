@@ -74,7 +74,15 @@ public class ChatService extends Service {
     {
         if (D) Log.d(TAG, "onCreate");
 
-        mChatConnector = new ChatConnector(SERVER_URL);
+        mChatConnector = new ChatConnector(SERVER_URL) {
+            @Override
+            protected void onNewMessage(String payload) {
+                if (D) Log.d(TAG, "onNewMessage: " + payload);
+
+                Intent i = new Intent("android.intent.action.MAIN").putExtra("onNewMessage", payload);
+                sendBroadcast(i);
+            }
+        };
         mChatConnector.open();
     }
 

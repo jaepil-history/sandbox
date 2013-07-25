@@ -19,6 +19,8 @@ public class ChatApplication extends Application
     private static final String TAG = ChatApplication.class.getSimpleName();
     private static final boolean D = true;
 
+    private Activity mCurrentActivity = null;
+
     private ActivityLifecycleCallbacks callbacks = new ActivityLifecycleCallbacks() {
         @Override
         public void onActivityCreated(Activity activity, Bundle bundle) {
