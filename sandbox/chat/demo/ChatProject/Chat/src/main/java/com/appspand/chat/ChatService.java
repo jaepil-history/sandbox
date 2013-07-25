@@ -16,7 +16,8 @@ public class ChatService extends Service {
     private static final boolean D = true;
 
     // Socket
-    private static final String SERVER_URL = "ws://chat.appengine.jaepil.appspand.com:8080/v1/ws";
+    //private static final String SERVER_URL = "ws://chat.appengine.jaepil.appspand.com:8080/v1/ws";
+    private static final String SERVER_URL = "ws://chat.appengine.appspand.com:8080/v1/ws";
 
     private ChatConnector mChatConnector = null;
 
@@ -79,8 +80,9 @@ public class ChatService extends Service {
             protected void onNewMessage(String payload) {
                 if (D) Log.d(TAG, "onNewMessage: " + payload);
 
-                Intent i = new Intent("android.intent.action.MAIN").putExtra("onNewMessage", payload);
-                sendBroadcast(i);
+                Intent intent = new Intent("com.appspand.chat.ChatService.NewMessage");
+                intent.putExtra("payload", payload);
+                sendBroadcast(intent);
             }
         };
         mChatConnector.open();

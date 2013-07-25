@@ -143,39 +143,47 @@ public class ChatRoomActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        IntentFilter intentFilter = new IntentFilter("android.intent.action.MAIN");
+        IntentFilter intentFilter = new IntentFilter("com.appspand.chat.ChatService.NewMessage");
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String payload = intent.getStringExtra("onNewMessage");
+                String payload = intent.getStringExtra("payload");
                 if (D) Log.d(TAG, payload);
 
                 try {
                     JSONObject commandJson = new JSONObject(payload);
                     JSONObject payloadJson = commandJson.getJSONObject("payload");
 
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-                    String senderID = payloadJson.getString("sender_uid");
+                    String senderUid = payloadJson.getString("sender_uid");
                     String message = payloadJson.getString("message");
+                    long messageUid = Long.parseLong(payloadJson.getString("message_uid"));
                     int issuedAt = 0;
 
                     DateFormat df = DateFormat.getTimeInstance();
                     df.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
                     String time = df.format(issuedAt);
 
-                    String finalMessage = senderID + "(" + time + ") : " + message;
-                    final TextView textView = new TextView(ChatRoomActivity.this);
-                    textView.setTextColor(Color.BLACK);
-                    textView.setText(finalMessage);
-                    textView.setLayoutParams(params);
-                    mMessagesContainer.addView(textView);
+                    String finalMessage = senderUid + "(" + time + ") : " + message;
+                    showMessage(finalMessage);
 
-                    mScrollContainer.post(new Runnable(){
-                        public void run(){
-                            mScrollContainer.fullScroll(ScrollView.FOCUS_DOWN);
-                        }
-                    });
+                    ChatApplication application = (ChatApplication)getApplication();
+                    application.getChatConnector().markAsReadMessages(mMyID, senderUid,
+                            false, new long[] {messageUid},
+                            new ChatConnector.AsyncResult() {
+                                @Override
+                                public void handle(String response) {
+                                    try {
+                                        JSONObject command = new JSONObject(response);
+                                        JSONObject loginAns = command.getJSONObject("payload");
+                                        int errorCode = loginAns.getInt("error_code");
+                                        if (errorCode == 0) {
+                                            //
+                                        }
+                                    } catch (JSONException e) {
+                                    }
+                                }
+                            }
+                    );
                 } catch (JSONException e) {
                 }
             }

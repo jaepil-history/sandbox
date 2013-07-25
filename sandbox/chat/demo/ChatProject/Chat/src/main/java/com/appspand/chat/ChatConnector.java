@@ -1,11 +1,14 @@
 package com.appspand.chat;
 
 import android.util.Log;
+import android.util.Pair;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.KeyException;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 
 import de.tavendo.autobahn.WebSocketConnection;
@@ -24,6 +27,9 @@ public class ChatConnector {
     private final WebSocketConnection mConnection = new WebSocketConnection();
     private HashMap<String, AsyncResult> mAsyncResultHandlers = new HashMap<String, AsyncResult>();
 
+    private String mLastLoginStr;
+    private Deque<Pair<String, AsyncResult>> mMessageQueue = new ArrayDeque<Pair<String, AsyncResult>>();
+
     public interface AsyncResult {
         abstract void handle(String response);
     }
@@ -39,6 +45,10 @@ public class ChatConnector {
                 @Override
                 public void onOpen() {
                     if (D) Log.d(TAG, "Status: Connected to " + mUrl);
+
+                    if (!mLastLoginStr.isEmpty()) {
+                        sendMessage(mLastLoginStr);
+                    }
                 }
 
                 @Override
@@ -79,12 +89,13 @@ public class ChatConnector {
 
     protected void onNewMessage(String payload) {}
 
-    public void sendMessage(String message)
+    private void sendMessage(String message)
     {
         if (!mConnection.isConnected()) {
             mConnection.reconnect();
+        } else {
+            mConnection.sendTextMessage(message);
         }
-        mConnection.sendTextMessage(message);
     }
 
     public void login(String userUid, String userName, AsyncResult asyncResult)
@@ -102,6 +113,90 @@ public class ChatConnector {
             if (!mAsyncResultHandlers.containsKey("User_LoginAns"))
             {
                 mAsyncResultHandlers.put("User_LoginAns", asyncResult);
+            }
+
+            mLastLoginStr = command.toString();
+            sendMessage(mLastLoginStr);
+        }
+        catch (JSONException e) {
+        }
+        finally {
+        }
+    }
+
+    public void joinGroup(String userUid, String[] invitees, AsyncResult asyncResult)
+    {
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("user_uid", userUid);
+            JSONArray uids = new JSONArray();
+            for (int i = 0; i < invitees.length; ++i) {
+                uids.put(invitees[i]);
+            }
+            payload.put("invitee_uids", uids);
+
+            JSONObject command = new JSONObject();
+            command.put("cmd", "Group_JoinReq");
+            command.put("user_uid", userUid);
+            command.put("payload", payload);
+
+            if (!mAsyncResultHandlers.containsKey("Group_JoinAns"))
+            {
+                mAsyncResultHandlers.put("Group_JoinAns", asyncResult);
+            }
+            sendMessage(command.toString());
+        }
+        catch (JSONException e) {
+        }
+        finally {
+        }
+    }
+
+    public void leaveGroup(String userUid, String groupUid, AsyncResult asyncResult)
+    {
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("user_uid", userUid);
+            payload.put("group_uid", groupUid);
+
+            JSONObject command = new JSONObject();
+            command.put("cmd", "Group_LeaveReq");
+            command.put("user_uid", userUid);
+            command.put("payload", payload);
+
+            if (!mAsyncResultHandlers.containsKey("Group_LeaveAns"))
+            {
+                mAsyncResultHandlers.put("Group_LeaveAns", asyncResult);
+            }
+            sendMessage(command.toString());
+        }
+        catch (JSONException e) {
+        }
+        finally {
+        }
+    }
+
+    public void inviteUser(String userUid, String groupUid, String[] invitees,
+                           AsyncResult asyncResult)
+    {
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("user_uid", userUid);
+            payload.put("group_uid", groupUid);
+            JSONArray uids = new JSONArray();
+            for (int i = 0; i < invitees.length; ++i) {
+                uids.put(invitees[i]);
+            }
+            payload.put("invitee_uids", uids);
+
+            JSONObject command = new JSONObject();
+            command.put("cmd", "Group_InviteReq");
+            command.put("user_uid", userUid);
+            command.put("payload", payload);
+
+            if (!mAsyncResultHandlers.containsKey("Group_InviteAns"))
+            {
+                mAsyncResultHandlers.put("Group_InviteAns", asyncResult);
             }
             sendMessage(command.toString());
         }
@@ -146,7 +241,7 @@ public class ChatConnector {
             payload.put("user_uid", userUid);
             payload.put("target_uid", targetUid);
             payload.put("is_group", isGroup);
-            payload.put("sinceUid", sinceUid);
+            payload.put("since_uid", sinceUid);
             payload.put("count", count);
 
             JSONObject command = new JSONObject();
@@ -173,7 +268,12 @@ public class ChatConnector {
             payload.put("user_uid", userUid);
             payload.put("sender_uid", senderUid);
             payload.put("is_group", isGroup);
-            payload.put("message_uids", messageUids);
+            JSONArray uids = new JSONArray();
+            for (int i = 0; i < messageUids.length; ++i) {
+                uids.put(messageUids[i]);
+            }
+            payload.put("message_uids", uids);
+
 
             JSONObject command = new JSONObject();
             command.put("cmd", "Message_ReadReq");
