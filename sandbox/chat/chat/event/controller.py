@@ -28,7 +28,7 @@ def _send_message(target_uids, data):
     for uid, connection in result[0]:
         connection.write_message(data)
 
-    result += net.tcp.controller.find(user_uids=target_uids)
+    result = net.tcp.controller.find(user_uids=target_uids)
     if result[1]:
         offline_users += result[1]
 
