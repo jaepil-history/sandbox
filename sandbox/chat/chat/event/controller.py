@@ -1,31 +1,72 @@
 # Copyright (c) 2013 Appspand, Inc.
 
+from boto import sqs
+from boto.sqs import jsonmessage
+
 import net.protocols
 import net.tcp.controller
 import net.websocket.controller
 
 
-def on_message_send(sender_uid, member_uids, message):
+SQS = sqs.connect_to_region(aws_access_key_id="AKIAIFHFM4CZA26UVV4A",
+                            aws_secret_access_key="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",
+                            region_name="ap-southeast-1",
+                            path="/")
+SQS_QUEUE_NAME = "MSG_FROM_APPSPAND_TO_SNEK"
+SQS_QUEUE = SQS.get_queue(SQS_QUEUE_NAME)
+
+
+def _send_message(target_uids, data):
+    offline_users = []
+
+    result = net.websocket.controller.find(user_uids=target_uids)
+    if result[1]:
+        offline_users += result[1]
+
+    print "online:", len(result[0]), "offline:", len(result[1])
+
+    for uid, connection in result[0]:
+        connection.write_message(data)
+
+    result += net.tcp.controller.find(user_uids=target_uids)
+    if result[1]:
+        offline_users += result[1]
+
+    print "online:", len(result[0]), "offline:", len(result[1])
+
+    for uid, connection in result[0]:
+        connection.send(data)
+
+    return offline_users
+
+
+def on_message_send(sender_uid, group_uid, target_uids, message_info):
     noti = net.protocols.Message_NewNoti()
     noti.sender_uid = sender_uid
-    noti.message_uid = str(message.uid)
-    noti.message = message.message
+    noti.message_uid = str(message_info.uid)
+    noti.message = message_info.message
     noti_str = net.protocols.to_json(user_uid=sender_uid, message=noti)
 
-    online, offline = net.websocket.controller.find(user_uids=member_uids)
+    offline_users = _send_message(target_uids, noti_str)
+    if offline_users:
+        # TODO: call callback url for push notification
+        if group_uid is None:
+            group_uid = 0
 
-    for uid, connection in online:
-        connection.write_message(noti_str)
-
-    print "online:", len(online), "offline:", len(offline)
-
-    online, offline = net.tcp.controller.find(user_uids=member_uids)
-
-    for uid, connection in online:
-        connection.send(noti_str)
-
-    print "online:", len(online), "offline:", len(offline)
-    # TODO: call callback url for push notification
+        body = {
+            "sender_uid": sender_uid,
+            "group_uid": group_uid,
+            "target_uids": target_uids,
+            "message_info": {
+                "message_uid": message_info.uid,
+                "message": message_info.message,
+                "issued_at": message_info.issued_at,
+                "expires_at": message_info.expires_at
+            }
+        }
+        m = jsonmessage.JSONMessage(body=body)
+        SQS_QUEUE.write(m)
+        print "queued: ", body
 
 
 def on_message_read(user_uid, member_uids, message_uids):

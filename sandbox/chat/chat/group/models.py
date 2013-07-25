@@ -18,7 +18,7 @@ class Group(Document):
     title = StringField(max_length=512)
     owner = StringField(required=True, max_length=512)
     members = ListField(StringField(max_length=512), required=True)
-    dt_created = IntField(required=True)
+    created_at = IntField(required=True)
 
     meta = {
         "indexes": [
@@ -26,7 +26,7 @@ class Group(Document):
         ],
         "roles": {
             "json": {
-                "_default": blacklist("id", "dt_created")
+                "_default": blacklist("id", "created_at")
             }
         }
     }

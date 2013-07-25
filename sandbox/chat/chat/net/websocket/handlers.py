@@ -194,7 +194,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message(ans_json)
 
     def message_get(self, user_uid, request):
-        message_info = message.controller.get(src_uid=request.sender_uid,
+        message_info = message.controller.get(src_uid=request.user_uid,
                                               dest_uid=request.target_uid,
                                               since_uid=request.since_uid,
                                               count=request.count,
@@ -206,8 +206,13 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             error_code = 100
             error_message = "Cannot read messages"
 
+        message_info_str = "{\"messages\": ["
+        message_info_str += (", ".join(m.to_json() for m in message_info))
+        message_info_str += "]}"
+
         ans = net.protocols.Message_GetAns()
         ans.request = request
+        ans.message_info = message_info_str
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)

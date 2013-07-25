@@ -16,8 +16,8 @@ def create(user_uid, user_name, platform_id, device_token):
     user_info = models.User(uid=user_uid,
                             name=user_name,
                             devices=devices,
-                            dt_created=now,
-                            dt_last_login=now)
+                            created_at=now,
+                            last_login_at=now)
 
     return user_info.save()
 
@@ -45,7 +45,7 @@ def login(user_uid, user_name, platform_id, device_token):
                            platform_id=platform_id,
                            device_token=device_token)
     else:
-        user_info.dt_last_login = timestamp.get_timestamp()
+        user_info.last_login_at = timestamp.get_timestamp()
         user_info.save()
 
     return user_info

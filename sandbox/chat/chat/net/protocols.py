@@ -141,5 +141,6 @@ class Message_GetReq(Message):
 
 class Message_GetAns(Message):
     request = ModelType(Message_GetReq)
+    message_info = StringType(required=True, max_length=1024 * 8)
     error_code = IntType(required=True)
     error_message = StringType(required=True)

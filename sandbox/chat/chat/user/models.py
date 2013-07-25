@@ -31,8 +31,8 @@ class User(Document):
     name = StringField(required=True, max_length=255)
     devices = ListField(EmbeddedDocumentField(DeviceInfo))
     joined_groups = ListField(StringField(max_length=512))
-    dt_created = IntField(required=True)
-    dt_last_login = IntField(required=True)
+    created_at = IntField(required=True)
+    last_login_at = IntField(required=True)
 
     meta = {
         "indexes": [
@@ -40,7 +40,7 @@ class User(Document):
         ],
         "roles": {
             "json": {
-                "_default": blacklist("id", "devices", "dt_created", "dt_last_login")
+                "_default": blacklist("id", "devices", "created_at", "last_login_at")
             }
         }
     }

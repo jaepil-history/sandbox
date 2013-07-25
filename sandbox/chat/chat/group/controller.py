@@ -53,7 +53,7 @@ def create(owner_uid, invitee_uids, title=None):
                               title=title,
                               owner=owner_uid,
                               members=members,
-                              dt_created=now)
+                              created_at=now)
 
     _save(group_info=group_info)
 

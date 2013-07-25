@@ -52,8 +52,9 @@ def send(sender_uid, target_uid, message, is_group=None):
         queue_info.save()
 
     event.controller.on_message_send(sender_uid=sender_uid,
-                                     member_uids=target_uids,
-                                     message=message_info)
+                                     group_uid=group_uid,
+                                     target_uids=target_uids,
+                                     message_info=message_info)
 
     return message_info
 
