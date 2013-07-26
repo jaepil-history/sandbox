@@ -6,7 +6,7 @@ import signal
 import sys
 import time
 
-import daemonize
+# import daemonize
 
 import mongoengine
 
@@ -113,12 +113,12 @@ def main():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2 and sys.argv[1] == "--daemon":
-        daemon = daemonize.Daemonize(app="appspand.chat",
-                                     pid="/tmp/appspand.chat.pid",
-                                     action=main)
-        daemon.start()
-    else:
+    # if len(sys.argv) == 2 and sys.argv[1] == "--daemon":
+    #     daemon = daemonize.Daemonize(app="appspand.chat",
+    #                                  pid="/tmp/appspand.chat.pid",
+    #                                  action=main)
+    #     daemon.start()
+    # else:
         # Init signals handler for TERM and INT signals
         # (and so KeyboardInterrupt)
         signal.signal(signal.SIGTERM, sig_handler)

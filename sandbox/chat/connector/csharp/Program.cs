@@ -87,7 +87,7 @@ namespace connector
 			var handler = new ChatHandler();
 			var connector = new Connector();
 			connector.SetHandler(handler);
-			connector.Connect("chat.appengine.appspand.com", 20001, 1000 * 10);
+			connector.Connect("chat.appengine.local.appspand.com", 20001, 1000 * 10);
 			while (handler.active_link == null) {}
 
 			Login(handler.active_link, user_id, user_name);

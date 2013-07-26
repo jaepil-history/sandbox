@@ -51,6 +51,23 @@ class WebSocketClient(object):
 
         print "login 2"
 
+    @gen.coroutine
+    def sendTo(self, sender_uid, target_uid, message):
+        print "starting to send a message"
+        msg_req = net.protocols.Message_SendReq()
+        msg_req.sender_uid = sender_uid
+        msg_req.target_uid = target_uid
+        msg_req.is_group = True
+        msg_req.message = message
+        req = net.protocols.to_json(user_uid=sender_uid, message=msg_req)
+        self.connection.write_message(req)
+
+        res = yield self.connection.read_message()
+        msg_ans = net.protocols.Message_SendAns(json.loads(res))
+        print msg_ans.serialize()
+
+        print "finish to send a message"
+
 
 @gen.coroutine
 def run_websocket(url, user_uid, user_name):
@@ -140,21 +157,16 @@ def group_leave(group_uid, user_uid):
 
 def main():
     if len(sys.argv) < 3:
-        print "client.py [User ID] [User Name] [Group ID]"
+        print "client.py [User ID] [User Name] [Target ID]"
         return 1
 
     user_uid = sys.argv[1]
     user_name = sys.argv[2]
-    group_uid = None
-    if len(sys.argv) > 3:
-        group_uid = sys.argv[3]
+    target_uid = sys.argv[3]
 
-    user_login(user_uid=user_uid, user_name=user_name)
-    group_join(group_uid=group_uid, user_uid=user_uid)
-
-    #client = WebSocketClient()
-    #client.connect(url=websocket_url)
-    #client.login(user_uid=user_uid, user_name=user_name)
+    # client = WebSocketClient()
+    # client.connect(url=websocket_url)
+    # client.login(user_uid=user_uid, user_name=user_name)
     #run_tcpsocket(user_uid=user_uid, user_name=user_name)
     run_websocket(url=websocket_url, user_uid=user_uid, user_name=user_name)
     #websocket_connect(url=websocket_url)
