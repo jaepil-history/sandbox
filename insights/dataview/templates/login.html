@@ -1,47 +1,48 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-	<title></title>
-	<link rel="icon" type="image/png" href="/media/images/favicon.png" />
-	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-	<link rel="stylesheet" href="/media/css/login.css" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Login</title>
+<script type="text/javascript" src="media/js/jquery-latest.js"></script>
+<script type="text/javascript" src="media/js/common_design.js"></script>
+<link href="media/css/login.css" rel="stylesheet" type="text/css">
 </head>
+
 <body>
-	<div class="center">
-		<!--<img class='logo' src="/media/images/logo.png" alt="" />-->
-		{% if message %}
-			<div class="message green">
-				{{ message }}
-			</div>
-		{% endif %}
-		<div class="login_box">
-			<form action="{{ base_url|url('login') }}" method='post'>
-			<ul>
-				{% if errors %}
-				<li>
-					<span class="error">
-						{{ errors }}
-					</span>
-				</li>
-				{% endif %}
-				<li>
-					<label for="" class='background-label username'></label>
-					<input name="username" type="text" placeholder='Username' />
-				</li>
-				<li>
-					<label for="" class='background-label password'></label>
-					<input name="password" type="password" placeholder='Password' />
-				</li>
-				<li>
-					<input type="hidden" name='next' value="{{ next }}" />
-					<input type="submit" value="Login" class='button login' />
-				</li>
-			</ul>
-			</form>
-		</div>
-	
-	</div>
-	
+	<div id="Wrap">
+    
+    	<!-- Header S -->
+    	<div id="Header">
+        	<h1><img src="media/images/common/img_appspand.png" alt="APPSPAND DataPRO" /></h1>
+            <!-- ▽▽ Header LoginBtn ▽▽ -->
+            <div class="btn">
+                <a href="{{base_url|url('create_user')}}"><img src="media/images/common/btn_signup.gif" alt="sign up" /></a>
+                <a href=""><img src="media/images/common/btn_login.gif" alt="login" /></a>
+            </div>
+             <!-- △△ Header LoginBtn △△ -->
+        </div>
+        <!-- Header E -->
+        
+        <!-- Container S -->
+        <div id="Container">
+         	<!-- ▽▽ Login ▽▽ -->
+        	<div id="Login">
+   	  			<fieldset class="login">
+                    <form action="{{ base_url|url('login') }}" method='post'>
+                        <label class="idInput"><input type="text" name="username" class="bg"/></label>
+                        <label class="pwInput"><input type="password" name="password" class="bg"/></label>
+                        <input type="image" class="loginBtn" src="media/images/login/btn_login.gif" width="142" height="46" alt="login" />
+                    </form>
+				</fieldset>
+                <p class="pwS"><a href=""><strong>Forgot your Password?</strong></a></p>
+            </div>
+            <!-- △△ Login △△ -->
+        </div>
+        <!-- Container E -->
+        
+        <!-- Footer S -->
+        <div id="Footer">copyright@</div>
+        <!-- Footer E -->
+    </div>
 </body>
 </html>

@@ -1,0 +1,39 @@
+@charset "utf-8";
+/* CSS Document */
+
+#Wrap {width:100%; min-width:1200px;}
+#Header {width:100%; height:130px; background:url('../images/common/bg_header.gif') repeat-x left top;}
+#Header h1 {padding:24px 0 0 23px; display:inline-block;}
+#Header .btn {float:right; margin:9px 60px 0 0;}
+
+#HeaderM {width:100%; height:200px; background:url('../images/common/bg_header.gif') repeat-x left top;}
+#HeaderM h1 {padding:24px 0 0 23px; display:inline-block;}
+#HeaderM .loginInfo {float:right; margin:0 60px 0 0; color:#FFF; width:255px; height:52px; padding:9px 10px; background:#5c4776;
+					border:0; border-radius:0 0 5px 5px;}
+#HeaderM .loginInfo .txt {border-bottom:1px solid #462f63;font-size:14px; line-height:28px; }
+#HeaderM .loginInfo .marketBtn {border-top:1px solid #9e87ba; padding:4px 6px;}
+#HeaderM .loginInfo span { text-decoration:underline; font-weight:bold; }
+#HeaderM .loginInfo .btn {float:right;}
+
+
+#Gnb {overflow:hidden; margin:74px 0 0 23px;}
+#Gnb li {float:left; display:inline-block; margin-right:15px; padding:15px 29px 16px 29px; font:16px "Verdana"; color:#FFF; line-height:18px;}
+#Gnb li.on { background:#786689;  padding:15px 29px 16px 29px; border:0; border-radius:4px 4px 0 0;}
+#Gnb li:hover { background:#786689;  padding:15px 29px 16px 29px; border:0; border-radius:4px 4px 0 0;}
+
+#Container {}
+#ContainerM {width:100%; height:100%; background:url('../images/common/bg_left.gif') repeat-y left top;}
+
+#LeftContainer {float:left; width:185px; padding-left:15px; padding-bottom:50%;}
+#LeftContainer .gameLogo {margin:26px 0 20px;}
+#LeftContainer .sMenu {width:165px; font-size:14px; color:#5d5d5d; font-weight:bold;}
+#LeftContainer .sMenu li {line-height:35px; background:url('../images/common/bg_smenu.gif') repeat-x left top; padding-left:7px; }
+#LeftContainer .sMenu li img {vertical-align:middle; padding-right:5px;}
+#LeftContainer .sMenu li:hover {color:#130926;}
+
+#ConContainer {margin-left:185px; padding:15px 15px 0 30px; margin-bottom:50px;}
+
+
+
+#Footer {width:100%; line-height:50px; text-align:center; height:80px; border-top:1px solid #ececec; margin-top:100px; }
+#FooterM {width:100%; line-height:50px; text-align:center; height:80px; border-top:1px solid #ececec; }

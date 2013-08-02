@@ -13,6 +13,9 @@ class LoginView(BaseView):
 
     def get(self):
 
+        request = self.request
+        print request
+
         # Redirect if there are no users in the database
         users = user_model.count_users()
         if users == 0:
@@ -32,6 +35,9 @@ class LoginView(BaseView):
 
 
     def post(self):
+        request = self.request
+        print request
+
         form_data = {
                 "username": self.get_argument('username', ''),
                 "password": self.get_argument('password', ''),

@@ -4,6 +4,10 @@ import base64
 import tornado.web
 
 from dataview.views.app import(
+        IndexView,
+        BasicView,
+        AnalyticsView,
+        OperationView,
         ProcessedDataView,
         DashboardView,
         DiscoveryView,
@@ -27,7 +31,10 @@ app_settings = {
 
 handlers = [
 	# App
-    (r"/", ProcessedDataView),
+    (r"/", IndexView),
+    (r"/basic", BasicView),
+    (r"/analytics", AnalyticsView),
+    (r"/operation", OperationView),
 	(r"^/settings", SettingsView),
     (r"^/settings/change-password$", SettingsChangePasswordView),
 	# Auth

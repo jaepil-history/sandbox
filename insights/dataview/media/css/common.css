@@ -1,0 +1,19 @@
+@charset "utf-8";
+/* CSS Document */
+
+* {margin:0; padding:0}
+html {width:100%;}
+body {font-size:11px;font-family:verdana;color:#504f4f;}
+img {border:0;vertical-align:top;}
+h1,h2,h3,h4,h5,h6 {font-size:100%;}
+ul,ol,li {list-style-type:none;}
+fieldset {border:0;}
+select, textarea {font-size:1em}
+legend {display:none;}
+
+a {color:#5d5d5d;text-decoration:none;}
+a:hover {text-decoration:none;}
+
+.fLeft {float:left;}
+.fRight {float:right;}
+.clear {clear:both;}

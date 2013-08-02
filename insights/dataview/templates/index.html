@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}DataPro{% endblock %}
+
+{% block sidemenu %}
+<ul class="sMenu">
+    <a href=""><li><img src="media/images/common/img_smenuicon_01.gif" />Dashboard</li></a>
+    <a href=""><li><img src="media/images/common/img_smenuicon_02.gif" />Custom</li></a>
+    <a href=""><li><img src="media/images/common/img_smenuicon_03.gif" />Funnel</li></a>
+    <a href=""><li><img src="media/images/common/img_smenuicon_04.gif" />Realtime</li></a>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div>
+<!--ㅡMain Menu -->
+<h2>Dashboard</h2>
+<!-- sub menu -->
+<h3>Activity</h3>
+<!-- chart view -->
+
+<div class="chart">
+    <div class="title">
+    <h3 class="help" data-content="게임의 플레이 횟수 및 플레이 시간을 볼 수 있습니다." data-original-title="" title="">
+        <span style="color: #9fbd33">Number of Sessions</span> &amp; <span style="color: #f65b25">Average Time Spent</span>
+    </h3>
+</div>
+</div>
+<!-- sub menu -->
+<h3>Monetization</h3>
+<!-- chart view -->
+<div class="chart"></div>
+<!-- sub menu -->
+<h3>Events</h3>
+<!-- chart view -->
+<div class="chart"></div>
+<!--ㅡMain Menu -->
+<h2>Custom</h2>
+<!-- sub menu -->
+<h3>Activity</h3>
+<!-- chart view -->
+<div class="chart"></div>
+<!-- sub menu -->
+<h3>Monetization</h3>
+<!-- chart view -->
+<div class="chart"></div>
+</div>
+{% endblock %}

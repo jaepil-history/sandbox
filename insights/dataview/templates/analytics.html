@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+
+{% block sidemenu %}
+<ul class="sMenu">
+    <a href=""><li><img src="media/images/common/img_smenuicon_01.gif" />Dashboard</li></a>
+    <a href=""><li><img src="media/images/common/img_smenuicon_02.gif" />Custom</li></a>
+    <a href=""><li><img src="media/images/common/img_smenuicon_03.gif" />Funnel</li></a>
+    <a href=""><li><img src="media/images/common/img_smenuicon_04.gif" />Realtime</li></a>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div>
+<!--ㅡMain Menu -->
+<h2>Dashboard</h2>
+<!-- sub menu -->
+<h3>Activity</h3>
+<!-- chart view -->
+<div class="chart"></div>
+<!-- sub menu -->
+<h3>Monetization</h3>
+<!-- chart view -->
+<div class="chart"></div>
+<!-- sub menu -->
+<h3>Events</h3>
+<!-- chart view -->
+<div class="chart"></div>
+<!--ㅡMain Menu -->
+<h2>Custom</h2>
+<!-- sub menu -->
+<h3>Activity</h3>
+<!-- chart view -->
+<div class="chart"></div>
+<!-- sub menu -->
+<h3>Monetization</h3>
+<!-- chart view -->
+<div class="chart"></div>
+</div>
+{% endblock %}

@@ -1,222 +1,69 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <title>DataView {{ app.version }} - {% block title %} {% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<link rel="icon" type="image/png" href="/media/images/favicon.png" />
-	<link rel="stylesheet" href="/media/css/screen.css" />
-	<link rel="stylesheet" href="/media/css/jquery-ui.css" />
-
-    <!-- Le styles -->
-    <link href="http://twitter.github.io/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
-    <link href="http://twitter.github.io/bootstrap/assets/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="http://twitter.github.io/bootstrap/assets/css/docs.css" rel="stylesheet">
-    <link href="http://twitter.github.io/bootstrap/assets/js/google-code-prettify/prettify.css" rel="stylesheet">
-
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-    <script src="/media/js/html5shiv.js"></script>
-    <![endif]-->
-
-    <!-- Le fav and touch icons -->
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-57-precomposed.png">
-    <link rel="shortcut icon" href="http://twitter.github.io/bootstrap/assets/ico/favicon.png">
-
-    <!--
-    <script type="text/javascript" async="" id="gauges-tracker" data-site-id="4f0dc9fef5a1f55508000013" src="/media/js/track.js"></script>
-    <script type="text/javascript" async="" src="/media/js/azcarbon_2_1_0_HORIZDARK.js"></script>
-    <script type="text/javascript" async="" src="/media/js/ga.js"></script>
-    <script type="text/javascript">
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-146052-10']);
-      _gaq.push(['_trackPageview']);
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-    </script>
-    <style id="holderjs-style" type="text/css">
-        .holderjs-fluid {font-size:16px;font-weight:bold;text-align:center;font-family:sans-serif;margin:0}
-    </style>
-    -->
-    {% block header %}
-	{% endblock %}
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{% block title %} {% endblock %}</title>
+<script type="text/javascript" src="media/js/jquery-latest.js"></script>
+<script type="text/javascript" src="media/js/common_design.js"></script>
+<link href="media/css/main.css" rel="stylesheet" type="text/css">
 </head>
 
-
-<body data-spy="scroll" data-target=".bs-docs-sidebar" data-twttr-rendered="true">
-
-    <!-- Navbar
-    ================================================== -->
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container">
-                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="brand" href="http://twitter.github.io/bootstrap/index.html">Bootstrap</a>
-                <div class="nav-collapse collapse">
-                    <ul class="nav">
-                        <li class="">
-                            <a href="/">Home</a>
-                        </li>
-                        <li>
-                            <a class='{% if current_page=='processed_data' %}active{% endif %}' href="/">Processed Data</a>
-                        </li>
-                        {% if acl == "True" and app.user %}
-                        <li>
-                            <a class='top {% if current_page=='settings' %}active{% endif %}' href="/settings">Settings</a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                    {% if acl == "True" %}
-                    <ul class="nav">
-                        <li>
-                            <a href="{{ base_url|url('logout') }}" class='logout' title='Logout'>Logout</a>
-                        </li>
-                    </ul>
-                    {% endif %}
-                </div>
+<body>
+	<div id="Wrap">
+    
+    	<!-- HeaderM S -->
+    	<div id="HeaderM">
+        	<h1><img src="media/images/common/img_appspand.png" alt="APPSPAND DataPRO" /></h1>
+            <!-- ▽▽ Header LoginInfo ▽▽ -->
+            <div class="loginInfo">
+                <p class="txt">
+                	Welcome! <span>username</span>
+                    <a href="{{base_url|url('logout')}}"><img src="media/images/common/btn_logout.gif" alt="logout" class="btn" /></a>
+                </p>
+                <p class="marketBtn">
+                <a href=""><img src="media/images/common/btn_apple.gif" alt="apple store"  /></a>
+                <a href=""><img src="media/images/common/btn_google.gif" alt="Google market"  /></a>
+                </p>
             </div>
-        </div>
-    </div>
-
-    <!-- Subhead
-    ================================================== -->
-    <header class="jumbotron subhead" id="overview">
-        <div class="container">
-            <h1>Insights</h1>
-        </div>
-    </header>
-
-
-    <div class="container-fluid"  style="min-height:70%">
-
-        <!-- Docs nav
-        ================================================== -->
-        <div class="row-fluid">
-            <div class="span3 bs-docs-sidebar">
-                <ul class="nav nav-list bs-docs-sidenav affix-top">
-                    <li><a href="/?category=discovery"><i class="icon-chevron-right"></i>Discovery</a></li>
-                    <li><a href="/?category=emails"><i class="icon-chevron-right"></i>Emails</a></li>
-                    <li><a href="/?category=events"><i class="icon-chevron-right"></i>Events</a></li>
-                    <li><a href="/?category=installs"><i class="icon-chevron-right"></i>Installs</a></li>
-                    <li><a href="/?category=invites"><i class="icon-chevron-right"></i>Invites</a></li>
-                    <li><a href="/?category=messages"><i class="icon-chevron-right"></i>Messages</a></li>
-                    <li><a href="/?category=monetization"><i class="icon-chevron-right"></i>Monetization</a></li>
-                    <li><a href="/?category=notifications"><i class="icon-chevron-right"></i>Notifications</a></li>
-                    <li><a href="/?category=virality"><i class="icon-chevron-right"></i>Virality</a></li>
-                    <li><a href="/?category=returning_users"><i class="icon-chevron-right"></i>Returning Users</a></li>
-                    <li><a href="/?category=stream"><i class="icon-chevron-right"></i>Stream</a></li>
-                    <li><a href="/?category=traffic"><i class="icon-chevron-right"></i>Traffic</a></li>
-                    <li><a href="/?category=time"><i class="icon-chevron-right"></i>Time</a></li>
-                    <li><a href="/?category=user_distribution"><i class="icon-chevron-right"></i>User Distribution</a></li>
-                    <li><a href="/?category=user_retention"><i class="icon-chevron-right"></i>User Retention</a></li>
-                    <li><a href="/?category=user_sessions"><i class="icon-chevron-right"></i>User Sessions</a></li>
-                    <li><a href="/?category=unique_visitors"><i class="icon-chevron-right"></i>Unique Visitors</a></li>
+             <!-- △△ Header LoginInfo △△ -->
+             
+             <!-- ▽▽ GNB ▽▽ -->
+             <div id="Gnb">
+             	<ul>
+                	<a href="/"><li class='{% if current_page=='index' %}on{% endif %}'>Home</li></a>
+                    <a href="/basic"><li class='{% if current_page=='basic' %}on{% endif %}'>Basic</li></a>
+                    <a href="/analytics"><li class='{% if current_page=='analytics' %}on{% endif %}'>Analytics</li></a>
+                    <a href="/operation"><li class='{% if current_page=='operation' %}on{% endif %}'>Operation</li></a>
                 </ul>
-            </div>
-            <div class="span9">
-                <!-- Main Content Area -->
-                <div class="wrapper">
-                    <div id="content">
-                        <div id="breadcrumb">
-                            <ul>
-                                {% block breadcrumb %}
-                                {% endblock breadcrumb %}
-                            </ul>
-                        </div>
-                        {% block filter %}{% endblock %}
-                        {% block content %}
-                        {% endblock %}
-                    </div><!-- content end -->
-                </div><!-- wrapper end -->
-            </div>
+             </div>
+            <!-- △△ GNB △△ -->
         </div>
+        <!-- HeaderM E -->
+        
+        <!-- Container S -->
+        <div id="ContainerM">
+         	<!-- ▽▽ Left-Container ▽▽ -->
+        		<div id="LeftContainer">
+                	<p class="gameLogo"><img src="media/images/common/img_gamelogo.gif" /></p>
+                    <!-- side sub menu -->
+                    {% block sidemenu %}
+                    {% endblock %}
+                    <!-- side sub menu -->
+                </div>
+            <!-- △△ Left-Container △△ -->
+            
+            <!-- ▽▽ Contents-Container ▽▽ -->
+        		<div id="ConContainer">
+                	{% block content %}
+                    {% endblock %}
+                </div>
+            <!-- △△ Contents-Container △△ -->
+        </div>
+        <!-- Container E -->
+        
+        <!-- Footer S -->
+        <div id="FooterM">copyright@</div>
+        <!-- Footer E -->
     </div>
-
-
-    <!-- Footer
-    ================================================== -->
-    <footer class="footer">
-        <div class="container">
-            <p>Designed and built with all the love in the world by <a href="http://twitter.com/mdo" target="_blank">@mdo</a> and <a href="http://twitter.com/fat" target="_blank">@fat</a>.</p>
-            <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
-            <p><a href="http://glyphicons.com/">Glyphicons Free</a> licensed under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
-            <ul class="footer-links">
-                <li><a href="http://blog.getbootstrap.com/">Blog</a></li>
-                <li class="muted">·</li>
-                <li><a href="https://github.com/twitter/bootstrap/issues?state=open">Issues</a></li>
-                <li class="muted">·</li>
-                <li><a href="https://github.com/twitter/bootstrap/blob/master/CHANGELOG.md">Changelog</a></li>
-            </ul>
-        </div>
-    </footer>
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script type="text/javascript" src="/media/js/widgets.js"></script>
-    <script src="/media/js/jquery.js"></script>
-    <script src="/media/js/bootstrap-transition.js"></script>
-    <script src="/media/js/bootstrap-alert.js"></script>
-    <script src="/media/js/bootstrap-modal.js"></script>
-    <script src="/media/js/bootstrap-dropdown.js"></script>
-    <script src="/media/js/bootstrap-scrollspy.js"></script>
-    <script src="/media/js/bootstrap-tab.js"></script>
-    <script src="/media/js/bootstrap-tooltip.js"></script>
-    <script src="/media/js/bootstrap-popover.js"></script>
-    <script src="/media/js/bootstrap-button.js"></script>
-    <script src="/media/js/bootstrap-collapse.js"></script>
-    <script src="/media/js/bootstrap-carousel.js"></script>
-    <script src="/media/js/bootstrap-typeahead.js"></script>
-    <script src="/media/js/bootstrap-affix.js"></script>
-
-    <script src="/media/js/holder.js"></script>
-    <script src="/media/js/prettify.js"></script>
-
-    <script src="/media/js/application.js"></script>
-
-
-    <!-- Analytics
-
-    <script>
-        var _gauges = _gauges || [];
-        (function() {
-          var t   = document.createElement('script');
-          t.type  = 'text/javascript';
-          t.async = true;
-          t.id    = 'gauges-tracker';
-          t.setAttribute('data-site-id', '4f0dc9fef5a1f55508000013');
-          t.src = '//secure.gaug.es/track.js';
-          var s = document.getElementsByTagName('script')[0];
-          s.parentNode.insertBefore(t, s);
-        })();
-    </script>
-    ================================================== -->
-
-	<script type="text/javascript" src='/media/js/jquery-1.7.2.min.js'></script>
-	<script type="text/javascript" src='/media/js/date.format.min.js'></script>
-	<script type="text/javascript" src='/media/js/jquery.relative-date.js'></script>
-	<script type="text/javascript" src='/media/js/moment.min.js'></script>
-	{% block js %}
-	{% endblock %}
-
 </body>
 </html>

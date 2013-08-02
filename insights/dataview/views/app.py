@@ -16,6 +16,58 @@ from dataview.views.models import (
         user_model
         )
 
+class IndexView(BaseView):
+
+    def initialize(self):
+        super(IndexView, self).initialize()
+
+    @authenticated
+    def get(self):
+
+        self.render("index.html",
+                current_page='index',
+                )
+
+
+class BasicView(BaseView):
+
+    def initialize(self):
+        super(BasicView, self).initialize()
+
+    @authenticated
+    def get(self):
+
+        self.render("basic.html",
+                current_page='basic',
+                )
+
+
+class AnalyticsView(BaseView):
+
+    def initialize(self):
+        super(AnalyticsView, self).initialize()
+
+    @authenticated
+    def get(self):
+
+        self.render("analytics.html",
+                current_page='analytics',
+                )
+
+
+class OperationView(BaseView):
+
+    def initialize(self):
+        super(OperationView, self).initialize()
+
+    @authenticated
+    def get(self):
+
+        self.render("operation.html",
+                current_page='operation',
+                )
+
+
 class DashboardView(BaseView):
 
     def initialize(self):
