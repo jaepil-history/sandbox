@@ -4,8 +4,9 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-
 import android.util.Log;
+
+import com.appspand.chat.protocol.ChatProtocol;
 
 /**
  * Created by jaepil on 7/11/13.
@@ -16,8 +17,7 @@ public class ChatService extends Service {
     private static final boolean D = true;
 
     // Socket
-    //private static final String SERVER_URL = "ws://chat.appengine.jaepil.appspand.com:8080/v1/ws";
-    private static final String SERVER_URL = "ws://chat.appengine.appspand.com:8080/v1/ws";
+    private static final String SERVER_URL = "ws://chat.dev.appspand.com/v1/ws";
 
     private ChatConnector mChatConnector = null;
 

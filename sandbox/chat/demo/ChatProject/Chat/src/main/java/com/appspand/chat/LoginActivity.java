@@ -4,24 +4,18 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.appspand.chat.protocol.ChatProtocol;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -154,20 +148,15 @@ public class LoginActivity extends Activity implements AsyncResponse {
             showProgress(true);
 
             ChatApplication application = (ChatApplication)getApplication();
-            application.getChatConnector().login(mEmail, mEmail, new ChatConnector.AsyncResult() {
-                @Override
-                public void handle(String response) {
-                    try {
-                        JSONObject command = new JSONObject(response);
-                        JSONObject loginAns = command.getJSONObject("payload");
-                        int errorCode = loginAns.getInt("error_code");
-
-                        showProgress(false);
-                        processFinish(errorCode == 0);
-                    } catch (JSONException e) {
-                    }
-                }
-            });
+            application.getChatConnector().login(mEmail, mEmail,
+                    new ChatConnector.AsyncResult<ChatProtocol.User_LoginAns>()
+                    {
+                        @Override
+                        void handle(ChatProtocol.User_LoginAns response) {
+                            showProgress(false);
+                            processFinish(response.mErrorCode == 0);
+                        }
+                    });
 
 //            mAuthTask = new UserLoginTask();
 //            mAuthTask.delegate = this;

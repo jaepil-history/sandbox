@@ -1,14 +1,13 @@
 package com.appspand.chat;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.app.Activity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +17,12 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.appspand.chat.protocol.ChatProtocol;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Date;
 import java.text.DateFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -92,48 +92,33 @@ public class ChatRoomActivity extends Activity {
 
         ChatApplication application = (ChatApplication)getApplication();
         application.getChatConnector().getMessages(mMyID, mRoomID, false, 0, 100,
-                new ChatConnector.AsyncResult() {
+                new ChatConnector.AsyncResult<ChatProtocol.Message_GetAns>() {
                     @Override
-                    public void handle(String response) {
-                        try {
-                            JSONObject command = new JSONObject(response);
-                            JSONObject loginAns = command.getJSONObject("payload");
-                            int errorCode = loginAns.getInt("error_code");
-                            if (errorCode != 0) {
-                                return;
-                            }
+                    public void handle(ChatProtocol.Message_GetAns response) {
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        for (ChatProtocol.MessageInfo m: response.mMessageInfo) {
+                            String senderID = m.mSenderUID;
+                            int issuedAt = m.mIssuedAt;
+                            String message = m.mMessage;
 
-                            String message_info_str = loginAns.getString("message_info");
-                            JSONObject message_info = new JSONObject(message_info_str);
-                            JSONArray messages = message_info.getJSONArray("messages");
+                            DateFormat df = DateFormat.getTimeInstance();
+                            df.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+                            String time = df.format(issuedAt);
 
-                            for (int i = 0; i < messages.length(); ++i) {
-                                JSONObject obj = messages.getJSONObject(i);
-                                String senderID = obj.getString("sender_uid");
-                                int issuedAt = obj.getInt("issued_at");
-                                String message = obj.getString("message");
-
-                                DateFormat df = DateFormat.getTimeInstance();
-                                df.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
-                                String time = df.format(issuedAt);
-
-                                String finalMessage = senderID + "(" + time + ") : " + message;
-                                final TextView textView = new TextView(ChatRoomActivity.this);
-                                textView.setTextColor(Color.BLACK);
-                                textView.setText(finalMessage);
-                                textView.setLayoutParams(params);
-                                mMessagesContainer.addView(textView);
-                            }
-
-                            mScrollContainer.post(new Runnable(){
-                                public void run(){
-                                    mScrollContainer.fullScroll(ScrollView.FOCUS_DOWN);
-                                }
-                            });
-                        } catch (JSONException e) {
+                            String finalMessage = senderID + "(" + time + ") : " + message;
+                            final TextView textView = new TextView(ChatRoomActivity.this);
+                            textView.setTextColor(Color.BLACK);
+                            textView.setText(finalMessage);
+                            textView.setLayoutParams(params);
+                            mMessagesContainer.addView(textView);
                         }
+
+                        mScrollContainer.post(new Runnable(){
+                            public void run(){
+                                mScrollContainer.fullScroll(ScrollView.FOCUS_DOWN);
+                            }
+                        });
                     }
                 }
         );
@@ -169,18 +154,9 @@ public class ChatRoomActivity extends Activity {
                     ChatApplication application = (ChatApplication)getApplication();
                     application.getChatConnector().markAsReadMessages(mMyID, senderUid,
                             false, new long[] {messageUid},
-                            new ChatConnector.AsyncResult() {
+                            new ChatConnector.AsyncResult<ChatProtocol.Message_ReadAns>() {
                                 @Override
-                                public void handle(String response) {
-                                    try {
-                                        JSONObject command = new JSONObject(response);
-                                        JSONObject loginAns = command.getJSONObject("payload");
-                                        int errorCode = loginAns.getInt("error_code");
-                                        if (errorCode == 0) {
-                                            //
-                                        }
-                                    } catch (JSONException e) {
-                                    }
+                                public void handle(ChatProtocol.Message_ReadAns response) {
                                 }
                             }
                     );
@@ -217,18 +193,9 @@ public class ChatRoomActivity extends Activity {
 
             ChatApplication application = (ChatApplication)getApplication();
             application.getChatConnector().sendMessage(mMyID, mRoomID, false, msg,
-                    new ChatConnector.AsyncResult() {
+                    new ChatConnector.AsyncResult<ChatProtocol.Message_SendAns>() {
                         @Override
-                        public void handle(String response) {
-                            try {
-                                JSONObject command = new JSONObject(response);
-                                JSONObject loginAns = command.getJSONObject("payload");
-                                int errorCode = loginAns.getInt("error_code");
-                                if (errorCode == 0) {
-                                    //
-                                }
-                            } catch (JSONException e) {
-                            }
+                        public void handle(ChatProtocol.Message_SendAns response) {
                         }
                     }
             );

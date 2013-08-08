@@ -3,7 +3,6 @@ package com.appspand.chat;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 public class SQLiteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_CREATE_FRIEND_LIST = "create table friend_list (_id integer primary key autoincrement, user_id text not null);" ;
