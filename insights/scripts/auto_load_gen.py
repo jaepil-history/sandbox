@@ -16,9 +16,9 @@ import time
 import logging
 
 # Configure logging
-LOGFILE = '/usr/local/insights/autogen.log'
-logging.basicConfig(filename=LOGFILE,level=logging.DEBUG)
-logger = logging.getLogger('autogen')
+# LOGFILE = '/usr/local/insights/autogen.log'
+# logging.basicConfig(filename=LOGFILE,level=logging.DEBUG)
+# logger = logging.getLogger('autogen')
 
 import settings
 
@@ -26,7 +26,8 @@ import settings
 options = settings.parse_options()
 
 class InsightsClient(object):
-    INSIGHTS_API_URL = "http://api.insights.appspand.com:8001/api/v1/"
+    # INSIGHTS_API_URL = "http://api.insights.appspand.com:8001/api/v1/"
+    INSIGHTS_API_URL = "http://localhost:8001/api/v1/"
 
     def __init__(self, app_id):
         self.app_id = app_id
@@ -140,7 +141,7 @@ def getApps(config):
     apps = list(col_application.find())
 
     if len(apps) < 1:
-        logger.warning('No registered application found')
+        # logger.warning('No registered application found')
         print 'No registered application found'
         return
     else :
@@ -166,35 +167,15 @@ def main(options):
 
     for uuid in range(10000, 20000):
         # client and user are picked randomly
-        while True:
-            http_client = http_clients[random.randint(0, len(apps) - 1)]
-            col_cpu_name = str(http_client.app_id) + '.event.cpu'
-            # print col_cpu_name
-            user = db_insights[col_cpu_name].find_one({'uuid': uuid})
-            # print 'user: ' + str(user)
-            if user is not None:
-                break
-            # else:
-            #     print 'user is None'
-
-        # print 'here is the user'
+        http_client = http_clients[random.randint(0, len(apps) - 1)]
 
         '''
         # client actions
         '''
-        # Generate data at random time(unit: milisecond)
-        time.sleep(random.randint(0, 10) * 0.001)
         http_client.track_apa(uuid)
-        # Generate data at random time(unit: milisecond)
-        # time.sleep(random.randint(0, 100) * 0.001)
-        # http_client.track_cpu(uuid)
-        # Generate data at random time(unit: milisecond)
-        time.sleep(random.randint(0, 10) * 0.001)
+        http_client.track_cpu(uuid)
         http_client.track_pgr(uuid)
-        # Generate data at random time(unit: milisecond)
-        time.sleep(random.randint(0, 10) * 0.001)
         http_client.track_pgr(uuid)
-        #client.track_mtu(uuid)
 
 
 if __name__ == "__main__":

@@ -49,7 +49,8 @@ def api_main(args, config):
         options=config,
         mongodb_client=mongodb_client
     )
-    application.add_handlers("api.insights.appspand.com", urls.handlers)
+    # application.add_handlers("api.insights.appspand.com", urls.handlers)
+    application.add_handlers("localhost", urls.handlers)
 
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(config.port)
@@ -62,7 +63,7 @@ def cmd_main(args, config):
     if len(args) < 1:
         return 1
 
-    app = importlib.import_module(".".join(["cmd", args[0]])) #importlib.import_module(".".join(["insights", "cmd", args[0]]))
+    app = importlib.import_module(".".join(["cmd", args[0]]))
     print str(app)
     print args[0]
     app.main(args, config)

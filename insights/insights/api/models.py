@@ -1,108 +1,73 @@
-import json
 import time
 import datetime
 
-from schematics.models import Model
-from schematics.serialize import to_json, to_python
-from schematics.types import DateTimeType, EmailType, IntType, LongType, SHA1Type, StringType
-from schematics.types.compound import ModelType
-from schematics.types.mongo import ObjectIdType
+import bson
+from mongoengine import Document
+from mongoengine import EmbeddedDocument
+from mongoengine import DateTimeField
+from mongoengine import EmbeddedDocumentField
+from mongoengine import IntField
+from mongoengine import LongField
+from mongoengine import StringField
+from mongoengine import EmailField
+from password import PasswordField
 
 import tornado.gen
 
 
-class message(object):
-    def __init__(self, message_type):
-        self.message_type = message_type
-
-    def __call__(self, cls):
-        setattr(cls, "_message_type", self.message_type)
-        return cls
 
 
-class collection_name(object):
-    def __init__(self, collection_name):
-        self.collection_name = collection_name
+class BaseDoc(Document):
+    # ts : timestamp
+    _dt = DateTimeField(required=True)
 
-    def __call__(self, cls):
-        setattr(cls, "_collection_name", self.collection_name)
-        return cls
-
-
-class Document(Model):
-    _id = ObjectIdType(minimized_field_name="_id")
-    _dt = DateTimeType(minimized_field_name="_dt", required=True)
-
-    def __init__(self, json_data=None, **kwargs):
-        if json_data is not None:
-            data = json.loads(json_data)
-            super(Document, self).__init__(**data)
-        else:
-            super(Document, self).__init__(**kwargs)
-
+    def __init__(self, *args, **values):
+        super(Document, self).__init__(*args, **values)
         self.initialize()
 
     def initialize(self):
-        # if hasattr(self, "_collection_name") is False:
-        #     raise Exception("Document has no target collection. Use @collection_name decorator.")
-
         self._dt = datetime.datetime.utcnow()
 
-        if self.timestamp is None:
-            self.timestamp = int(time.time())
+        if self.ts is None:
+            self.ts = int(time.time())
 
-    def to_json(self, validate=False):
-        if validate is True:
-            self.validate()
-        return to_json(self)
-
-    def to_python(self, validate=False):
-        if validate is True:
-            self.validate()
-        return to_python(self)
+    def to_python(self):
+        data = self.to_mongo()
+        data = bson.son.SON(data).to_dict()
+        del(data['_cls'])
+        return data
 
     @tornado.gen.coroutine
     def save(self, db_context, collection_name, validate=False):
-        doc = self.to_python(validate)
+        doc = self.to_python()
         yield db_context.insert(collection_name=collection_name, doc=doc)
         raise tornado.gen.Return(doc)
 
-
-class ClusterInfo(Model):
-    name = StringType(minimized_field_name="name", required=True)
-    db_name = StringType(minimized_field_name="db_name", required=True)
+    meta = {'allow_inheritance': True}
 
 
-class ApplicationInfo(Document):
-    name = StringType(minimized_field_name="name", max_length=100, required=True)
-    cluster = ModelType(ClusterInfo, minimized_field_name="cluster", required=True)
-    timestamp = IntType(minimized_field_name="ts")
+class ClusterInfo(EmbeddedDocument):
+    name = StringField(required=True, max_length=100)
+    db_name = StringField(required=True, max_length=100)
 
 
-class AccountInfo(Document):
-    name = StringType(minimized_field_name="name", max_length=100, required=True)
-    email = EmailType(minimized_field_name="email", max_length=100, required=True)
-    password = SHA1Type(minimized_field_name="pwd", required=True)
-    timestamp = IntType(minimized_field_name="ts")
+class ApplicationInfo(BaseDoc):
+    name = StringField(max_length=100, required=True)
+    cluster = EmbeddedDocumentField(ClusterInfo)
+    timestamp = IntField(db_field='ts')
+    # meta = {'collection': 'application'}
 
 
-class Message(Document):
-    _mt = StringType(minimized_field_name="_mt", required=True)
-
-    def initialize(self):
-        super(Message, self).initialize()
-
-        if self._mt is None:
-            if hasattr(self, "_message_type") is True:
-                self._mt = getattr(self, "_message_type")
-            else:
-                raise Exception("Message has no type information. Use @message decorator.")
+class AccountInfo(BaseDoc):
+    name = StringField(max_length=100, required=True)
+    email = EmailField(max_length=100, required=True)
+    password = PasswordField(algorithm="sha1")
+    timestamp = IntField(db_field='ts')
+    # meta = {'collection': 'account'}
 
 
 # apa
-@message("apa")
-@collection_name("apa")
-class ApplicationAdded(Message):
+class ApplicationAdded(BaseDoc):
     """
     s: The UID of the user adding the application.
     u: A 16-digit unique hexadecimal string to track an invite, notification email, or stream post;
@@ -115,38 +80,37 @@ class ApplicationAdded(Message):
         This parameter must match the su parameter in the associated ucc API call.
     data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
         It must be base64-encoded.
-    ts: The timestamp in the Epoch time format.
+    ts: The ts in the Epoch time format.
         Include this parameter to prevent the user's browser from caching the REST API call if sent
         using JavaScript.
     """
-
-    user_uid = LongType(minimized_field_name="uuid", required=True)
-    tracking_uid = StringType(minimized_field_name="tuid",
-                              regex="[0-9A-Fa-f]+", min_length=8, max_length=16)
-    data = StringType()
-    timestamp = IntType(minimized_field_name="ts")
+    _mt = StringField(default='apa')
+    user_uid = LongField(required=True, db_field='uuid')
+    tracking_uid = StringField(regex="[0-9A-Fa-f]+", min_length=8, max_length=16)
+    data = StringField()
+    timestamp = IntField(db_field='ts')
+    # meta = {'collection': 'apa'}
 
 
 # apr
-@message("apr")
-class ApplicationRemoved(Message):
+class ApplicationRemoved(BaseDoc):
     """
     s: The UID of the user removing the application.
     data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
         It must be base64-encoded.
-    ts: The timestamp in the Epoch time format.
+    ts: The ts in the Epoch time format.
         Include this parameter to prevent the user's browser from caching the REST API call if sent
         using JavaScript.
     """
 
-    user_uid = LongType(minimized_field_name="uuid", required=True)
-    data = StringType()
-    timestamp = IntType(minimized_field_name="ts")
+    _mt = StringField(default='apr')
+    user_uid = LongField(required=True, db_field='uuid')
+    data = StringField()
+    timestamp = IntField(db_field='ts')
 
 
 # cpu
-@message("cpu")
-class UserInformation(Message):
+class UserInformation(BaseDoc):
     """
     s: The UID of the user.
     b: The year of the user's birth, in YYYY/MM/DD format.
@@ -158,64 +122,64 @@ class UserInformation(Message):
     f: The number of friends a user has.
     data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
         It must be base64-encoded.
-    ts: The timestamp in the Epoch time format.
+    ts: The ts in the Epoch time format.
         Include this parameter to prevent the user's browser from caching the REST API call if sent
         using JavaScript.
     """
 
-    user_uid = LongType(minimized_field_name="uuid", required=True)
-    birthday = StringType(minimized_field_name="b", min_length=10, max_length=10)
-    gender = StringType(minimized_field_name="g", min_length=1, max_length=1)
-    country = StringType(minimized_field_name="lc")
-    friends_count = IntType(minimized_field_name="f")
-    data = StringType()
-    timestamp = IntType(minimized_field_name="ts")
+    _mt = StringField(default='cpu')
+    user_uid = LongField(required=True, db_field='uuid')
+    birthday = StringField(min_length=10, max_length=10, db_field='b')
+    gender = StringField(min_length=1, max_length=1, db_field='g')
+    country = StringField(db_field='lc')
+    friends_count = IntField(db_field='f')
+    data = StringField()
+    timestamp = IntField(db_field='ts')
 
 
 # evt
-@message("evt")
-class CustomEvent(Message):
+class CustomEvent(BaseDoc):
     """
     s: The UID of the user.
     data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
         It must be base64-encoded.
-    ts: The timestamp in the Epoch time format.
+    ts: The ts in the Epoch time format.
         Include this parameter to prevent the user's browser from caching the REST API call if sent
         using JavaScript.
     """
 
-    user_uid = LongType(minimized_field_name="uuid", required=True)
-    event_name = StringType(minimized_field_name="n", min_length=1, max_length=128, required=True)
-    value = IntType(minimized_field_name="v", default=1)
-    level = IntType(minimized_field_name="lv", default=1)
-    data = StringType()
-    timestamp = IntType(minimized_field_name="ts")
+    _mt = StringField(default='evt')
+    user_uid = LongField(required=True, db_field='uuid')
+    event_name = StringField(min_length=1, max_length=128, required=True)
+    value = IntField(default=1)
+    level = IntField(default=1)
+    data = StringField()
+    timestamp = IntField(db_field='ts')
 
 
 # ins
-@message("ins")
-class InviteSent(Message):
-    data = StringType()
-    timestamp = IntType(minimized_field_name="ts")
+class InviteSent(BaseDoc):
+    _mt = StringField(default='ins')
+    data = StringField()
+    timestamp = IntField(db_field='ts')
 
 
 # inr
-@message("inr")
-class InviteReceived(Message):
-    data = StringType()
-    timestamp = IntType(minimized_field_name="ts")
+class InviteReceived(BaseDoc):
+    _mt = StringField(default='inr')
+    data = StringField()
+    timestamp = IntField(db_field='ts')
 
 
 # gci
-@message("gci")
-class GoalCounts(Message):
-    data = StringType()
-    timestamp = IntType(minimized_field_name="ts")
+class GoalCounts(BaseDoc):
+    _mt = StringField(default='gci')
+    data = StringField()
+    timestamp = IntField(db_field='ts')
 
 
 # mtu
-@message("mtu")
-class RevenueTracking(Message):
+class RevenueTracking(BaseDoc):
     """
     s: The UID of the user.
     u: The page address to be recorded can be set manually using this parameter. If this message is
@@ -226,22 +190,22 @@ class RevenueTracking(Message):
         server directly from your server, you must set this parameter.
     data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
         It must be base64-encoded.
-    ts: The timestamp in the Epoch time format.
+    ts: The ts in the Epoch time format.
         Include this parameter to prevent the user's browser from caching the REST API call if sent
         using JavaScript.
     """
 
-    user_uid = LongType(minimized_field_name="uuid", required=True)
-    event_name = StringType(minimized_field_name="n", min_length=1, max_length=128)
-    value = IntType(minimized_field_name="v", required=True)
-    level = IntType(minimized_field_name="lv", default=1)
-    data = StringType()
-    timestamp = IntType(minimized_field_name="ts")
+    _mt = StringField(default='mtu')
+    user_uid = LongField(required=True, db_field='uuid')
+    event_name = StringField(min_length=1, max_length=128)
+    value = IntField(required=True)
+    level = IntField(default=1)
+    data = StringField()
+    timestamp = IntField(db_field='ts')
 
 
 # pgr
-@message("pgr")
-class PageRequest(Message):
+class PageRequest(BaseDoc):
     """
     s: The UID of the user.
     u: The page address to be recorded can be set manually using this parameter. If this message is
@@ -252,43 +216,49 @@ class PageRequest(Message):
         server directly from your server, you must set this parameter.
     data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
         It must be base64-encoded.
-    ts: The timestamp in the Epoch time format.
+    ts: The ts in the Epoch time format.
         Include this parameter to prevent the user's browser from caching the REST API call if sent
         using JavaScript.
     """
 
-    user_uid = LongType(minimized_field_name="uuid", required=True)
-    url = StringType(minimized_field_name="url", min_length=1, max_length=128)
-    ip = StringType(min_length=1, max_length=32)
-    data = StringType()
-    timestamp = IntType(minimized_field_name="ts", required=True)
+    _mt = StringField(default='pgr')
+    user_uid = LongField(required=True, db_field='uuid')
+    url = StringField(min_length=1, max_length=128)
+    ip = StringField(min_length=1, max_length=32)
+    data = StringField()
+    timestamp = IntField(db_field='ts',required=True)
 
 
 # pst
-@message("pst")
-class StreamPost(Message):
+class StreamPost(BaseDoc):
+    _mt = StringField(default='pst')
+    timestamp = IntField(db_field='ts')
     pass
 
 
 # psr
-@message("psr")
-class StreamResponse(Message):
+class StreamResponse(BaseDoc):
+    _mt = StringField(default='psr')
+    timestamp = IntField(db_field='ts')
     pass
 
 
 # ucc
-@message("ucc")
-class ExternalLinkClick(Message):
+class ExternalLinkClick(BaseDoc):
+    _mt = StringField(default='ucc')
+    timestamp = IntField(db_field='ts')
     pass
 
 
 # nes
-@message("nes")
-class NotificationEmailSent(Message):
+class NotificationEmailSent(BaseDoc):
+    _mt = StringField(default='nes')
+    timestamp = IntField(db_field='ts')
     pass
 
 
 # nei
-@message("nei")
-class NotificationEmailResponse(Message):
+class NotificationEmailResponse(BaseDoc):
+    _mt = StringField(default='nei')
+    timestamp = IntField(db_field='ts')
     pass

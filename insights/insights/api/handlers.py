@@ -11,8 +11,6 @@ import motor
 
 import models
 
-#from ..proxy import kontagent
-
 
 class BaseHandler(tornado.web.RequestHandler):
     class Context(object):

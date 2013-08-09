@@ -8,9 +8,8 @@ import tornado.web
 
 import bson
 import motor
-from dataview.api import dbmodels
 
-#from ..proxy import kontagent
+import models
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -61,7 +60,7 @@ class BaseHandler(tornado.web.RequestHandler):
             if doc is None:
                 raise Exception("Application ID not found")
 
-            app_info = dbmodels.ApplicationInfo(**doc)
+            app_info = models.ApplicationInfo(**doc)
             raise tornado.gen.Return(app_info)
 
         @tornado.gen.coroutine
@@ -112,7 +111,7 @@ class ApplicationAddedHandler(BaseHandler):
         #     use_test_server=self.options.kontagent_use_test_server)
         # kontagent.track_application_added(**self.context.arguments)
 
-        apa = dbmodels.ApplicationAdded(**self.context.arguments)
+        apa = models.ApplicationAdded(**self.context.arguments)
         yield apa.save(db_context=self.db_context, collection_name="apa", validate=True)
         self.write("1")
         self.finish()
@@ -122,7 +121,7 @@ class ApplicationRemovedHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
-        apr = dbmodels.ApplicationRemoved(**self.context.arguments)
+        apr = models.ApplicationRemoved(**self.context.arguments)
         yield apr.save(db_context=self.db_context, collection_name="apr", validate=True)
         self.write("1")
         self.finish()
@@ -132,7 +131,7 @@ class UserInformationHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
-        cpu = dbmodels.UserInformation(**self.context.arguments)
+        cpu = models.UserInformation(**self.context.arguments)
         yield cpu.save(db_context=self.db_context, collection_name="cpu", validate=True)
         self.write("1")
         self.finish()
@@ -142,7 +141,7 @@ class CustomEventHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
-        evt = dbmodels.CustomEvent(**self.context.arguments)
+        evt = models.CustomEvent(**self.context.arguments)
         yield evt.save(db_context=self.db_context, collection_name="evt", validate=True)
         self.write("1")
         self.finish()
@@ -164,7 +163,7 @@ class RevenueTrackingHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
-        mtu = dbmodels.RevenueTracking(**self.context.arguments)
+        mtu = models.RevenueTracking(**self.context.arguments)
         yield mtu.save(db_context=self.db_context, collection_name="mtu", validate=True)
         self.write("1")
         self.finish()
@@ -174,101 +173,10 @@ class PageRequestHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def get(self):
-        pgr = dbmodels.PageRequest(**self.context.arguments)
+        pgr = models.PageRequest(**self.context.arguments)
         yield pgr.save(db_context=self.db_context, collection_name="pgr", validate=True)
         self.write("1")
         self.finish()
-
-
-'''
-'''
-
-class DiscoveryHandler(BaseHandler):
-    pass
-
-
-class EmailConversionHandler(BaseHandler):
-    pass
-
-
-class EmailEventsHandler(BaseHandler):
-    pass
-
-
-class EmailLimitHandler(BaseHandler):
-    pass
-
-
-class EmailsReceivedHandler(BaseHandler):
-    pass
-
-
-class EmailsResponsesHandler(BaseHandler):
-    pass
-
-
-class EmailsSentHandler(BaseHandler):
-    pass
-
-
-class InviteConversionHandler(BaseHandler):
-    pass
-
-
-class InviteEventsHandler(BaseHandler):
-    pass
-
-
-class InviteLimitHandler(BaseHandler):
-    pass
-
-
-class InvitesReceivedHandler(BaseHandler):
-    pass
-
-
-class InviteResponsesHandler(BaseHandler):
-    pass
-
-
-class InvitesSentHandler(BaseHandler):
-    pass
-
-
-class MessagesSentHandler(BaseHandler):
-    pass
-
-
-class MessagesClicksHandler(BaseHandler):
-    pass
-
-
-class MessagesResponsesHandler(BaseHandler):
-    pass
-
-
-class NotificationConversionHandler(BaseHandler):
-    pass
-
-
-class NotificationEventsHandler(BaseHandler):
-    pass
-
-
-class NotificationLimitHandler(BaseHandler):
-    pass
-
-
-class NotificationsSentHandler(BaseHandler):
-    pass
-
-
-class NotificationsReceivedHandler(BaseHandler):
-    pass
-
-
-class NotificationsResponsesHandler(BaseHandler):
-    pass
 
 
 class StreamPostHandler(BaseHandler):
@@ -283,125 +191,9 @@ class ExternalLinkClickHandler(BaseHandler):
     pass
 
 
-class StreamPostClickRatioHandler(BaseHandler):
+class NotificationEmailSentHandler(BaseHandler):
     pass
 
 
-class MonetizationRevenueHandler(BaseHandler):
-    pass
-
-
-class MonetizationTransactionsHandler(BaseHandler):
-    pass
-
-
-class MonetizationAverageTransactionHandler(BaseHandler):
-    pass
-
-
-class MonetizationARPPUHandler(BaseHandler):
-    pass
-
-
-class MonetizationSpendingUsersHandler(BaseHandler):
-    pass
-
-
-class TrafficClicksHandler(BaseHandler):
-    pass
-
-
-class TrafficInstallSummaryHandler(BaseHandler):
-    pass
-
-
-class TrafficInstallsHandler(BaseHandler):
-    pass
-
-
-class TrafficSummaryHandler(BaseHandler):
-    pass
-
-
-class EventsCountHandler(BaseHandler):
-    pass
-
-
-class EventsDistributionHandler(BaseHandler):
-    pass
-
-
-class EventsNamesHandler(BaseHandler):
-    pass
-
-
-class EventsNamesSubtreeHandler(BaseHandler):
-    pass
-
-
-class EventsValueHandler(BaseHandler):
-    pass
-
-
-class GoalCountsHandler(BaseHandler):
-    pass
-
-
-class PageViewsHandler(BaseHandler):
-    pass
-
-
-class UsersGenderDistributionHandler(BaseHandler):
-    pass
-
-
-class UsersAgeDistributionHandler(BaseHandler):
-    pass
-
-
-class UsersFriendsDistributionHandler(BaseHandler):
-    pass
-
-
-class UsersCountryDistributionHandler(BaseHandler):
-    pass
-
-
-class UsersViralityHandler(BaseHandler):
-    pass
-
-
-class UsersReturningUsersHandler(BaseHandler):
-    pass
-
-
-class UsersUniqueVisitorsHandler(BaseHandler):
-    pass
-
-
-class UsersUniqueRollingHandler(BaseHandler):
-    pass
-
-
-class UsersRetentionHandler(BaseHandler):
-    pass
-
-
-class InstallsAllHandler(BaseHandler):
-    pass
-
-
-class InstallsUniqueHandler(BaseHandler):
-    pass
-
-
-class RemovesHandler(BaseHandler):
-    pass
-
-
-class UserSessionsHandler(BaseHandler):
-    pass
-
-
-class UserSessionsHandler(BaseHandler):
+class NotificationEmailResponseHandler(BaseHandler):
     pass

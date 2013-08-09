@@ -1,7 +1,7 @@
+import json
+
 from pymongo import MongoClient
-
 from tornado.options import OptionParser
-
 from api import models
 
 
@@ -25,8 +25,9 @@ def create_application(config):
         "name": cluster_name,
         "db_name": cluster_db_name
     }
+
     ai = models.ApplicationInfo(name=name, cluster=cluster)
-    doc = ai.to_python(validate=True)
+    doc = ai.to_python()
 
     col_application.insert(doc)
     print doc

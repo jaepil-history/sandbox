@@ -24,8 +24,8 @@ def create_account(config):
     email = raw_input("email: ")
     password = getpass.getpass("password: ")
 
-    ai = models.AccountInfo(name=name, email=email, password=hashlib.sha1(password).hexdigest())
-    doc = ai.to_python(validate=True)
+    ai = models.AccountInfo(name=name, email=email, password=password)
+    doc = ai.to_python()
 
     col_account.insert(doc)
     print doc

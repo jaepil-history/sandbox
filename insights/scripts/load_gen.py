@@ -12,7 +12,8 @@ import tornado.options
 
 
 class InsightsClient(object):
-    INSIGHTS_API_URL = "http://api.insights.appspand.com:8001/api/v1/"
+    # INSIGHTS_API_URL = "http://api.insights.appspand.com:8001/api/v1/"
+    INSIGHTS_API_URL = "http://localhost:8001/api/v1/"
 
     def __init__(self, app_id):
         self.app_id = app_id
@@ -121,8 +122,8 @@ def main(args):
     client = InsightsClient(app_id=app_id)
 
     for uuid in range(10000, 12000):
-        client.track_apa(uuid)
         client.track_cpu(uuid)
+        client.track_apa(uuid)
         client.track_pgr(uuid)
         client.track_pgr(uuid)
         #client.track_mtu(uuid)
