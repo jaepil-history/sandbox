@@ -4,4 +4,6 @@ redis==2.7.6
 hiredis==0.1.1
 pytz==2013b
 pymongo==2.5.2
+boto==2.9.9
 -e git+https://github.com/jaepil/mongoengine.git#egg=mongoengine
+-e git+https://github.com/j2labs/schematics.git#egg=schematics
