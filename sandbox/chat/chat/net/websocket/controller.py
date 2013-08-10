@@ -4,7 +4,6 @@ connections = {}
 
 
 def add_user(user_uid, connection):
-    # TODO: session 관리 해야 함
     # if connections.get(user_uid, None):
     #     return False
 
