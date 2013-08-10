@@ -18,6 +18,9 @@ class Link(object):
     def send(self, message):
         raise NotImplementedError("Link.send() is not implemented")
 
+    def ping(self, data):
+        raise NotImplementedError("Link.ping() is not implemented")
+
     def set_attribute(self, key, value):
         self.attributes[key] = value
 

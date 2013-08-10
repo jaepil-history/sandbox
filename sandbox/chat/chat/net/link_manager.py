@@ -1,5 +1,8 @@
 # Copyright (c) 2013 Appspand, Inc.
 
+from tornado.ioloop import PeriodicCallback
+
+
 __all__ = ["LinkManager"]
 
 
@@ -10,6 +13,12 @@ class LinkManager(object):
         super(LinkManager, self).__init__()
 
         self.links = {}
+        self._ping_timer = PeriodicCallback(callback=self._on_ping,
+                                            callback_time=1000 * 60)
+        self._ping_timer.start()
+
+    def _on_ping(self):
+        self.for_each(lambda link_id, link: link.ping(str(link_id)))
 
     @classmethod
     def instance(cls, **kwargs):
@@ -28,5 +37,5 @@ class LinkManager(object):
         return self.links.get(link_id, None)
 
     def for_each(self, f):
-        for link_id, link in self.links:
+        for link_id, link in self.links.iteritems():
             f(link_id, link)

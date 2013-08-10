@@ -20,3 +20,6 @@ class TCPLink(net.Link):
 
     def send(self, message):
         self.stream.write(tornado.escape.native_str(message))
+
+    def ping(self, data):
+        pass
