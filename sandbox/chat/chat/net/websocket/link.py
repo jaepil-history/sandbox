@@ -17,3 +17,6 @@ class WebSocketLink(net.Link):
 
     def send(self, message):
         self.connection.write_message(message)
+
+    def ping(self, data):
+        self.connection.ping(data)
