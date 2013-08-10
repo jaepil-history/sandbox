@@ -19,10 +19,6 @@ import android.widget.TextView;
 
 import com.appspand.chat.protocol.ChatProtocol;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.DateFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -132,16 +128,15 @@ public class ChatRoomActivity extends Activity {
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String payload = intent.getStringExtra("payload");
-                if (D) Log.d(TAG, payload);
+                if (intent.getAction().equals(ChatService.ACTION_ON_NEW_MESSAGE)) {
+                    String payload = intent.getStringExtra(ChatService.EXTRA_ON_NEW_MESSAGE);
+                    if (D) Log.d(TAG, payload);
 
-                try {
-                    JSONObject commandJson = new JSONObject(payload);
-                    JSONObject payloadJson = commandJson.getJSONObject("payload");
+                    ChatProtocol.Message_NewNoti noti = ChatConnector.parseNewMessage(payload);
 
-                    String senderUid = payloadJson.getString("sender_uid");
-                    String message = payloadJson.getString("message");
-                    long messageUid = Long.parseLong(payloadJson.getString("message_uid"));
+                    String senderUid = noti.mMessageInfo.mSenderUID;
+                    String message = noti.mMessageInfo.mMessage;
+                    long messageUid = noti.mMessageInfo.mUID;
                     int issuedAt = 0;
 
                     DateFormat df = DateFormat.getTimeInstance();
@@ -160,7 +155,6 @@ public class ChatRoomActivity extends Activity {
                                 }
                             }
                     );
-                } catch (JSONException e) {
                 }
             }
         };

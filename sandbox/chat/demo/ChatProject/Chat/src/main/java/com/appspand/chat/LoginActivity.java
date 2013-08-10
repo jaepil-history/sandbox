@@ -152,7 +152,7 @@ public class LoginActivity extends Activity implements AsyncResponse {
                     new ChatConnector.AsyncResult<ChatProtocol.User_LoginAns>()
                     {
                         @Override
-                        void handle(ChatProtocol.User_LoginAns response) {
+                        public void handle(ChatProtocol.User_LoginAns response) {
                             showProgress(false);
                             processFinish(response.mErrorCode == 0);
                         }

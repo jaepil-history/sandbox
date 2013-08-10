@@ -1,18 +1,12 @@
 package com.appspand.chat;
 
 import android.util.Log;
-import android.util.Pair;
 
 import com.appspand.chat.protocol.ChatProtocol;
-import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.HashMap;
 
 import de.tavendo.autobahn.WebSocketConnection;
@@ -32,16 +26,13 @@ public class ChatConnector {
     private HashMap<String, AsyncResult> mAsyncResultHandlers = new HashMap<String, AsyncResult>();
 
     private String mLastLoginStr = "";
-    private Deque<Pair<String, AsyncResult>> mMessageQueue = new ArrayDeque<Pair<String, AsyncResult>>();
 
     public static class AsyncResult<T> {
-        private final Type mType = new TypeToken<T>(){}.getType();
-
-        void handle(String className, String response) {
+        public void handle(String className, String response) {
             T t = ChatProtocol.fromJSON(className, response);
             handle(t);
         }
-        void handle(T response) {}
+        public void handle(T response) {}
     }
 
     public ChatConnector(String url) {
@@ -97,7 +88,13 @@ public class ChatConnector {
         mConnection.disconnect();
     }
 
-    protected void onNewMessage(String payload) {}
+    protected void onNewMessage(String newMessage) {}
+
+    public static ChatProtocol.Message_NewNoti parseNewMessage(String newMessage)
+    {
+        ChatProtocol.Message_NewNoti noti = ChatProtocol.fromJSON("Message_NewNoti", newMessage);
+        return noti;
+    }
 
     private void sendMessage(String message)
     {
