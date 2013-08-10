@@ -66,8 +66,8 @@ class MessageHandler(tornado.web.RequestHandler):
             dest_uid = group_uid
             is_group = True
 
-        message_infos = controller.read(src_uid=user_uid,
-                                        dest_uid=dest_uid,
+        message_infos = controller.read(user_uid=user_uid,
+                                        sender_uid=dest_uid,
                                         message_uids=parsed_message_uids,
                                         is_group=is_group)
 

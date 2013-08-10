@@ -206,14 +206,17 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             error_code = 100
             error_message = "Cannot read messages"
 
-        message_info_str = "{\"messages\": ["
-        message_info_str += (", ".join(m.to_json() for m in message_info))
-        message_info_str += "]}"
+        messages = []
+        for doc in message_info:
+            mi = net.protocols.MessageInfo()
+            mi.from_mongo_engine(doc)
+            messages.append(mi)
 
         ans = net.protocols.Message_GetAns()
         ans.request = request
-        ans.message_info = message_info_str
+        ans.message_info = messages
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
+        print ans_json
         self.write_message(ans_json)
