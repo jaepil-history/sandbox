@@ -41,10 +41,11 @@ def _send_message(target_uids, data):
 
 
 def on_message_send(sender_uid, group_uid, target_uids, message_info):
+    mi = net.protocols.MessageInfo()
+    mi.from_mongo_engine(message_info)
+
     noti = net.protocols.Message_NewNoti()
-    noti.sender_uid = sender_uid
-    noti.message_uid = str(message_info.uid)
-    noti.message = message_info.message
+    noti.message_info = mi
     noti_str = net.protocols.to_json(user_uid=sender_uid, message=noti)
 
     offline_users = _send_message(target_uids, noti_str)

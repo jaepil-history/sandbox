@@ -147,11 +147,10 @@ class MessageInfo(Message):
 
 
 class Message_NewNoti(Message):
-    sender_uid = StringType(required=True, max_length=512)
+    # sender_uid = StringType(required=True, max_length=512)
     #target_uid = StringType(required=True, max_length=512)
     #is_group = BooleanType(required=True)
-    message_uid = LongType(required=True)
-    message = StringType(required=True, max_length=1024)
+    message_info = ModelType(MessageInfo, required=True)
 
 
 class Message_SendReq(Message):
