@@ -195,7 +195,7 @@ class Acceptor(TCPServer):
 
     def message_read(self, link, user_uid, request):
         message_info = message.controller.read(user_uid=request.user_uid,
-                                               sender_uid=request.sender_uid,
+                                               target_uid=request.sender_uid,
                                                message_uids=request.message_uids,
                                                is_group=request.is_group)
         if message_info is not None:

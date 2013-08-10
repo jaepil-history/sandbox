@@ -63,16 +63,9 @@ class Message(Model):
 
 
 # User
-class User_DeviceInfo(Model):
-    platform_id = IntType(required=True)
-    device_token = StringType(required=True, max_length=512)
-
-
 class User_LoginReq(Message):
     user_uid = StringType(required=True, max_length=512)
     user_name = StringType(required=True, max_length=512)
-    profile_image_url = StringType(max_length=1024)
-    devices = ListType(ModelType(User_DeviceInfo))
 
 
 class User_LoginAns(Message):
@@ -94,6 +87,11 @@ class Group_JoinAns(Message):
     error_message = StringType(required=True)
 
 
+class Group_JoinNoti(Message):
+    group_uid = StringType(required=True, max_length=512)
+    user_uid = StringType(required=True, max_length=512)
+
+
 class Group_LeaveReq(Message):
     group_uid = StringType(required=True, max_length=512)
     user_uid = StringType(required=True, max_length=512)
@@ -103,6 +101,11 @@ class Group_LeaveAns(Message):
     request = ModelType(Group_LeaveReq)
     error_code = IntType(required=True)
     error_message = StringType(required=True)
+
+
+class Group_LeaveNoti(Message):
+    group_uid = StringType(required=True, max_length=512)
+    user_uid = StringType(required=True, max_length=512)
 
 
 class Group_InviteReq(Message):
@@ -115,6 +118,12 @@ class Group_InviteAns(Message):
     request = ModelType(Group_InviteReq)
     error_code = IntType(required=True)
     error_message = StringType(required=True)
+
+
+class Group_InviteNoti(Message):
+    group_uid = StringType(required=True, max_length=512)
+    user_uid = StringType(required=True, max_length=512)
+    invitee_uids = ListType(StringType(max_length=512), required=True)
 
 
 # Message
@@ -146,13 +155,6 @@ class MessageInfo(Message):
         document.expires_at = self.expires_at
 
 
-class Message_NewNoti(Message):
-    # sender_uid = StringType(required=True, max_length=512)
-    #target_uid = StringType(required=True, max_length=512)
-    #is_group = BooleanType(required=True)
-    message_info = ModelType(MessageInfo, required=True)
-
-
 class Message_SendReq(Message):
     sender_uid = StringType(required=True, max_length=512)
     target_uid = StringType(required=True, max_length=512)
@@ -162,9 +164,13 @@ class Message_SendReq(Message):
 
 class Message_SendAns(Message):
     request = ModelType(Message_SendReq)
-    message_uid = StringType(required=True, max_length=512)
+    message_info = ModelType(MessageInfo, required=True)
     error_code = IntType(required=True)
     error_message = StringType(required=True)
+
+
+class Message_NewNoti(Message):
+    message_info = ModelType(MessageInfo, required=True)
 
 
 class Message_ReadReq(Message):
@@ -178,6 +184,10 @@ class Message_ReadAns(Message):
     request = ModelType(Message_ReadReq)
     error_code = IntType(required=True)
     error_message = StringType(required=True)
+
+
+class Message_ReadNoti(Message):
+    message_info = ModelType(MessageInfo, required=True)
 
 
 class Message_GetReq(Message):

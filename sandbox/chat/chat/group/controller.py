@@ -112,8 +112,8 @@ def join(group_uid, user_uid, invitee_uids):
 
     _save(group_info=group_info)
 
-    event.controller.on_user_joined(group_uid=group_uid,
-                                    user_uid=user_uid)
+    event.controller.on_user_joined(user_uid=user_uid,
+                                    group_uid=group_uid)
 
     return group_info
 
@@ -130,7 +130,8 @@ def leave(group_uid, user_uid):
 
     _save(group_info=group_info)
 
-    event.controller.on_user_leaved(group_uid=group_uid,
-                                    user_uid=user_uid)
+    event.controller.on_user_leaved(user_uid=user_uid,
+                                    group_uid=group_uid,
+                                    target_uids=group_info.members)
 
     return group_info

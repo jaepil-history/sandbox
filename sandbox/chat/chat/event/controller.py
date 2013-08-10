@@ -70,8 +70,20 @@ def on_message_send(sender_uid, group_uid, target_uids, message_info):
         print "queued: ", body
 
 
-def on_message_read(user_uid, member_uids, message_uids):
-    pass
+def on_message_read(user_uid, group_uid, target_uids, messages):
+    message_info = []
+    for doc in messages:
+        mi = net.protocols.MessageInfo()
+        mi.from_mongo_engine(doc)
+        message_info.append(mi)
+
+    noti = net.protocols.Message_ReadNoti()
+    noti.message_info = message_info
+    noti_str = net.protocols.to_json(user_uid=user_uid, message=noti)
+
+    offline_users = _send_message(target_uids, noti_str)
+    if offline_users:
+        pass
 
 
 def on_input_started(group_uid, user_uid):
@@ -94,9 +106,16 @@ def on_user_banned(group_uid, user_uid, target_user_uids):
     pass
 
 
-def on_user_joined(group_uid, user_uid):
+def on_user_joined(user_uid, group_uid):
     pass
 
 
-def on_user_leaved(group_uid, user_uid):
-    pass
+def on_user_leaved(user_uid, group_uid, target_uids):
+    noti = net.protocols.Group_LeaveNoti()
+    noti.group_uid = group_uid
+    noti.user_uid = user_uid
+    noti_str = net.protocols.to_json(user_uid=user_uid, message=noti)
+
+    offline_users = _send_message(target_uids, noti_str)
+    if offline_users:
+        pass

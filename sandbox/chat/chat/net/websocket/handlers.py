@@ -157,18 +157,20 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                                                target_uid=request.target_uid,
                                                message=request.message,
                                                is_group=request.is_group)
+
+        mi = net.protocols.MessageInfo()
+
         if message_info is not None:
-            message_uid = message_info.uid
+            mi.from_mongo_engine(message_info)
             error_code = 0
             error_message = "OK"
         else:
-            message_uid = 0
             error_code = 100
             error_message = "Cannot send a message"
 
         ans = net.protocols.Message_SendAns()
         ans.request = request
-        ans.message_uid = message_uid
+        ans.message_info = mi
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
@@ -176,7 +178,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
     def message_read(self, user_uid, request):
         message_info = message.controller.read(user_uid=request.user_uid,
-                                               sender_uid=request.sender_uid,
+                                               target_uid=request.sender_uid,
                                                message_uids=request.message_uids,
                                                is_group=request.is_group)
         if message_info is not None:
