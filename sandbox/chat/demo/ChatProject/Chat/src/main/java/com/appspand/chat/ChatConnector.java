@@ -59,8 +59,12 @@ public class ChatConnector {
                     try {
                         JSONObject command = new JSONObject(payload);
                         String cmd = command.getString("cmd");
-                        if (cmd.equals("Message_NewNoti")) {
+                        if (cmd.equals("Group_JoinNoti")) {
+                        } else if (cmd.equals("Group_LeaveNoti")) {
+                        } else if (cmd.equals("Group_InviteNoti")) {
+                        } else if (cmd.equals("Message_NewNoti")) {
                             onNewMessage(payload);
+                        } else if (cmd.equals("Message_ReadNoti")) {
                         } else {
                             AsyncResult handler = mAsyncResultHandlers.remove(cmd);
                             if (handler != null) {

@@ -18,16 +18,20 @@ public class ChatProtocol {
 
         put("Group_JoinReq", new TypeToken<Header<Group_JoinReq>>(){}.getType());
         put("Group_JoinAns", new TypeToken<Header<Group_JoinAns>>(){}.getType());
+        put("Group_JoinNoti", new TypeToken<Header<Group_JoinNoti>>(){}.getType());
         put("Group_LeaveReq", new TypeToken<Header<Group_LeaveReq>>(){}.getType());
         put("Group_LeaveAns", new TypeToken<Header<Group_LeaveAns>>(){}.getType());
+        put("Group_LeaveNoti", new TypeToken<Header<Group_LeaveNoti>>(){}.getType());
         put("Group_InviteReq", new TypeToken<Header<Group_InviteReq>>(){}.getType());
         put("Group_InviteAns", new TypeToken<Header<Group_InviteAns>>(){}.getType());
+        put("Group_InviteNoti", new TypeToken<Header<Group_InviteNoti>>(){}.getType());
 
-        put("Message_NewNoti", new TypeToken<Header<Message_NewNoti>>(){}.getType());
         put("Message_SendReq", new TypeToken<Header<Message_SendReq>>(){}.getType());
         put("Message_SendAns", new TypeToken<Header<Message_SendAns>>(){}.getType());
+        put("Message_NewNoti", new TypeToken<Header<Message_NewNoti>>(){}.getType());
         put("Message_ReadReq", new TypeToken<Header<Message_ReadReq>>(){}.getType());
         put("Message_ReadAns", new TypeToken<Header<Message_ReadAns>>(){}.getType());
+        put("Message_ReadNoti", new TypeToken<Header<Message_ReadNoti>>(){}.getType());
         put("Message_GetReq", new TypeToken<Header<Message_GetReq>>(){}.getType());
         put("Message_GetAns", new TypeToken<Header<Message_GetAns>>(){}.getType());
     }};
@@ -60,14 +64,12 @@ public class ChatProtocol {
         return header.payload;
     }
 
+    // User
     public static class User_LoginReq {
         @SerializedName("user_uid")
         public String mUserUID;
         @SerializedName("user_name")
         public String mUserName;
-
-        public User_LoginReq()
-        {}
     }
 
     public static class User_LoginAns {
@@ -79,6 +81,7 @@ public class ChatProtocol {
         public String mErrorMessage;
     }
 
+    // Group
     public static class Group_JoinReq {
         @SerializedName("group_uid")
         public String mGroupUID;
@@ -97,6 +100,13 @@ public class ChatProtocol {
         public String mErrorMessage;
     }
 
+    public static class Group_JoinNoti {
+        @SerializedName("group_uid")
+        public String mGroupUID;
+        @SerializedName("user_uid")
+        public String mUserUID;
+    }
+
     public static class Group_LeaveReq {
         @SerializedName("group_uid")
         public String mGroupUID;
@@ -111,6 +121,13 @@ public class ChatProtocol {
         public int mErrorCode;
         @SerializedName("error_message")
         public String mErrorMessage;
+    }
+
+    public static class Group_LeaveNoti {
+        @SerializedName("group_uid")
+        public String mGroupUID;
+        @SerializedName("user_uid")
+        public String mUserUID;
     }
 
     public static class Group_InviteReq {
@@ -131,6 +148,16 @@ public class ChatProtocol {
         public String mErrorMessage;
     }
 
+    public static class Group_InviteNoti {
+        @SerializedName("group_uid")
+        public String mGroupUID;
+        @SerializedName("user_uid")
+        public String mUserUID;
+        @SerializedName("invitee_uids")
+        public String[] mInviteeUIDs;
+    }
+
+    // Message
     public static class MessageInfo {
         @SerializedName("uid")
         public long mUID;
@@ -148,11 +175,6 @@ public class ChatProtocol {
         public int mExpiresAt;
     }
 
-    public static class Message_NewNoti {
-        @SerializedName("message_info")
-        public MessageInfo mMessageInfo;
-    }
-
     public static class Message_SendReq {
         @SerializedName("sender_uid")
         public String mSenderUID;
@@ -167,10 +189,17 @@ public class ChatProtocol {
     public static class Message_SendAns {
         @SerializedName("request")
         public Message_SendReq mRequest;
+        @SerializedName("message_info")
+        public MessageInfo mMessageInfo;
         @SerializedName("error_code")
         public int mErrorCode;
         @SerializedName("error_message")
         public String mErrorMessage;
+    }
+
+    public static class Message_NewNoti {
+        @SerializedName("message_info")
+        public MessageInfo mMessageInfo;
     }
 
     public static class Message_ReadReq {
@@ -191,6 +220,11 @@ public class ChatProtocol {
         public int mErrorCode;
         @SerializedName("error_message")
         public String mErrorMessage;
+    }
+
+    public static class Message_ReadNoti {
+        @SerializedName("message_info")
+        public MessageInfo mMessageInfo;
     }
 
     public static class Message_GetReq {
