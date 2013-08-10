@@ -187,7 +187,7 @@ class Message_ReadAns(Message):
 
 
 class Message_ReadNoti(Message):
-    message_info = ModelType(MessageInfo, required=True)
+    message_info = ListType(ModelType(MessageInfo), required=True)
 
 
 class Message_GetReq(Message):

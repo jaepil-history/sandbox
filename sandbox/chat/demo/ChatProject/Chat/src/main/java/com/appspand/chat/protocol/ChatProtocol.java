@@ -224,7 +224,7 @@ public class ChatProtocol {
 
     public static class Message_ReadNoti {
         @SerializedName("message_info")
-        public MessageInfo mMessageInfo;
+        public MessageInfo[] mMessageInfo;
     }
 
     public static class Message_GetReq {

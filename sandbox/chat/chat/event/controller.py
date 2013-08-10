@@ -71,9 +71,6 @@ def on_message_send(sender_uid, group_uid, target_uids, message_info):
 
 
 def on_message_read(user_uid, group_uid, target_uids, messages):
-    if not messages:
-        return
-
     message_info = []
     for doc in messages:
         mi = net.protocols.MessageInfo()
