@@ -47,7 +47,7 @@ public class ChatConnector {
                 public void onOpen() {
                     if (D) Log.d(TAG, "Status: Connected to " + mUrl);
 
-                    if (!mLastLoginStr.isEmpty()) {
+                    if (mLastLoginStr.length() > 0) {
                         sendMessage(mLastLoginStr);
                     }
                 }
