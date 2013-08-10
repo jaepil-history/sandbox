@@ -124,15 +124,16 @@ public class ChatRoomActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        IntentFilter intentFilter = new IntentFilter("com.appspand.chat.ChatService.NewMessage");
+        IntentFilter intentFilter = new IntentFilter(ChatService.ACTION_ON_NOTIFICATION_EVENT);
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(ChatService.ACTION_ON_NEW_MESSAGE)) {
-                    String payload = intent.getStringExtra(ChatService.EXTRA_ON_NEW_MESSAGE);
-                    if (D) Log.d(TAG, payload);
+                String command = intent.getStringExtra(ChatService.EXTRA_COMMAND_NAME);
+                String payload = intent.getStringExtra(ChatService.EXTRA_COMMAND_DATA);
+                if (D) Log.d(TAG, "onNotiEvent(" + command + "): " + payload);
 
-                    ChatProtocol.Message_NewNoti noti = ChatConnector.parseNewMessage(payload);
+                if (command.equals(ChatService.COMMAND_NEW_MESSAGE_NOTI)) {
+                    ChatProtocol.Message_NewNoti noti = ChatConnector.parseNotificationEvent(command, payload);
 
                     String senderUid = noti.mMessageInfo.mSenderUID;
                     String message = noti.mMessageInfo.mMessage;
@@ -155,6 +156,9 @@ public class ChatRoomActivity extends Activity {
                                 }
                             }
                     );
+                } else if (command.equals(ChatService.COMMAND_READ_MESSAGE_NOTI)) {
+                    ChatProtocol.Message_ReadNoti noti = ChatConnector.parseNotificationEvent(command, payload);
+                    // TODO:
                 }
             }
         };

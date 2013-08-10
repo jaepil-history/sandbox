@@ -21,8 +21,12 @@ public class ChatService extends Service {
     private ChatConnector mChatConnector = null;
 
     // Actions
-    public static final String ACTION_ON_NEW_MESSAGE = "com.appspand.chat.ChatService.NewMessage";
-    public static final String EXTRA_ON_NEW_MESSAGE = "payload";
+    public static final String ACTION_ON_NOTIFICATION_EVENT = "com.appspand.chat.ChatService.NotificationEvent";
+    public static final String EXTRA_COMMAND_NAME = "command.name";
+    public static final String EXTRA_COMMAND_DATA = "command.data";
+
+    public static final String COMMAND_NEW_MESSAGE_NOTI = "Message_NewNoti";
+    public static final String COMMAND_READ_MESSAGE_NOTI = "Message_ReadNoti";
 
     public ChatService()
     {
@@ -50,11 +54,12 @@ public class ChatService extends Service {
 
         mChatConnector = new ChatConnector(SERVER_URL) {
             @Override
-            protected void onNewMessage(String newMessage) {
-                if (D) Log.d(TAG, "onNewMessage: " + newMessage);
+            protected void onNotificationEvent(String command, String data) {
+                if (D) Log.d(TAG, "onNewMessage: " + data);
 
-                Intent intent = new Intent(ACTION_ON_NEW_MESSAGE);
-                intent.putExtra(EXTRA_ON_NEW_MESSAGE, newMessage);
+                Intent intent = new Intent(ACTION_ON_NOTIFICATION_EVENT);
+                intent.putExtra(EXTRA_COMMAND_NAME, command);
+                intent.putExtra(EXTRA_COMMAND_DATA, data);
                 sendBroadcast(intent);
             }
         };

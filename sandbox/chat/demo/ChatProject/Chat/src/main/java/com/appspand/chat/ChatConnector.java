@@ -39,7 +39,7 @@ public class ChatConnector {
         this.mUrl = url;
     }
 
-    public void open()
+    private void internalOpen(final String[] data)
     {
         try {
             mConnection.connect(mUrl, new WebSocketHandler() {
@@ -48,7 +48,15 @@ public class ChatConnector {
                     if (D) Log.d(TAG, "Status: Connected to " + mUrl);
 
                     if (mLastLoginStr.length() > 0) {
-                        sendMessage(mLastLoginStr);
+                        mConnection.sendTextMessage(mLastLoginStr);
+                    }
+
+                    if (data != null)
+                    {
+                        for (int i = 0; i < data.length; ++i)
+                        {
+                            mConnection.sendTextMessage(data[i]);
+                        }
                     }
                 }
 
@@ -59,12 +67,10 @@ public class ChatConnector {
                     try {
                         JSONObject command = new JSONObject(payload);
                         String cmd = command.getString("cmd");
-                        if (cmd.equals("Group_JoinNoti")) {
-                        } else if (cmd.equals("Group_LeaveNoti")) {
-                        } else if (cmd.equals("Group_InviteNoti")) {
-                        } else if (cmd.equals("Message_NewNoti")) {
-                            onNewMessage(payload);
-                        } else if (cmd.equals("Message_ReadNoti")) {
+                        if (cmd.equals("Group_JoinNoti") || cmd.equals("Group_LeaveNoti")
+                                || cmd.equals("Group_InviteNoti") || cmd.equals("Message_NewNoti")
+                                || cmd.equals("Message_ReadNoti")) {
+                            onNotificationEvent(cmd, payload);
                         } else {
                             AsyncResult handler = mAsyncResultHandlers.remove(cmd);
                             if (handler != null) {
@@ -87,27 +93,31 @@ public class ChatConnector {
         }
     }
 
+    public void open()
+    {
+        internalOpen(null);
+    }
+
     public void close()
     {
         mConnection.disconnect();
     }
 
-    protected void onNewMessage(String newMessage) {}
+    protected void onNotificationEvent(String command, String data) {}
 
-    public static ChatProtocol.Message_NewNoti parseNewMessage(String newMessage)
+    public static <T> T parseNotificationEvent(String command, String data)
     {
-        ChatProtocol.Message_NewNoti noti = ChatProtocol.fromJSON("Message_NewNoti", newMessage);
+        T noti = ChatProtocol.fromJSON(command, data);
         return noti;
     }
 
     private void sendMessage(String message)
     {
-//        if (!mConnection.isConnected()) {
-//            mConnection.reconnect();
-//        } else {
-//            mConnection.sendTextMessage(message);
-//        }
-        mConnection.sendTextMessage(message);
+        if (!mConnection.isConnected()) {
+            internalOpen(new String[] {message});
+        } else {
+            mConnection.sendTextMessage(message);
+        }
     }
 
     public void login(String userUid, String userName,
