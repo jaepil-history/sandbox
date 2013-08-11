@@ -38,18 +38,19 @@ def send(sender_uid, target_uid, message, is_group=False):
     message_info.save()
 
     for user_uid in target_uids:
-        queue_info = queue.controller.find_one(user_uid=user_uid)
-        if queue_info is None:
-            queue_info = queue.controller.create(user_uid=user_uid)
-        queue_info.message_uids.append(message_uid)
-        queue_info.save()
+        if sender_uid != user_uid:
+            queue_info = queue.controller.find_one(user_uid=user_uid)
+            if queue_info is None:
+                queue_info = queue.controller.create(user_uid=user_uid)
+            queue_info.message_uids.append(message_uid)
+            queue_info.save()
 
-    if sender_uid not in target_uids:
-        queue_info = queue.controller.find_one(user_uid=sender_uid)
-        if queue_info is None:
-            queue_info = queue.controller.create(user_uid=sender_uid)
-        queue_info.message_uids.append(message_uid)
-        queue_info.save()
+    # if sender_uid not in target_uids:
+    #     queue_info = queue.controller.find_one(user_uid=sender_uid)
+    #     if queue_info is None:
+    #         queue_info = queue.controller.create(user_uid=sender_uid)
+    #     queue_info.message_uids.append(message_uid)
+    #     queue_info.save()
 
     event.controller.on_message_send(sender_uid=sender_uid,
                                      group_uid=group_uid,
