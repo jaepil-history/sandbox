@@ -31,6 +31,7 @@ def shutdown():
     # io_loop.tcp_server.stop()
 
     # logging.info('Will shutdown in 2 seconds ...')
+    interop.service.stop()
     io_loop.add_timeout(time.time() + 2, io_loop.stop)
 
 
