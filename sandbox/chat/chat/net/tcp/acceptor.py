@@ -224,6 +224,7 @@ class Acceptor(TCPServer):
                                               dest_uid=request.target_uid,
                                               since_uid=request.since_uid,
                                               count=request.count,
+                                              message_uids=request.message_uids,
                                               is_group=request.is_group)
         if message_info is not None:
             error_code = 0

@@ -110,9 +110,15 @@ def read(user_uid, target_uid, message_uids, is_group=False):
     return messages
 
 
-def get(src_uid, dest_uid, since_uid=None, count=None, is_group=False):
+def get(src_uid, dest_uid, since_uid=None, count=None, message_uids=None, is_group=False):
     queue_info = queue.controller.find_one(user_uid=src_uid)
     if queue_info is None:
         queue_info = queue.controller.create(user_uid=src_uid)
 
-    return find(message_uids=queue_info.message_uids)
+    messages = []
+    if queue_info.message_uids:
+        messages = find(message_uids=queue_info.message_uids)
+    if message_uids:
+        messages += find(message_uids=message_uids)
+
+    return messages

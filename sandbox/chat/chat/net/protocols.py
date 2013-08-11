@@ -197,6 +197,7 @@ class Message_GetReq(Message):
     is_group = BooleanType(required=True)
     since_uid = LongType()
     count = IntType()
+    message_uids = ListType(LongType())
 
 
 class Message_GetAns(Message):

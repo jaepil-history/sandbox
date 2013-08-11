@@ -203,7 +203,7 @@ public class ChatConnector {
     }
 
     public void getMessages(String userUid, String targetUid, boolean isGroup,
-                            long sinceUid, int count,
+                            long sinceUid, int count, long[] messageUids,
                             AsyncResult<ChatProtocol.Message_GetAns> asyncResult)
     {
         ChatProtocol.Message_GetReq req = new ChatProtocol.Message_GetReq();
@@ -212,6 +212,7 @@ public class ChatConnector {
         req.mIsGroup = isGroup;
         req.mSinceUID = sinceUid;
         req.mCount = count;
+        req.mMessageUIDs = messageUids;
 
         if (!mAsyncResultHandlers.containsKey("Message_GetAns"))
         {

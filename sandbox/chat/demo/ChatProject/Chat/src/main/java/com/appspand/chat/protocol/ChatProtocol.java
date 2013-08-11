@@ -240,6 +240,8 @@ public class ChatProtocol {
         public long mSinceUID;
         @SerializedName("count")
         public int mCount;
+        @SerializedName("message_uids")
+        public long[] mMessageUIDs;
     }
 
     public static class Message_GetAns {

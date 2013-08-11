@@ -87,7 +87,7 @@ public class ChatRoomActivity extends Activity {
         });
 
         ChatApplication application = (ChatApplication)getApplication();
-        application.getChatConnector().getMessages(mMyID, mRoomID, false, 0, 100,
+        application.getChatConnector().getMessages(mMyID, mRoomID, false, 0, 100, new long[]{},
                 new ChatConnector.AsyncResult<ChatProtocol.Message_GetAns>() {
                     @Override
                     public void handle(ChatProtocol.Message_GetAns response) {
