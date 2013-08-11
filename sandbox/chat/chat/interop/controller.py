@@ -48,4 +48,4 @@ def pull():
             item_body = item.get_body()
             result.append(item_body)
 
-        SQS_QUEUE_FROM_SNEK.delete_message(message)
+        SQS_QUEUE_FROM_SNEK.delete_message_batch(items)
