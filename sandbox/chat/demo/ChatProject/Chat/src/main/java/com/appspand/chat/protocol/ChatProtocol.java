@@ -216,6 +216,8 @@ public class ChatProtocol {
     public static class Message_ReadAns {
         @SerializedName("request")
         public Message_ReadReq mRequest;
+        @SerializedName("message_info")
+        public MessageInfo[] mMessageInfo;
         @SerializedName("error_code")
         public int mErrorCode;
         @SerializedName("error_message")
@@ -243,11 +245,11 @@ public class ChatProtocol {
     public static class Message_GetAns {
         @SerializedName("request")
         public Message_GetReq mRequest;
+        @SerializedName("message_info")
+        public MessageInfo[] mMessageInfo;
         @SerializedName("error_code")
         public int mErrorCode;
         @SerializedName("error_message")
         public String mErrorMessage;
-        @SerializedName("message_info")
-        public MessageInfo[] mMessageInfo;
     }
 }

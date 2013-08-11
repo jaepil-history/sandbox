@@ -182,6 +182,7 @@ class Message_ReadReq(Message):
 
 class Message_ReadAns(Message):
     request = ModelType(Message_ReadReq)
+    message_info = ListType(ModelType(MessageInfo))
     error_code = IntType(required=True)
     error_message = StringType(required=True)
 
