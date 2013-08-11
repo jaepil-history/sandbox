@@ -16,6 +16,7 @@ from tornado import httpserver
 from tornado import ioloop
 from tornado import web
 
+import interop.service
 from net.tcp import acceptor
 from settings import base
 from util import cache
@@ -97,6 +98,10 @@ def init_server(config):
     tcp_server.listen(port=config.port_tcp)
 
 
+def init_service(config):
+    interop.service.start()
+
+
 def run_server(config):
     ioloop.IOLoop.instance().start()
 
@@ -105,6 +110,7 @@ def main():
     init_database(config=config)
 
     init_server(config=config)
+    init_service(config=config)
 
     print "Chat server is started..."
 
