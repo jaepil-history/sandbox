@@ -17,6 +17,7 @@ from tornado import ioloop
 from tornado import web
 
 import interop.service
+from log import logger
 from net.tcp import acceptor
 from settings import base
 from util import cache
@@ -80,7 +81,8 @@ def init_database(config):
                         host=config.mongodb_connection_uri,
                         max_pool_size=config.mongodb_pool_size,
                         socketTimeoutMS=config.mongodb_timeout)
-    print config.mongodb_connection_uri
+    logger.access_log.debug("mongodb connection url: %s"
+                            % config.mongodb_connection_uri)
 
 
 def init_server(config):
@@ -108,12 +110,14 @@ def run_server(config):
 
 
 def main():
+    logger.init()
+
     init_database(config=config)
 
     init_server(config=config)
     init_service(config=config)
 
-    print "Chat server is started..."
+    logger.access_log.debug("Chat server is started...")
 
     run_server(config=config)
 

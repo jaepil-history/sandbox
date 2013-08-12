@@ -4,9 +4,9 @@ import json
 
 from tornado.tcpserver import TCPServer
 
+from log import logger
 import message.controller
 import group.controller
-import user.controller
 
 import net
 import net.protocols
@@ -42,7 +42,7 @@ class Acceptor(TCPServer):
     def on_opened(self, link):
         link.user_uid = None
 
-        print "Link(%d): on opened" % link.hash()
+        logger.access_log.debug("Link(%d): on opened" % link.hash())
 
         net.LinkManager.instance().add(link_id=link.hash(), link=link)
 
@@ -52,7 +52,7 @@ class Acceptor(TCPServer):
         link.stream.read_until(b"\r\n\r\n", callback=on_received)
 
     def on_received(self, link, data):
-        print "Link(%d): on received - %s" % (link.hash(), data)
+        logger.access_log.debug("Link(%d): on received - %s" % (link.hash(), data))
         #link.send(data)
         self.on_message(link, data)
 
@@ -62,7 +62,7 @@ class Acceptor(TCPServer):
     def on_closed(self, link):
         net.LinkManager.instance().remove(link_id=link.hash())
 
-        print "Link(%d): on closed" % link.hash()
+        logger.access_log.debug("Link(%d): on closed" % link.hash())
 
         if link.user_uid:
             net.tcp.controller.remove_user(user_uid=link.user_uid, connection=link)

@@ -4,9 +4,9 @@ import json
 
 import tornado.websocket
 
+from log import logger
 import message.controller
 import group.controller
-import user.controller
 import net.websocket.controller
 
 import net
@@ -33,14 +33,14 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
         net.LinkManager.instance().add(link_id=link.hash(), link=link)
 
-        print "websocket opened:", self.link_id
+        logger.access_log.debug("WebSocket(%d): on opened" % self.link_id)
 
     def on_message(self, message):
         link = net.LinkManager.instance().find(link_id=self.link_id)
         if link is None:
-            print "link not found:", self.link_id
+            logger.access_log.debug("WebSocket(%d): link not found" % self.link_id)
 
-        print "websocket:", message.encode("utf-8")
+        logger.access_log.debug("WebSocket(%d): on message - %s" % (self.link_id, message.encode("utf-8")))
 
         msg = json.loads(message)
         if "cmd" not in msg or "user_uid" not in msg or "payload" not in msg:
@@ -74,7 +74,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             pass
 
     def on_close(self):
-        print "websocket closed:", self.link_id
+        logger.access_log.debug("WebSocket(%d): on closed" % self.link_id)
         net.LinkManager.instance().remove(link_id=self.link_id)
 
         net.websocket.controller.remove_user(user_uid=self.user_uid, connection=self)
@@ -228,5 +228,4 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
-        print ans_json
         self.write_message(ans_json)

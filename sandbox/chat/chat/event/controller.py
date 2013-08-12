@@ -1,5 +1,6 @@
 # Copyright (c) 2013 Appspand, Inc.
 
+from log import logger
 import net.protocols
 import net.tcp.controller
 import net.websocket.controller
@@ -14,7 +15,7 @@ def _send_message(target_uids, data):
     if result[1]:
         offline_users += result[1]
 
-    print "online:", len(result[0]), "offline:", len(result[1])
+    logger.access_log.debug("online: %d, offline: %d" % (len(result[0]), len(result[1])))
 
     for uid, connection in result[0]:
         connection.write_message(data)
@@ -23,7 +24,7 @@ def _send_message(target_uids, data):
     if result[1]:
         offline_users += result[1]
 
-    print "online:", len(result[0]), "offline:", len(result[1])
+    logger.access_log.debug("online: %d, offline: %d" % (len(result[0]), len(result[1])))
 
     for uid, connection in result[0]:
         connection.send(data)
