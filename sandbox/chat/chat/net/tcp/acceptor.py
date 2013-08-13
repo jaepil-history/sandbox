@@ -10,7 +10,6 @@ import group.controller
 
 import net
 import net.protocols
-import net.tcp.controller
 from net.tcp.link import TCPLink
 
 
@@ -60,12 +59,11 @@ class Acceptor(TCPServer):
         link.stream.read_until(b"\r\n\r\n", callback=on_received)
 
     def on_closed(self, link):
-        net.LinkManager.instance().remove(link_id=link.hash())
-
         logger.access_log.debug("Link(%d): on closed" % link.hash())
 
         if link.user_uid:
-            net.tcp.controller.remove_user(user_uid=link.user_uid, connection=link)
+            net.LinkManager.instance().logout(user_uid=link.user_uid)
+        net.LinkManager.instance().remove(link_id=link.hash())
 
     def on_message(self, link, message):
         msg = json.loads(message)
@@ -101,7 +99,7 @@ class Acceptor(TCPServer):
     def user_login(self, link, user_uid, request):
         link.user_uid = request.user_uid
 
-        if net.tcp.controller.add_user(user_uid=link.user_uid, connection=link):
+        if net.LinkManager.instance().login(user_uid=user_uid, link=link):
             error_code = 0
             error_message = "OK"
         else:

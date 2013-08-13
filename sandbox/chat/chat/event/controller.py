@@ -1,35 +1,21 @@
 # Copyright (c) 2013 Appspand, Inc.
 
 from log import logger
+from net.link_manager import LinkManager
 import net.protocols
-import net.tcp.controller
-import net.websocket.controller
 
 import interop.controller
 
 
 def _send_message(target_uids, data):
-    offline_users = []
+    (online, offline) = LinkManager.instance().find(user_uids=target_uids)
 
-    result = net.websocket.controller.find(user_uids=target_uids)
-    if result[1]:
-        offline_users += result[1]
+    logger.access_log.debug("online: %d, offline: %d" % (len(online), len(offline)))
 
-    logger.access_log.debug("online: %d, offline: %d" % (len(result[0]), len(result[1])))
+    for link in online:
+        link.send(data)
 
-    for uid, connection in result[0]:
-        connection.write_message(data)
-
-    result = net.tcp.controller.find(user_uids=target_uids)
-    if result[1]:
-        offline_users += result[1]
-
-    logger.access_log.debug("online: %d, offline: %d" % (len(result[0]), len(result[1])))
-
-    for uid, connection in result[0]:
-        connection.send(data)
-
-    return offline_users
+    return offline
 
 
 def on_message_send(sender_uid, group_uid, target_uids, message_info):
