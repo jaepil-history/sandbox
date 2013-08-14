@@ -17,7 +17,7 @@ class Message(Document):
     uid = LongField(required=True)
     sender_uid = StringField(required=True, max_length=512)
     group_uid = StringField(max_length=512)
-    message = StringField(required=True, max_length=1024)
+    message = StringField(required=True, max_length=10240)
     countdown = IntField(required=True)
     issued_at = IntField(required=True)
     expires_at = IntField(required=True)

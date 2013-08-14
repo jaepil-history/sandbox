@@ -131,7 +131,7 @@ class MessageInfo(Message):
     uid = LongType(required=True)
     sender_uid = StringType(required=True, max_length=512)
     group_uid = StringType(max_length=512)
-    message = StringType(required=True, max_length=1024)
+    message = StringType(required=True, max_length=10240)
     countdown = IntType(required=True)
     issued_at = IntType(required=True)
     expires_at = IntType(required=True)
@@ -159,7 +159,7 @@ class Message_SendReq(Message):
     sender_uid = StringType(required=True, max_length=512)
     target_uid = StringType(required=True, max_length=512)
     is_group = BooleanType(required=True)
-    message = StringType(required=True, max_length=1024)
+    message = StringType(required=True, max_length=10240)
 
 
 class Message_SendAns(Message):
