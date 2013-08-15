@@ -1,15 +1,15 @@
 from dataview.api import handlers
 
 '''
-http://query.kontagent.net/processed/v1/social/users/gender_distribution/<data_type>.<data_format>/?api_key=<API KEY>&<other parameters>
-http://query.kontagent.net/processed/v1/social/users/age_distribution/<data_type>.<data_format>/?api_key=<API KEY>&<other parameters>
-http://query.kontagent.net/processed/v1/social/users/friends_distribution/<data_type>.<data_format>/?api_key=<API KEY>&<other parameters>
-http://query.kontagent.net/processed/v1/social/users/country_distribution/<data_type>.<data_format>/?api_key=<API KEY>&<other parameters>
+http://query.kontagent.net/processed/v1/users/gender_distribution/<data_type>.<data_format>/?api_key=<API KEY>&<other parameters>
+http://query.kontagent.net/processed/v1/users/age_distribution/<data_type>.<data_format>/?api_key=<API KEY>&<other parameters>
+http://query.kontagent.net/processed/v1/users/friends_distribution/<data_type>.<data_format>/?api_key=<API KEY>&<other parameters>
+http://query.kontagent.net/processed/v1/users/country_distribution/<data_type>.<data_format>/?api_key=<API KEY>&<other parameters>
 
-http://query.kontagent.net/processed/v1/social/messages/discovery_clicks/series.json/?start_time=20110605_0000&api_key=&time_segment=week&end_time=20110705_0000&discovery_type=nf
-http://query.kontagent.net/processed/v1/social/events/count/dict.json/?start_time=20121007_0000&api_key=&time_segment=day&end_time=20121107_0000
-http://query.kontagent.net/processed/v1/social/events/distribution/dict.json/?api_key=<API KEY>&<other parameters>
-http://query.kontagent.net/processed/v1/social/events/names/list.json/?api_key=<API_KEY>
+http://query.kontagent.net/processed/v1/messages/discovery_clicks/series.json/?start_time=20110605_0000&api_key=&time_segment=week&end_time=20110705_0000&discovery_type=nf
+http://query.kontagent.net/processed/v1/events/count/dict.json/?start_time=20121007_0000&api_key=&time_segment=day&end_time=20121107_0000
+http://query.kontagent.net/processed/v1/events/distribution/dict.json/?api_key=<API KEY>&<other parameters>
+http://query.kontagent.net/processed/v1/events/names/list.json/?api_key=<API_KEY>
 etc...
 '''
 

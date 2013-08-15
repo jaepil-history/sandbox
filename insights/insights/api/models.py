@@ -11,14 +11,12 @@ from mongoengine import LongField
 from mongoengine import StringField
 from mongoengine import EmailField
 from password import PasswordField
+from mongoengine import ValidationError
 
 import tornado.gen
 
 
-
-
 class BaseDoc(Document):
-    # ts : timestamp
     _dt = DateTimeField(required=True)
 
     def __init__(self, *args, **values):
@@ -27,9 +25,9 @@ class BaseDoc(Document):
 
     def initialize(self):
         self._dt = datetime.datetime.utcnow()
-
-        if self.ts is None:
-            self.ts = int(time.time())
+        # ts : timestamp
+        if self.timestamp is None:
+            self.timestamp = int(time.time())
 
     def to_python(self):
         data = self.to_mongo()
@@ -39,6 +37,13 @@ class BaseDoc(Document):
 
     @tornado.gen.coroutine
     def save(self, db_context, collection_name, validate=False):
+        if validate:
+            try:
+                self.validate()
+            except ValidationError:
+                doc = ValidationError.to_dict()
+                raise tornado.gen.Return(doc)
+
         doc = self.to_python()
         yield db_context.insert(collection_name=collection_name, doc=doc)
         raise tornado.gen.Return(doc)

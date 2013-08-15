@@ -22,13 +22,13 @@ cmd_options.define(name="app", type=str, default="api", help="Application name")
 
 class Application(tornado.web.Application):
     def __init__(self, handlers, options, mongodb_client):
-        database = {
+        db_client = {
             "appspand": mongodb_client,
             "insights": mongodb_client
         }
         settings = {
             "debug": options.debug,
-            "database": database,
+            "db_client": db_client,
             "options": options
         }
 

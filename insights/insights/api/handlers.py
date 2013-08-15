@@ -45,8 +45,8 @@ class BaseHandler(tornado.web.RequestHandler):
             self.context = context
             self.settings = settings
             self.connection = {
-                "appspand": settings["database"]["appspand"],
-                "insights": settings["database"]["insights"]
+                "appspand": settings["db_client"]["appspand"],
+                "insights": settings["db_client"]["insights"]
             }
 
         @tornado.gen.coroutine

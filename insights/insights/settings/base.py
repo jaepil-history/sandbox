@@ -34,7 +34,7 @@ def parse_options(args=None):
     options.define("mongodb_max_concurrent", default=10, type=int,
                    help="Max. concurrent connection")
     options.define("mongodb_max_wait_time", default=1000 * 10, type=int,
-                   help="Max. concurrent connection")
+                   help="Max. wait time")
     options.define("mongodb_appspand_db_name", default="appspand", type=str,
                    help="Database name for appspand applications")
 

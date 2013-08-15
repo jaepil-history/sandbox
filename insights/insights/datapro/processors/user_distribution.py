@@ -34,7 +34,7 @@ app_id.processed schema
 '''
 
 from pymongo import MongoClient
-import settings
+from insights.datapro import settings
 
 from datetime import datetime, date
 import time
@@ -45,11 +45,11 @@ from collections import defaultdict
 options = settings.parse_options()
 
 db_client_processed = MongoClient(host=options.mongodb_processed_connection_uri,
-                            max_pool_size=options.mongodb_max_concurrent)
+                            max_pool_size=options.mongodb_pool_size)
 db_processed = db_client_processed[options.mongodb_processed_db_name]
 
 db_client_appspand = MongoClient(host=options.mongodb_appspand_connection_uri,
-                            max_pool_size=options.mongodb_max_concurrent)
+                            max_pool_size=options.mongodb_pool_size)
 db_appspand = db_client_appspand[options.mongodb_appspand_db_name]
 col_application = db_appspand.application
 
@@ -144,7 +144,7 @@ class Groups:
                 return False
 
         code += ' += 1'
-        #print code
+        print code
         return compile(code, '<string>', 'exec')
 
     def count(self, doc):

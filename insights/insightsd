@@ -13,7 +13,7 @@ import sys
 # 	print 'Insights is not installed'
 # 	sys.exit()
 
-from insights.datapro.system.daemon import Daemon
+from datapro.system.daemon import Daemon
 from insights import __version__
 from insights.settings import base
 from insights.main import Application

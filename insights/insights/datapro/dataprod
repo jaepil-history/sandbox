@@ -1,0 +1,103 @@
+#!/usr/bin/env python
+# This Python file uses the following encoding: utf-8
+#
+# Copyright 2013 Appspand
+
+import sys
+import time
+import logging
+
+from insights.datapro import __version__
+from insights.datapro.system.daemon import Daemon
+from insights.datapro.system import runner
+from insights.datapro import settings
+from insights.datapro.api.dbhandler_pymongo import DBHandler
+from pymongo import MongoClient
+
+PIDFILE = '/var/run/dataprod.pid'
+# Keep all log files in one place
+LOGFILE = '/usr/local/insights/dataprod.log'
+
+# Configure logging
+logging.basicConfig(filename=LOGFILE,level=logging.DEBUG)
+logger = logging.getLogger('dataprod')
+
+def init_database(config):
+    mongodb_client = MongoClient(host=config.mongodb_connection_uri,
+                        max_pool_size=config.mongodb_pool_size)
+    logger.access_log.debug("mongodb connection url: %s"
+                            % config.mongodb_connection_uri)
+
+    return mongodb_client
+
+class DataProDaemon(Daemon):
+
+    def __init__(self, pidfile, config):
+        super(DataProDaemon, self).__init__(pidfile)
+        self.db_client = init_database(config=config)
+        self.dbs = {
+            "appspand": self.db_client,
+            "insights": self.db_client,
+            "processed": self.db_client,
+            "config": config
+        }
+        self.db_handler = DBHandler(self.dbs)
+
+    def run(self):
+
+        while True:
+            system_info = runner.system()
+            try:
+                self.db_handler.store_entries(system_info)
+            except Exception, e:
+                logger.exception('Saving system info failed')
+
+            process_info = runner.processes()
+
+            try:
+                self.db_handler.store_entries(process_info)
+            except Exception, e:
+                logger.exception('Saving process info failed')
+
+            # Checks the system every 60 seconds
+            time.sleep(settings.SYSTEM_CHECK_PERIOD)
+
+if __name__ == "__main__":
+    config = settings.parse_options()
+    daemon = DataProDaemon(PIDFILE, config=config)
+
+    if len(sys.argv) == 2:
+        if 'start' == sys.argv[1]:
+            try:
+                daemon.start()
+            except Exception, e:
+                logger.exception("DataProD cant be started")
+        elif 'stop' == sys.argv[1]:
+            print "Stopping DataProDaemon ..."
+            daemon.stop()
+        elif 'restart' == sys.argv[1]:
+            print "Restarting DataProDaemon ..."
+            daemon.restart()
+        elif 'status' == sys.argv[1]:
+            try:
+                pf = file(PIDFILE, 'r')
+                pid = int(pf.read().strip())
+                pf.close()
+            except IOError:
+                pid = None
+            except SystemExit:
+                pid = None
+
+            if pid:
+                print 'DataProDaemon {0} is running as pid {1}'.format(__version__, pid)
+            else:
+                print 'DataProDaemon is not running.'
+
+        else:
+            print "Unknown command"
+            sys.exit(2)
+            sys.exit(0)
+    else:
+        print "usage: %s start|stop|restart|status" % sys.argv[0]
+        sys.exit(2)
+

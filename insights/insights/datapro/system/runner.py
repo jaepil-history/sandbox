@@ -1,6 +1,5 @@
 import sys
 
-from insights.datapro.system.collector import system_info_collector, process_info_collector
 from insights.datapro.core import settings
 from insights.datapro.utils.dates import unix_utc_now
 
