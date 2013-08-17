@@ -1,0 +1,46 @@
+%YAML 1.1
+---
+application:
+  title: Appspand Chat Server configuration for staging environment
+  module: chat.main:main
+  version: 1.0
+  revision: 1
+
+# Debugging
+debug: false
+
+# Identity
+host: chat.staging.appspand.com
+port: 8200
+
+# Databases
+database:
+  mongodb:
+    connection_uri: mongodb://localhost:27017/chat-staging
+    connection_pool: 3
+    timeout: 5000
+
+  redis:
+    enabled: true
+    connection_uri: redis://localhost:6379/1
+    connection_pool: 3
+    timeout: 5000
+    host: localhost
+    port: 6379
+    password: !!str
+    db: 1
+
+# Session
+session:
+  timeout_minutes: 60
+
+# Interop
+interop:
+  sqs:
+    access_key: AKIAIFHFM4CZA26UVV4A
+    secret_key: 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
+    region: ap-southeast-1
+    path: /
+    request_queue_name: MSG_FROM_SNEK_TO_APPSPAND
+    fallback_queue_name: MSG_FROM_APPSPAND_TO_SNEK
+...

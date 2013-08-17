@@ -44,13 +44,26 @@ class QueuePoller(Thread):
                                     is_group=send_req.is_group)
 
 
+_started = False
 _queue_poller = QueuePoller()
 
 
 def start():
+    global _started
+    global _queue_poller
+
+    if _started:
+        return
+
     _queue_poller.start()
+    _started = True
 
 
 def stop():
-    _queue_poller.stop()
-    _queue_poller.join()
+    global _started
+    global _queue_poller
+
+    if _started:
+        _started = False
+        _queue_poller.stop()
+        _queue_poller.join()

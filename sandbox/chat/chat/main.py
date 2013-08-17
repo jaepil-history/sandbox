@@ -6,24 +6,18 @@ import signal
 import sys
 import time
 
-# import daemonize
-
 import mongoengine
-
-# from celery import Celery
 
 from tornado import httpserver
 from tornado import ioloop
+from tornado import options
 from tornado import web
 
+import app.config
 import interop.service
 from log import logger
-from net.tcp import acceptor
-from settings import base
+# from net.tcp import acceptor
 from util import cache
-
-
-config = base.parse_options()
 
 
 def shutdown():
@@ -61,7 +55,6 @@ def build_url_handlers():
     from group import urls as group_urls
     from user import urls as user_urls
 
-    # fav_icon_handler = [(r"/(favicon.ico)", None)]
     handlers = message_urls.handlers + ws_urls.handlers\
         + group_urls.handlers + user_urls.handlers
 
@@ -69,40 +62,45 @@ def build_url_handlers():
 
 
 def init_database(config):
-    if config.redis_enabled:
-        cache.init(host=config.redis_host, port=config.redis_port,
-                   password=config.redis_password, pool_size=config.redis_pool_size,
-                   socket_timeout=config.redis_timeout, db=config.redis_db)
+    database = config.database
+
+    redis = database.redis
+    if redis.enabled:
+        cache.init(host=redis.host, port=redis.port,
+                   password=redis.password, pool_size=redis.connection_pool,
+                   socket_timeout=redis.timeout, db=redis.db)
 
         redis = cache.get_connection()
         redis.ping()
 
+    mongodb = database.mongodb
     mongoengine.connect(db="chat",
-                        host=config.mongodb_connection_uri,
-                        max_pool_size=config.mongodb_pool_size,
-                        socketTimeoutMS=config.mongodb_timeout)
+                        host=mongodb.connection_uri,
+                        max_pool_size=mongodb.connection_pool,
+                        socketTimeoutMS=mongodb.timeout)
     logger.access_log.debug("mongodb connection url: %s"
-                            % config.mongodb_connection_uri)
+                            % mongodb.connection_uri)
 
 
 def init_server(config):
     url_handlers = build_url_handlers()
     application = Application(
         handlers=url_handlers,
-        config=config,
-        debug=config.debug
+        debug=config.debug,
+        config=config
     )
     application.add_handlers(config.host, url_handlers)
 
     http_server = httpserver.HTTPServer(application)
-    http_server.listen(config.port_http)
+    http_server.listen(config.port)
 
-    tcp_server = acceptor.Acceptor()
-    tcp_server.listen(port=config.port_tcp)
+    # tcp_server = acceptor.Acceptor()
+    # tcp_server.listen(port=config.port_tcp)
 
 
 def init_service(config):
-    interop.service.start()
+    if config.interop:
+        interop.service.start()
 
 
 def run_server(config):
@@ -111,6 +109,13 @@ def run_server(config):
 
 def main():
     logger.init()
+
+    if len(sys.argv) < 2:
+        print "main.py [config]"
+        return False
+
+    options.parse_command_line()
+    config = app.config.load_appcfg(sys.argv[1])
 
     init_database(config=config)
 
@@ -125,15 +130,9 @@ def main():
 
 
 if __name__ == "__main__":
-    # if len(sys.argv) == 2 and sys.argv[1] == "--daemon":
-    #     daemon = daemonize.Daemonize(app="appspand.chat",
-    #                                  pid="/tmp/appspand.chat.pid",
-    #                                  action=main)
-    #     daemon.start()
-    # else:
-        # Init signals handler for TERM and INT signals
-        # (and so KeyboardInterrupt)
-        signal.signal(signal.SIGTERM, sig_handler)
-        signal.signal(signal.SIGINT, sig_handler)
+    # Init signals handler for TERM and INT signals
+    # (and so KeyboardInterrupt)
+    signal.signal(signal.SIGTERM, sig_handler)
+    signal.signal(signal.SIGINT, sig_handler)
 
-        main()
+    main()

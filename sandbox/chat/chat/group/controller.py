@@ -6,18 +6,16 @@ from util import cache
 from util import idgen
 from util import timestamp
 
+import app.config
 import event.controller
-import user.controller
-from settings import base
 
 import models
 
 
-config = base.get_options()
-
-
 def _save(group_info):
-    if config.redis_enabled:
+    config = app.config.appcfg
+
+    if config.redis.enabled:
         redis = cache.get_connection()
         key = ("group.%s" % group_info.uid)
         json = group_info.to_json()
@@ -29,9 +27,10 @@ def _save(group_info):
 
 
 def _load(group_uid):
-    group_info = None
+    config = app.config.appcfg
 
-    if config.redis_enabled:
+    group_info = None
+    if config.redis.enabled:
         redis = cache.get_connection()
         key = ("group.%s" % group_uid)
         json = redis.get(name=key)
