@@ -41,6 +41,10 @@ def parse_options(args=None):
                    help="Max. concurrent connection")
     options.define("mongodb_timeout", default=1000 * 10, type=int,
                    help="Timeout to use for mongodb operations")
+    options.define("mongodb_max_concurrent", default=10, type=int,
+                   help="Max. concurrent connection")
+    options.define("mongodb_max_wait_time", default=1000 * 10, type=int,
+                   help="Max. wait time")
     options.define("mongodb_appspand_db_name", default="appspand", type=str,
                    help="Database name for appspand applications")
     options.define("mongodb_insights_db_name", default="insights", type=str,

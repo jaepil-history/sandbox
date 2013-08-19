@@ -172,6 +172,7 @@ def main(options):
         '''
         # client actions
         '''
+        time.sleep(random.random())
         http_client.track_apa(uuid)
         http_client.track_cpu(uuid)
         http_client.track_pgr(uuid)

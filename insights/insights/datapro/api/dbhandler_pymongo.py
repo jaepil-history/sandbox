@@ -86,7 +86,7 @@ class DBHandler(object):
 
         return result
 
-    def get_uuids_info(self, app_id, *uuids):
+    def get_users_info(self, app_id, *uuids):
         app_info = self.get_app_info(app_id)
         collection_name_items = [app_id, "event", 'cpu']
         canonical_collection_name = ".".join(collection_name_items)
@@ -101,6 +101,19 @@ class DBHandler(object):
             result.append(user)
 
         return result
+
+    def get_user_info(self, app_id, uuid):
+        app_info = self.get_app_info(app_id)
+        collection_name_items = [app_id, "event", 'cpu']
+        canonical_collection_name = ".".join(collection_name_items)
+
+        connection = self.connection["insights"]
+        database = connection[app_info['cluster']['db_name']]
+        collection = database[canonical_collection_name]
+
+        user_info = collection.find_one({'uuid':uuid})
+
+        return user_info
 
     def find_to_list(self, app_id, collection_name, start, end):
         if collection_name is None:
