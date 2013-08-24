@@ -173,6 +173,23 @@ class Message_NewNoti(Message):
     message_info = ModelType(MessageInfo, required=True)
 
 
+class Message_CancelReq(Message):
+    sender_uid = StringType(required=True, max_length=512)
+    target_uid = StringType(required=True, max_length=512)
+    is_group = BooleanType(required=True)
+    message_uid = LongType(required=True)
+
+
+class Message_CancelAns(Message):
+    request = ModelType(Message_CancelReq)
+    error_code = IntType(required=True)
+    error_message = StringType(required=True)
+
+
+class Message_CancelNoti(Message):
+    message_info = ModelType(MessageInfo, required=True)
+
+
 class Message_ReadReq(Message):
     user_uid = StringType(required=True, max_length=512)
     sender_uid = StringType(required=True, max_length=512)

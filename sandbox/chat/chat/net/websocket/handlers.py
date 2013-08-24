@@ -20,6 +20,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         "Group_LeaveReq": net.protocols.Group_LeaveReq,
         "Group_InviteReq": net.protocols.Group_InviteReq,
         "Message_SendReq": net.protocols.Message_SendReq,
+        "Message_CancelReq": net.protocols.Message_CancelReq,
         "Message_ReadReq": net.protocols.Message_ReadReq,
         "Message_GetReq": net.protocols.Message_GetReq
     }
@@ -64,6 +65,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             self.group_invite(link=link, user_uid=user_uid, request=req)
         elif cmd == "Message_SendReq":
             self.message_send(link=link, user_uid=user_uid, request=req)
+        elif cmd == "Message_CancelReq":
+            self.message_cancel(link=link, user_uid=user_uid, request=req)
         elif cmd == "Message_ReadReq":
             self.message_read(link=link, user_uid=user_uid, request=req)
         elif cmd == "Message_GetReq":
@@ -175,6 +178,31 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
         self.write_message(ans_json)
+
+    def message_cancel(self, link, user_uid, request):
+        message_info = message.controller.cancel(sender_uid=request.sender_uid,
+                                                 target_uid=request.target_uid,
+                                                 message_uid=request.message_uid,
+                                                 is_group=request.is_group)
+
+        mi = net.protocols.MessageInfo()
+
+        if message_info is not None:
+            mi.from_mongo_engine(message_info)
+            error_code = 0
+            error_message = "OK"
+        else:
+            error_code = 100
+            error_message = "Cannot send a message"
+
+        ans = net.protocols.Message_SendAns()
+        ans.request = request
+        ans.message_info = mi
+        ans.error_code = error_code
+        ans.error_message = error_message
+        ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
+        self.write_message(ans_json)
+
 
     def message_read(self, link, user_uid, request):
         message_info = message.controller.read(user_uid=request.user_uid,

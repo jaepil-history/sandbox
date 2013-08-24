@@ -36,6 +36,19 @@ def on_message_send(sender_uid, group_uid, target_uids, message_info):
                                 message_info=message_info)
 
 
+def on_message_cancel(sender_uid, group_uid, target_uids, message_info):
+    mi = net.protocols.MessageInfo()
+    mi.from_mongo_engine(message_info)
+
+    noti = net.protocols.Message_CancelNoti()
+    noti.message_info = mi
+    noti_str = net.protocols.to_json(user_uid=sender_uid, message=noti)
+
+    offline_users = _send_message(target_uids, noti_str)
+    if offline_users:
+        pass
+
+
 def on_message_read(user_uid, group_uid, target_uids, messages):
     message_info = []
     for doc in messages:
