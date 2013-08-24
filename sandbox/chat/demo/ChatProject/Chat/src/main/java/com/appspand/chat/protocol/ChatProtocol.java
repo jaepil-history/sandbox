@@ -202,6 +202,31 @@ public class ChatProtocol {
         public MessageInfo mMessageInfo;
     }
 
+    public static class Message_CancelReq {
+        @SerializedName("sender_uid")
+        public String mSenderUID;
+        @SerializedName("target_uid")
+        public String mTargetUID;
+        @SerializedName("is_group")
+        public boolean mIsGroup;
+        @SerializedName("message_uid")
+        public long mMessageUID;
+    }
+
+    public static class Message_CancelAns {
+        @SerializedName("request")
+        public Message_CancelReq mRequest;
+        @SerializedName("error_code")
+        public int mErrorCode;
+        @SerializedName("error_message")
+        public String mErrorMessage;
+    }
+
+    public static class Message_CancelNoti {
+        @SerializedName("message_info")
+        public MessageInfo mMessageInfo;
+    }
+
     public static class Message_ReadReq {
         @SerializedName("user_uid")
         public String mUserUID;

@@ -156,6 +156,9 @@ public class ChatRoomActivity extends Activity {
                                 }
                             }
                     );
+                } else if (command.equals(ChatService.COMMAND_CANCEL_MESSAGE_NOTI)) {
+                    ChatProtocol.Message_CancelNoti noti = ChatConnector.parseNotificationEvent(command, payload);
+                    // TODO:
                 } else if (command.equals(ChatService.COMMAND_READ_MESSAGE_NOTI)) {
                     ChatProtocol.Message_ReadNoti noti = ChatConnector.parseNotificationEvent(command, payload);
                     // TODO:

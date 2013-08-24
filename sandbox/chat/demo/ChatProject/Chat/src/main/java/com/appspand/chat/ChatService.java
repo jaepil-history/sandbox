@@ -26,6 +26,7 @@ public class ChatService extends Service {
     public static final String EXTRA_COMMAND_DATA = "command.data";
 
     public static final String COMMAND_NEW_MESSAGE_NOTI = "Message_NewNoti";
+    public static final String COMMAND_CANCEL_MESSAGE_NOTI = "Message_CancelNoti";
     public static final String COMMAND_READ_MESSAGE_NOTI = "Message_ReadNoti";
 
     public ChatService()

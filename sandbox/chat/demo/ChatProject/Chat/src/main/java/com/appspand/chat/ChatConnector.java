@@ -202,6 +202,23 @@ public class ChatConnector {
         sendMessage(ChatProtocol.toJSON(senderUid, req));
     }
 
+    public void cancelMessage(String senderUid, String targetUid, boolean isGroup,
+                              long messageUid, AsyncResult<ChatProtocol.Message_CancelAns> asyncResult)
+    {
+        ChatProtocol.Message_CancelReq req = new ChatProtocol.Message_CancelReq();
+        req.mSenderUID = senderUid;
+        req.mTargetUID = targetUid;
+        req.mIsGroup = isGroup;
+        req.mMessageUID = messageUid;
+
+        if (!mAsyncResultHandlers.containsKey("Message_CancelAns"))
+        {
+            mAsyncResultHandlers.put("Message_CancelAns", asyncResult);
+        }
+
+        sendMessage(ChatProtocol.toJSON(senderUid, req));
+    }
+
     public void getMessages(String userUid, String targetUid, boolean isGroup,
                             long sinceUid, int count, long[] messageUids,
                             AsyncResult<ChatProtocol.Message_GetAns> asyncResult)
