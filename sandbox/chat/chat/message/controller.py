@@ -66,10 +66,8 @@ def cancel(sender_uid, target_uid, message_uid, is_group=False):
         group_uid = target_uid
         group_info = _find_group(group_uid=target_uid)
         target_uids = group_info.members
-        countdown = len(target_uids) - 1
     else:
         target_uids = [target_uid]
-        countdown = 1
 
     message_info = find_one(message_uid=message_uid)
 
@@ -78,8 +76,9 @@ def cancel(sender_uid, target_uid, message_uid, is_group=False):
             queue_info = queue.controller.find_one(user_uid=user_uid)
             if queue_info is None:
                 continue
-            queue_info.message_uids.remove(message_uid)
-            queue_info.save()
+            if message_uid in queue_info.message_uids:
+                queue_info.message_uids.remove(message_uid)
+                queue_info.save()
 
     event.controller.on_message_cancel(sender_uid=sender_uid,
                                        group_uid=group_uid,
