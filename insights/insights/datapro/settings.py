@@ -7,9 +7,7 @@ import os
 
 from tornado import options
 
-
 config_path = "settings.conf"
-
 
 def parse_options(args=None):
     # Debugging

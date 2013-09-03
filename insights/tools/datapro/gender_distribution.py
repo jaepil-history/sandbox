@@ -330,4 +330,24 @@ print '--------------------------------------------------------------'
 # print counter.seoul.total.total.male
 # print counter.seoul.total.total.unknown
 # print counter.seoul.total.total.total
-
+'''
+{
+    u'status': 0,
+    u'receipt': {
+        u'purchase_date_pst': u'2013-09-01 09:57:58 America/Los_Angeles',
+        u'product_id': u'com.doobic.meteos.gold10',
+        u'original_transaction_id': u'1000000085830212',
+        u'unique_identifier': u'160f6082ce610da1ddcd64c71dfd7333d7f28390',
+        u'original_purchase_date_pst': u'2013-09-01 09:57:58 America/Los_Angeles',
+        u'original_purchase_date': u'2013-09-01 16:57:58 Etc/GMT',
+        u'unique_vendor_identifier': u'53668491-C439-4197-BEF7-591D0C3C282D',
+        u'bvrs': u'1.0', u'original_purchase_date_ms': u'1378054678205',
+        u'purchase_date': u'2013-09-01 16:57:58 Etc/GMT',
+        u'item_id': u'697878275',
+        u'purchase_date_ms': u'1378054678205',
+        u'bid': u'com.doobic.meteos',
+        u'transaction_id': u'1000000085830212',
+        u'quantity': u'1'
+    }
+}
+'''

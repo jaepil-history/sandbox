@@ -32,10 +32,12 @@ class DBHandler(object):
     @tornado.gen.coroutine
     def get_app_ids(self):
         connection = self.connection["appspand"]
-        database = connection[self.settings["options"].mongodb_appspand_db_name]
+        database = connection[self.dbs["config"].mongodb_appspand_db_name]
         collection = database["application"]
 
-        ids = yield motor.Op(collection.find().to_list, {"_id"})
+        print collection
+        ids = yield motor.Op(collection.find, {"_id"})
+        print ids
         if ids is None:
             raise Exception("No application found")
 
@@ -45,7 +47,7 @@ class DBHandler(object):
     @tornado.gen.coroutine
     def get_app_info(self, app_id):
         connection = self.connection["appspand"]
-        database = connection[self.settings["options"].mongodb_appspand_db_name]
+        database = connection[self.dbs["config"].mongodb_appspand_db_name]
         collection = database["application"]
 
         app_info = yield motor.Op(collection.find_one, {"_id": app_id})

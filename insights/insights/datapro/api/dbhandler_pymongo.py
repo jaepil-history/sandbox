@@ -19,6 +19,7 @@ class DBHandler(object):
             "processed" : dbs["processed"]
         }
 
+
     def get_app_ids(self):
         connection = self.connection["appspand"]
         database = connection[self.dbs["config"].mongodb_appspand_db_name]
@@ -37,6 +38,7 @@ class DBHandler(object):
 
         return result
 
+
     def get_app_info(self, app_id):
         connection = self.connection["appspand"]
         database = connection[self.dbs["config"].mongodb_appspand_db_name]
@@ -47,6 +49,7 @@ class DBHandler(object):
             raise Exception("Application ID not found")
 
         return app_info
+
 
     def get_column_values(self, app_id, collection_name, column_name, start, end):
         if collection_name is None:
@@ -68,6 +71,7 @@ class DBHandler(object):
 
         return result
 
+
     def get_uuids(self, app_id, collection_name, start, end):
         if collection_name is None:
             raise Exception("Collection name is not specified")
@@ -86,6 +90,7 @@ class DBHandler(object):
 
         return result
 
+
     def get_users_info(self, app_id, *uuids):
         app_info = self.get_app_info(app_id)
         collection_name_items = [app_id, "event", 'cpu']
@@ -102,6 +107,7 @@ class DBHandler(object):
 
         return result
 
+
     def get_user_info(self, app_id, uuid):
         app_info = self.get_app_info(app_id)
         collection_name_items = [app_id, "event", 'cpu']
@@ -114,6 +120,7 @@ class DBHandler(object):
         user_info = collection.find_one({'uuid':uuid})
 
         return user_info
+
 
     def find_to_list(self, app_id, collection_name, start, end):
         if collection_name is None:
@@ -132,9 +139,7 @@ class DBHandler(object):
         for doc in cursor:
             result.append(doc)
         return result
-        # cursor = yield motor.Op(collection.find, {'_dt': {'$gt':start, '$lte':end}})
-        # while (yield cursor.fetch_next):
-        #     doc = cursor.next_object()
+
 
     def cursor(self, app_id, collection_name, start, end):
         if collection_name is None:
@@ -150,6 +155,7 @@ class DBHandler(object):
 
         cursor = collection.find({'_dt': {'$gt':start, '$lte':end}})
         return cursor
+
 
     def insert(self, app_id, collection_name, doc):
         if collection_name is None:
