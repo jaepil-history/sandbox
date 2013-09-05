@@ -39,6 +39,7 @@ class DataProDaemon(Daemon):
             "appspand": self.db_client,
             "insights": self.db_client,
             "processed": self.db_client,
+            "retention": self.db_client,
             "config": config
         }
         self.db_handler = DBHandler(self.dbs)
@@ -61,6 +62,7 @@ class DataProDaemon(Daemon):
 
             # Checks the system every 60 seconds
             time.sleep(settings.SYSTEM_CHECK_PERIOD)
+
 
 if __name__ == "__main__":
     config = settings.parse_options()

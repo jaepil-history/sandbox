@@ -21,17 +21,20 @@ from mongoengine import EmailField
 from mongoengine import ValidationError
 from password import PasswordField
 
-MAX_LEVEL = 50
+MAX_LEVEL = 100
 MAX_DAYS = 20
+
+friends_division = ['0-10', '11-20', '21-40', '41-60', '61-80', '81-125', '126-249', '250+', 'u']
 
 class BaseResult(Document):
     _dt = DateTimeField(required=True)
     title = StringField(required=True)
     timestamp = IntField(db_field='ts')
-    last_doc_id = ObjectIdField(required=True, db_field='last_id')
+    last_doc_id = ObjectIdField(required=True, db_field='l_id')
     runtime = LongField(required=True)
     counts = IntField()
-
+    level = ListField(IntField(), default=lambda: [0 for x in range(MAX_LEVEL)], db_field='lv')
+    friends = ListField(IntField(), default=lambda: [0 for x in range(len(friends_division))], db_field='f')
 
     def __init__(self, *args, **values):
         super(Document, self).__init__(*args, **values)
@@ -42,6 +45,40 @@ class BaseResult(Document):
         # ts : timestamp
         if self.timestamp is None:
             self.timestamp = int(time.time())
+
+    def accumulate(self, doc):
+        self.groupbylevel(doc)
+        self.groupbyfriends(doc)
+
+    def groupbylevel(self, doc):
+        try:
+            self.level[doc['ul']-1] += 1
+        except:
+            print 'user level is not proper'
+
+    def groupbyfriends(self, doc):
+        position = doc['f']
+        for value in friends_division:
+            if '-' in value:
+                segment = value.split('-')
+                start = int(segment[0])
+                end = int(segment[1])
+                if position >= start and position <= end:
+                    self.friends[friends_division.index(value)] += 1
+                    break
+
+            elif '+' in value:
+                segment = value.split('+')
+                if position >= int(segment[0]):
+                    self.friends[friends_division.index(value)] += 1
+                    break
+
+            elif value == 'u':
+                self.friends[friends_division.index(value)] += 1
+                break
+
+            else:
+                print str(doc['_id']) + ': not counted by friends group'
 
     def to_python(self):
         data = self.to_mongo()

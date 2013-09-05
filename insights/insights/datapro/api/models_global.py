@@ -38,7 +38,7 @@ class BaseResult(Document):
     _dt = DateTimeField(required=True)
     title = StringField(required=True)
     timestamp = IntField(db_field='ts')
-    last_doc_id = ObjectIdField(required=True, db_field='last_id')
+    last_doc_id = ObjectIdField(required=True, db_field='l_id')
     runtime = LongField(required=True)
     counts = IntField()
     gender = ListField(IntField(), default=lambda: [0 for x in range(len(gender_division))], db_field='g')

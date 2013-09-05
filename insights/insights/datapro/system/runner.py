@@ -1,6 +1,6 @@
 import sys
 
-from insights.datapro.core import settings
+from insights.datapro import settings
 from insights.datapro.utils.dates import unix_utc_now
 
 

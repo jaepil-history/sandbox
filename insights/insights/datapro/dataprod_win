@@ -1,0 +1,99 @@
+#!/usr/bin/env python
+# This Python file uses the following encoding: utf-8
+#
+# Copyright 2013 Appspand
+
+import sys
+import time
+import logging
+from time import gmtime, strftime
+
+from insights.datapro import __version__
+# from insights.datapro.system.daemon import Daemon
+# from insights.datapro.system import runner
+from insights.datapro import settings
+from insights.datapro.api.dbhandler_pymongo import DBHandler
+from pymongo import MongoClient
+
+from processors import test_pymongo
+
+# Keep all log files in one place
+LOGFILE = 'dataprod.log'
+
+# Configure logging
+logging.basicConfig(filename=LOGFILE,level=logging.DEBUG)
+logger = logging.getLogger('dataprod')
+
+def init_database(config):
+    mongodb_client = MongoClient(host=config.mongodb_connection_uri,
+                        max_pool_size=config.mongodb_pool_size)
+
+    return mongodb_client
+
+class DataProDaemon(object):
+
+    def __init__(self, config):
+        self.interval = config.interval
+        self.db_client = init_database(config=config)
+        self.dbs = {
+            "appspand": self.db_client,
+            "insights": self.db_client,
+            "processed": self.db_client,
+            "retention": self.db_client,
+            "config": config
+        }
+        self.db_handler = DBHandler(self.dbs)
+
+    def run(self):
+
+        while True:
+            print 'datapro is running'
+            print strftime("%Y-%m-%d %H:%M:%S", gmtime())
+            print strftime("%a, %d %b %Y %X +0000", gmtime())
+
+            test_pymongo.run(self.db_handler)
+
+            # Analyze data every 60 seconds
+            time.sleep(self.interval)
+
+
+if __name__ == "__main__":
+    config = settings.parse_options()
+    daemon = DataProDaemon(config=config)
+    daemon.run()
+
+    # if len(sys.argv) == 2:
+    #     if 'start' == sys.argv[1]:
+    #         try:
+    #             daemon.start()
+    #         except Exception, e:
+    #             logger.exception("DataProD cant be started")
+    #     elif 'stop' == sys.argv[1]:
+    #         print "Stopping DataProDaemon ..."
+    #         daemon.stop()
+    #     elif 'restart' == sys.argv[1]:
+    #         print "Restarting DataProDaemon ..."
+    #         daemon.restart()
+    #     elif 'status' == sys.argv[1]:
+    #         try:
+    #             pf = file(PIDFILE, 'r')
+    #             pid = int(pf.read().strip())
+    #             pf.close()
+    #         except IOError:
+    #             pid = None
+    #         except SystemExit:
+    #             pid = None
+    #
+    #         if pid:
+    #             print 'DataProDaemon {0} is running as pid {1}'.format(__version__, pid)
+    #         else:
+    #             print 'DataProDaemon is not running.'
+    #
+    #     else:
+    #         print "Unknown command"
+    #         sys.exit(2)
+    #         sys.exit(0)
+    # else:
+    #     print "usage: %s start|stop|restart|status" % sys.argv[0]
+    #     sys.exit(2)
+
