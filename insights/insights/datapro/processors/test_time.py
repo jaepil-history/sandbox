@@ -6,6 +6,17 @@
 from datetime import datetime
 from datetime import timedelta
 
+
+today = datetime.utcnow().date()
+yesterday = today - timedelta(days=1)
+print 'today: ' + str(today)
+print 'yesterday: ' + str(yesterday)
+print 'year: ' + str(today.year)
+print 'month: ' + str(today.month)
+print 'day: ' + str(today.day)
+
+
+
 now = datetime.utcnow().today()
 print now
 

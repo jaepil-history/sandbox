@@ -14,6 +14,7 @@ from insights.datapro import __version__
 from insights.datapro import settings
 from insights.datapro.api.dbhandler_pymongo import DBHandler
 from pymongo import MongoClient
+from datetime import datetime, timedelta
 
 from processors import test_pymongo
 from processors import test_retention
@@ -47,6 +48,10 @@ class DataProDaemon(object):
         self.db_handler = DBHandler(self.dbs)
 
     def run(self):
+        today = datetime.utcnow().date() + timedelta(days=1)
+        yesterday = today - timedelta(days=1)
+        start = datetime(yesterday.year, yesterday.month, yesterday.day, 00, 00, 00)
+        end = datetime(today.year, today.month, today.day, 00, 00, 00)
 
         while True:
             print 'datapro is running'
@@ -54,12 +59,13 @@ class DataProDaemon(object):
             print strftime("%a, %d %b %Y %X +0000", gmtime())
 
             # test_pymongo.run(self.db_handler)
-            test_new_users.run(self.db_handler)
-            test_count_logins.run(self.db_handler)
-            test_retention.run(self.db_handler)
+            test_new_users.run(self.db_handler, start, end)
+            test_count_logins.run(self.db_handler, start, end)
+            # test_retention.run(self.db_handler, start, end)
 
             # Analyze data every 60 seconds
-            time.sleep(self.interval)
+            # time.sleep(self.interval)
+            time.sleep(6000)
 
 
 if __name__ == "__main__":
