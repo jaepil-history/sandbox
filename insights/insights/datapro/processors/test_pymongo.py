@@ -121,7 +121,7 @@ def run(db_handler):
     for doc in memory:
         counts += 1
         last_doc_id = doc['_id']
-        base_result1.groupbyfriends(doc)
+        base_result1.group_by_friends(doc)
 
     print 'last_doc_id = ' + str(last_doc_id)
 

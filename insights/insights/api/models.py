@@ -8,13 +8,17 @@ from mongoengine import DateTimeField
 from mongoengine import EmbeddedDocumentField
 from mongoengine import IntField
 from mongoengine import LongField
+from mongoengine import FloatField
 from mongoengine import StringField
+from mongoengine import ListField
+from mongoengine import BooleanField
 from mongoengine import EmailField
 from password import PasswordField
 from mongoengine import ValidationError
 
 import tornado.gen
 
+MAX_RETENTION_DAYS = 21
 
 class BaseDoc(Document):
     _dt = DateTimeField(required=True)
@@ -75,7 +79,7 @@ class AccountInfo(BaseDoc):
 class ApplicationAdded(BaseDoc):
     """
     s: The UID of the user adding the application.
-    ul: The level of the user.
+    ul: The level of the user. Installation or reinstallation
     f: The number of friends a user has.
     data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
         It must be base64-encoded.
@@ -88,6 +92,7 @@ class ApplicationAdded(BaseDoc):
     user_uid = LongField(required=True, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
+    created_at = DateTimeField(required=True, db_field='nru')
     data = StringField()
     timestamp = IntField(db_field='ts')
     # meta = {'collection': 'apa'}
@@ -114,7 +119,7 @@ class ApplicationRemoved(BaseDoc):
     timestamp = IntField(db_field='ts')
 
 
-# cpu
+# cpu : login event
 class UserInformation(BaseDoc):
     """
     s: The UID of the user.
@@ -128,30 +133,31 @@ class UserInformation(BaseDoc):
 
     _mt = StringField(default='cpu')
     user_uid = LongField(required=True, db_field='uuid')
+    user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     data = StringField()
     timestamp = IntField(db_field='ts')
 
 
-# lgn
-class Login(BaseDoc):
-    """
-    s: The UID of the user adding the application.
-    ul: The level of the user.
-    f: The number of friends a user has.
-    data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
-        It must be base64-encoded.
-    ts: The ts in the Epoch time format.
-        Include this parameter to prevent the user's browser from caching the REST API call if sent
-        using JavaScript.
-    """
-
-    _mt = StringField(default='lgn')
-    user_uid = LongField(required=True, db_field='uuid')
-    user_level = IntField(required=True, default=1, db_field='ul')
-    friends_count = IntField(db_field='f')
-    timestamp = IntField(db_field='ts')
-    # meta = {'collection': 'lgn'}
+# # lgn
+# class Login(BaseDoc):
+#     """
+#     s: The UID of the user adding the application.
+#     ul: The level of the user.
+#     f: The number of friends a user has.
+#     data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
+#         It must be base64-encoded.
+#     ts: The ts in the Epoch time format.
+#         Include this parameter to prevent the user's browser from caching the REST API call if sent
+#         using JavaScript.
+#     """
+#
+#     _mt = StringField(default='lgn')
+#     user_uid = LongField(required=True, db_field='uuid')
+#     user_level = IntField(required=True, default=1, db_field='ul')
+#     friends_count = IntField(db_field='f')
+#     timestamp = IntField(db_field='ts')
+#     # meta = {'collection': 'lgn'}
 
 
 # lgt
@@ -175,6 +181,27 @@ class Logout(BaseDoc):
     # meta = {'collection': 'lgt'}
 
 
+# wid
+class Withdrawal(BaseDoc):
+    """
+    s: The UID of the user adding the application.
+    ul: The level of the user.
+    f: The number of friends a user has.
+    data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
+        It must be base64-encoded.
+    ts: The ts in the Epoch time format.
+        Include this parameter to prevent the user's browser from caching the REST API call if sent
+        using JavaScript.
+    """
+
+    _mt = StringField(default='wid')
+    user_uid = LongField(required=True, db_field='uuid')
+    user_level = IntField(required=True, default=1, db_field='ul')
+    friends_count = IntField(db_field='f')
+    timestamp = IntField(db_field='ts')
+    # meta = {'collection': 'wid'}
+
+
 # mtu
 class RevenueTracking(BaseDoc):
     """
@@ -188,10 +215,10 @@ class RevenueTracking(BaseDoc):
 
     _mt = StringField(default='mtu')
     user_uid = LongField(required=True, db_field='uuid')
-    event_name = StringField(min_length=1, max_length=128)
-    value = IntField(required=True)
-    level = IntField(required=True, default=1, db_field='lv')
-    data = StringField()
+    user_level = IntField(required=True, default=1, db_field='ul')
+    friends_count = IntField(db_field='f')
+    item_id = IntField(required=True, db_field='iid')
+    amount = FloatField(required=True, db_field='a')
     timestamp = IntField(db_field='ts')
 
 

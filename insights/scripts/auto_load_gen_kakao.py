@@ -12,6 +12,7 @@ import tornado.options
 
 from pymongo import MongoClient
 
+import datetime
 import time
 import logging
 
@@ -51,7 +52,8 @@ class InsightsClient(object):
         params = {
             "uuid": uuid,
             "f": random.randint(0, 1000),
-            "ul": random.randint(1, 100)
+            "ul": random.randint(1, 100),
+            'nru': datetime.datetime.utcnow()
         }
 
         url = self.make_request(self.app_id, "apa", params)
@@ -70,7 +72,8 @@ class InsightsClient(object):
     def track_cpu(self, uuid):
         params = {
             "uuid": uuid,
-            "f": random.randint(0, 1000)
+            "f": random.randint(0, 1000),
+            "ul": random.randint(1, 100)
         }
 
         url = self.make_request(self.app_id, "cpu", params)
@@ -92,7 +95,9 @@ class InsightsClient(object):
         params = {
             "uuid": uuid,
             "f": random.randint(0, 1000),
-            "ul": random.randint(1, 100)
+            "ul": random.randint(1, 100),
+            "iid": random.randint(1, 30),
+            "a": random.random() * 1000
         }
 
         url = self.make_request(self.app_id, "mtu", params)
@@ -159,22 +164,38 @@ def main(options):
     apps = getApps(options)
     print apps
 
+    # execute once initially
     http_clients = []
     for app in apps:
         http_clients.append(InsightsClient(app_id=str(app['_id'])))
+        for uuid in range(20000, 25000):
+            http_client = http_clients[apps.index(app)]
+            # client actions
+            http_client.track_apa(uuid)
+    #
+    # for uuid in range(10000, 20000):
+    #     # client and user are picked randomly
+    #     http_client = http_clients[random.randint(0, len(apps) - 1)]
+    #     # client actions
+    #     time.sleep(0.5 * random.random())
+    #     http_client.track_cpu(uuid)
+    #     http_client.track_pgr(uuid)
+    #     http_client.track_mtu(uuid)
 
-    for uuid in range(10000, 20000):
+    # repeat for statement everyday
+    # http_clients = []
+    # for app in apps:
+    #     http_clients.append(InsightsClient(app_id=str(app['_id'])))
+
+    for i in range(5000):
         # client and user are picked randomly
         http_client = http_clients[random.randint(0, len(apps) - 1)]
-
-        '''
+        uuid = random.randint(10000, 25000)
         # client actions
-        '''
-        time.sleep(random.random())
-        http_client.track_apa(uuid)
+        time.sleep(0.5 * random.random())
         http_client.track_cpu(uuid)
         http_client.track_pgr(uuid)
-        http_client.track_pgr(uuid)
+        http_client.track_mtu(uuid)
 
 
 if __name__ == "__main__":

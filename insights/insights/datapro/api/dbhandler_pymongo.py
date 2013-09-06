@@ -16,8 +16,7 @@ class DBHandler(object):
         self.connection = {
             "appspand": dbs["appspand"],
             "insights": dbs["insights"],
-            "processed": dbs["processed"],
-            "retention": dbs["retention"]
+            "processed": dbs["processed"]
         }
 
 

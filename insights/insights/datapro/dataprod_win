@@ -16,6 +16,7 @@ from insights.datapro.api.dbhandler_pymongo import DBHandler
 from pymongo import MongoClient
 
 from processors import test_pymongo
+from processors import test_retention
 
 # Keep all log files in one place
 LOGFILE = 'dataprod.log'
@@ -51,7 +52,8 @@ class DataProDaemon(object):
             print strftime("%Y-%m-%d %H:%M:%S", gmtime())
             print strftime("%a, %d %b %Y %X +0000", gmtime())
 
-            test_pymongo.run(self.db_handler)
+            # test_pymongo.run(self.db_handler)
+            test_retention.run(self.db_handler)
 
             # Analyze data every 60 seconds
             time.sleep(self.interval)

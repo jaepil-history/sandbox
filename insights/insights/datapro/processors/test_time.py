@@ -6,11 +6,25 @@
 from datetime import datetime
 from datetime import timedelta
 
-now = datetime.utcnow()
+now = datetime.utcnow().today()
 print now
 
-today = now.today()
-print today
+prefix = ["%04d" % now.year,
+            "%02d" % now.month,
+            "%02d" % now.day]
+
+col_prefix = "_".join(prefix)
+
+print  col_prefix
+print prefix
+
+print now.timetuple()
+print now.day
+
+# print now.today()
+
+# today = now.today()
+# print today
 
 hour = now.hour
 print hour
