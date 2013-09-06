@@ -21,8 +21,8 @@ def run(db_handler):
 
     from datetime import datetime, timedelta
 
-    start = datetime.utcnow() - timedelta(hours=1000)
-    end = datetime.utcnow()
+    start = datetime.utcnow().today() - timedelta(hours=1000)
+    end = datetime.utcnow().today()
     app_id = "5226e79b35b6e6080cca3f1d"
     # app_id = "5226e77335b6e61184d73e39"
 
@@ -33,6 +33,7 @@ def run(db_handler):
     from insights.datapro.api import models
     import time
 
+    print 'saving nru ...'
     counts = 0
     elapsed = 0
     last_doc_id = None
@@ -42,7 +43,7 @@ def run(db_handler):
         counts += 1
         last_doc_id = doc['_id']
         user = models.User()
-        user.created_at = doc['nru']
+        user.created_at = doc['c']
         user.friends_count = doc['f']
         user.user_uid = doc['uuid']
         user.user_level = doc['ul']

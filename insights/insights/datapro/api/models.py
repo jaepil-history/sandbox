@@ -20,7 +20,7 @@ from mongoengine import StringField
 from mongoengine import ValidationError
 
 MAX_LEVEL = 100
-MAX_RETENTION_DAYS = 20
+MAX_RETENTION_DAYS = 28
 
 friends_division = ['0-10', '11-20', '21-40', '41-60', '61-80', '81-125', '126-249', '250+', 'u']
 
@@ -94,7 +94,7 @@ class BaseResult(Document):
                 print ValidationError.to_dict()
 
         doc = self.to_python()
-        result = db_handler.insert(collection_name=collection_name, doc=doc)
+        result = db_handler.insert_to_processed(collection_name=collection_name, doc=doc)
         return result
 
     meta = {'allow_inheritance': True}
@@ -118,11 +118,10 @@ class User(Document):
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
 
-    created_at = DateTimeField(required=True)
+    created_at = DateTimeField(required=True, db_field='c')
     last_login_at = DateTimeField(required=True, db_field='l_in')
 
-    retention = ListField(BooleanField(), default=lambda: [False for x in range(MAX_RETENTION_DAYS)], db_field='ret')
-    logins_a_day = ListField(IntField(), default=lambda: [0 for x in range(MAX_RETENTION_DAYS)], db_field='lgn')
+    logins_a_day = ListField(IntField(), default=lambda: [0 for x in range(MAX_RETENTION_DAYS)], db_field='ln')
 
     timestamp = IntField(db_field='ts')
     # meta = {'collection': 'usr'}
@@ -155,7 +154,7 @@ class User(Document):
                 print ValidationError.to_dict()
 
         doc = self.to_python()
-        result = db_handler.insert(app_id=app_id, collection_name=collection_name, doc=doc)
+        result = db_handler.insert_to_processed(app_id=app_id, collection_name=collection_name, doc=doc)
         return result
 
 

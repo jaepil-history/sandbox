@@ -53,7 +53,7 @@ class InsightsClient(object):
             "uuid": uuid,
             "f": random.randint(0, 1000),
             "ul": random.randint(1, 100),
-            'nru': datetime.datetime.utcnow()
+            'c': datetime.datetime.utcnow()
         }
 
         url = self.make_request(self.app_id, "apa", params)
@@ -168,10 +168,11 @@ def main(options):
     http_clients = []
     for app in apps:
         http_clients.append(InsightsClient(app_id=str(app['_id'])))
-        for uuid in range(20000, 25000):
+        for uuid in range(10000, 25000):
             http_client = http_clients[apps.index(app)]
             # client actions
             http_client.track_apa(uuid)
+
     #
     # for uuid in range(10000, 20000):
     #     # client and user are picked randomly
@@ -187,12 +188,12 @@ def main(options):
     # for app in apps:
     #     http_clients.append(InsightsClient(app_id=str(app['_id'])))
 
-    for i in range(5000):
+    for i in range(10000):
         # client and user are picked randomly
         http_client = http_clients[random.randint(0, len(apps) - 1)]
         uuid = random.randint(10000, 25000)
         # client actions
-        time.sleep(0.5 * random.random())
+        time.sleep(0.2 * random.random())
         http_client.track_cpu(uuid)
         http_client.track_pgr(uuid)
         http_client.track_mtu(uuid)

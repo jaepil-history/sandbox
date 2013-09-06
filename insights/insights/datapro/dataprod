@@ -39,7 +39,6 @@ class DataProDaemon(Daemon):
             "appspand": self.db_client,
             "insights": self.db_client,
             "processed": self.db_client,
-            "retention": self.db_client,
             "config": config
         }
         self.db_handler = DBHandler(self.dbs)

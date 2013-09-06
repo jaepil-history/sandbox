@@ -92,7 +92,7 @@ class ApplicationAdded(BaseDoc):
     user_uid = LongField(required=True, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
-    created_at = DateTimeField(required=True, db_field='nru')
+    created_at = DateTimeField(required=True, db_field='c')
     data = StringField()
     timestamp = IntField(db_field='ts')
     # meta = {'collection': 'apa'}

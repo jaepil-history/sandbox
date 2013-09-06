@@ -17,6 +17,8 @@ from pymongo import MongoClient
 
 from processors import test_pymongo
 from processors import test_retention
+from processors import test_count_logins
+from processors import test_new_users
 
 # Keep all log files in one place
 LOGFILE = 'dataprod.log'
@@ -40,7 +42,6 @@ class DataProDaemon(object):
             "appspand": self.db_client,
             "insights": self.db_client,
             "processed": self.db_client,
-            "retention": self.db_client,
             "config": config
         }
         self.db_handler = DBHandler(self.dbs)
@@ -53,6 +54,8 @@ class DataProDaemon(object):
             print strftime("%a, %d %b %Y %X +0000", gmtime())
 
             # test_pymongo.run(self.db_handler)
+            test_new_users.run(self.db_handler)
+            test_count_logins.run(self.db_handler)
             test_retention.run(self.db_handler)
 
             # Analyze data every 60 seconds

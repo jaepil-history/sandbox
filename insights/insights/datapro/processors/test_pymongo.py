@@ -15,7 +15,7 @@ def init_database(config):
     return mongodb_client
 
 def run(db_handler):
-    app_ids = db_handler.get_app_ids()
+    app_ids = db_handler.get_app_ids_from_appspand()
 
     print app_ids
 
@@ -84,7 +84,7 @@ def run(db_handler):
     last_doc_id = None
     start_cal = time.time()
 
-    for doc in db_handler.cursor(app_id, 'apa', start, end):
+    for doc in db_handler.find_from_insights(app_id, 'apa', start, end):
         counts += 1
         last_doc_id = doc['_id']
         base_result.accumulate(doc)
@@ -147,11 +147,45 @@ if __name__ == "__main__":
         "appspand": db_client,
         "insights": db_client,
         "processed": db_client,
-        "retention": db_client,
         "config": config
     }
 
     db_handler = DBHandler(dbs)
-    run(db_handler=db_handler)
+    # run(db_handler=db_handler)
+
+    app_id = "5226e79b35b6e6080cca3f1d"
+    uuid = 10000
+
+
+
+    database = db_client['processed']
+    collection_name_items = [app_id, "processed", 'usr']
+    canonical_collection_name = ".".join(collection_name_items)
+    collection = database[canonical_collection_name]
+
+    print 'before updating ...'
+    user_info = collection.find_one( {"uuid": uuid})
+    print user_info
+    print '+++++++++++++++++++++++'
+
+    days = 5
+    db_handler.update_user_login_at_processed(app_id, uuid, days)
+    # index = 0
+    # collection.update( { "uuid": uuid },
+    #                     {
+    #                         '$set': { 'ret.' + str(index):True },
+    #                         '$inc': { 'lgn.' + str(index):1 }
+    #                     })
+
+    # # delete a field
+    # collection.update(  { "uuid": uuid },
+    #                     {
+    #                         '$unset': { 'login':1 }
+    #                     })
+
+    print 'after updating ...'
+    user_info = collection.find_one( {"uuid": uuid})
+    print user_info
+
 
 

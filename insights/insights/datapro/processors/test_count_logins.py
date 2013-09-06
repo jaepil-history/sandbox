@@ -21,8 +21,8 @@ def run(db_handler):
 
     from datetime import datetime, timedelta
 
-    start = datetime.utcnow() - timedelta(hours=1000)
-    end = datetime.utcnow()
+    start = datetime.utcnow().today() - timedelta(hours=1000)
+    end = datetime.utcnow().today()
     app_id = "5226e79b35b6e6080cca3f1d"
     # app_id = "5226e77335b6e61184d73e39"
 
@@ -33,20 +33,26 @@ def run(db_handler):
     from insights.datapro.api import models
     import time
 
+    print 'counting login ...'
+
     counts = 0
     elapsed = 0
     last_doc_id = None
     start_cal = time.time()
+    today = datetime.utcnow().date()
+    # print 'today: ' + str(today)
 
-    for doc in db_handler.find_from_insights(app_id, 'apa', start, end):
+    for doc in db_handler.find_from_insights(app_id, 'cpu', start, end):
         counts += 1
         last_doc_id = doc['_id']
-        user = models.User()
-        user.created_at = doc['nru']
-        user.friends_count = doc['f']
-        user.user_uid = doc['uuid']
-        user.user_level = doc['ul']
-        user.save(db_handler, app_id, 'usr', validate=True)
+        uuid = doc['uuid']
+        # print 'doc[_dt]: ' + str(doc['_dt'].date())
+        diff_days = today - doc['_dt'].date()
+        # print 'diff_days: ' + str(diff_days)
+        diff_days = diff_days.days
+        # print 'diff_days: ' + str(diff_days)
+        if diff_days > 0 and diff_days <= models.MAX_RETENTION_DAYS:
+            db_handler.update_user_login_at_processed(app_id, uuid, diff_days)
 
     print 'last_doc_id = ' + str(last_doc_id)
 

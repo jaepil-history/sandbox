@@ -20,17 +20,10 @@ class DBHandler(object):
         }
 
 
-    def get_app_ids(self):
+    def get_app_ids_from_appspand(self):
         connection = self.connection["appspand"]
         database = connection[self.dbs["config"].mongodb_appspand_db_name]
         collection = database["application"]
-
-        # selected = []
-        # cursor = collection.find(fields=["_id", "name"])
-        # for doc in cursor:
-        #     selected.append({doc['name']:str(doc['_id'])})
-        #
-        # print selected
 
         result = collection.find().distinct("_id")
         if result is None:
@@ -39,7 +32,7 @@ class DBHandler(object):
         return result
 
 
-    def get_app_info(self, app_id):
+    def get_app_info_from_appspand(self, app_id):
         connection = self.connection["appspand"]
         database = connection[self.dbs["config"].mongodb_appspand_db_name]
         collection = database["application"]
@@ -57,7 +50,7 @@ class DBHandler(object):
         if column_name is None:
             raise Exception("Column name is not specified")
 
-        app_info = self.get_app_info(app_id)
+        app_info = self.get_app_info_from_appspand(app_id)
         collection_name_items = [app_id, "event", collection_name]
         canonical_collection_name = ".".join(collection_name_items)
 
@@ -76,7 +69,7 @@ class DBHandler(object):
         if collection_name is None:
             raise Exception("Collection name is not specified")
 
-        app_info = self.get_app_info(app_id)
+        app_info = self.get_app_info_from_appspand(app_id)
         collection_name_items = [app_id, "event", collection_name]
         canonical_collection_name = ".".join(collection_name_items)
 
@@ -91,13 +84,11 @@ class DBHandler(object):
         return result
 
 
-    def get_users_info(self, app_id, *uuids):
-        app_info = self.get_app_info(app_id)
-        collection_name_items = [app_id, "event", 'cpu']
+    def get_users_info_from_processed(self, app_id, *uuids):
+        collection_name_items = [app_id, "processed", 'usr']
         canonical_collection_name = ".".join(collection_name_items)
-
-        connection = self.connection["insights"]
-        database = connection[app_info['cluster']['db_name']]
+        connection = self.connection["processed"]
+        database = connection[self.dbs["config"].mongodb_processed_db_name]
         collection = database[canonical_collection_name]
 
         result = []
@@ -108,13 +99,11 @@ class DBHandler(object):
         return result
 
 
-    def get_user_info(self, app_id, uuid):
-        app_info = self.get_app_info(app_id)
-        collection_name_items = [app_id, "event", 'cpu']
+    def get_user_info_from_processed(self, app_id, uuid):
+        collection_name_items = [app_id, "processed", 'usr']
         canonical_collection_name = ".".join(collection_name_items)
-
-        connection = self.connection["insights"]
-        database = connection[app_info['cluster']['db_name']]
+        connection = self.connection["processed"]
+        database = connection[self.dbs["config"].mongodb_processed_db_name]
         collection = database[canonical_collection_name]
 
         user_info = collection.find_one({'uuid':uuid})
@@ -122,11 +111,27 @@ class DBHandler(object):
         return user_info
 
 
+    def update_user_login_at_processed(self, app_id, uuid, days):
+        collection_name_items = [app_id, "processed", 'usr']
+        canonical_collection_name = ".".join(collection_name_items)
+        connection = self.connection["processed"]
+        database = connection[self.dbs["config"].mongodb_processed_db_name]
+        collection = database[canonical_collection_name]
+
+        result = collection.update( { "uuid": uuid },
+                                    {
+                                        # '$set': { 'ret.' + str(days - 1):True },
+                                        '$inc': { 'ln.' + str(days - 1):1 }
+                                    })
+
+        return result
+
+
     def find_to_list(self, app_id, collection_name, start, end):
         if collection_name is None:
             raise Exception("Collection name is not specified")
 
-        app_info = self.get_app_info(app_id)
+        app_info = self.get_app_info_from_appspand(app_id)
         collection_name_items = [app_id, "event", collection_name]
         canonical_collection_name = ".".join(collection_name_items)
 
@@ -141,11 +146,11 @@ class DBHandler(object):
         return result
 
 
-    def cursor(self, app_id, collection_name, start, end):
+    def find_from_insights(self, app_id, collection_name, start, end):
         if collection_name is None:
             raise Exception("Collection name is not specified")
 
-        app_info = self.get_app_info(app_id)
+        app_info = self.get_app_info_from_appspand(app_id)
         collection_name_items = [app_id, "event", collection_name]
         canonical_collection_name = ".".join(collection_name_items)
 
@@ -157,7 +162,7 @@ class DBHandler(object):
         return cursor
 
 
-    def insert(self, app_id, collection_name, doc):
+    def insert_to_processed(self, app_id, collection_name, doc):
         if collection_name is None:
             raise Exception("Collection name is not specified")
 

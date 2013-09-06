@@ -20,7 +20,7 @@ def init_database(config):
     return mongodb_client
 
 def run(db_handler):
-    app_ids = db_handler.get_app_ids()
+    app_ids = db_handler.get_app_ids_from_appspand()
 
     print app_ids
 
