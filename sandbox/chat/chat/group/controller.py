@@ -56,9 +56,9 @@ def create(owner_uid, invitee_uids, title=None):
 
     _save(group_info=group_info)
 
-    event.controller.on_user_invited(group_uid=uid,
-                                     user_uid=owner_uid,
-                                     invitee_uids=invitee_uids)
+    # event.controller.on_user_invited(group_uid=uid,
+    #                                  user_uid=owner_uid,
+    #                                  invitee_uids=invitee_uids)
 
     return group_info
 

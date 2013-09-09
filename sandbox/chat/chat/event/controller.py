@@ -101,7 +101,7 @@ def on_user_banned(group_uid, user_uid, target_user_uids):
     pass
 
 
-def on_user_joined(user_uid, group_uid, group_member_uids):
+def on_user_joined(user_uid, group_uid):
     pass
 
 
