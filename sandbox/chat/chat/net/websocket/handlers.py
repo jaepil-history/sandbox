@@ -197,9 +197,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             error_code = 100
             error_message = "Cannot send a message"
 
-        ans = net.protocols.Message_SendAns()
+        ans = net.protocols.Message_CancelAns()
         ans.request = request
-        ans.message_info = mi
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
