@@ -47,7 +47,7 @@ def create(owner_uid, invitee_uids, title=None):
     #uid = hashlib.sha1("%s-%d" % (owner_uid, now)).hexdigest()
     uid = ("%d" % idgen.get_next_id())
 
-    members = [owner_uid].append(invitee_uids)
+    members = [owner_uid] + invitee_uids
     group_info = models.Group(uid=uid,
                               title=title,
                               owner=owner_uid,

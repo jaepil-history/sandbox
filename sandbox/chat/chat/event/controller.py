@@ -81,7 +81,16 @@ def on_input_stopped(group_uid, user_uid):
 
 
 def on_user_invited(group_uid, user_uid, invitee_uids):
-    pass
+    noti = net.protocols.Group_InviteNoti()
+    noti.group_uid = group_uid
+    noti.user_uid = user_uid
+    noti.invitee_uids = invitee_uids
+    noti_str = net.protocols.to_json(user_uid=user_uid, message=noti)
+
+    offline_users = _send_message(sender_uid=user_uid,
+                                  target_uids=invitee_uids, data=noti_str)
+    if offline_users:
+        pass
 
 
 def on_user_kicked(group_uid, user_uid, target_user_uids):
@@ -92,7 +101,7 @@ def on_user_banned(group_uid, user_uid, target_user_uids):
     pass
 
 
-def on_user_joined(user_uid, group_uid):
+def on_user_joined(user_uid, group_uid, group_member_uids):
     pass
 
 
@@ -102,6 +111,7 @@ def on_user_leaved(user_uid, group_uid, target_uids):
     noti.user_uid = user_uid
     noti_str = net.protocols.to_json(user_uid=user_uid, message=noti)
 
-    offline_users = _send_message(target_uids, noti_str)
+    offline_users = _send_message(sender_uid=user_uid,
+                                  target_uids=target_uids, data=noti_str)
     if offline_users:
         pass
