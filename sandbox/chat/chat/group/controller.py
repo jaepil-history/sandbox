@@ -96,7 +96,7 @@ def join(group_uid, user_uid, invitee_uids):
     # if user_uid not in group_info.members:
     #     return None
 
-    if group_uid is None:
+    if not group_uid:
         group_info = create(owner_uid=user_uid, invitee_uids=invitee_uids)
     else:
         group_info = find(group_uid=group_uid)

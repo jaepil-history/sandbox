@@ -109,6 +109,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         if group_info is not None:
             error_code = 0
             error_message = "OK"
+            if not request.group_uid:
+                request.group_uid = group_info.uid
         else:
             error_code = 100
             error_message = "Cannot join group"
