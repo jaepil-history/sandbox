@@ -1,5 +1,6 @@
 #from hashlib import sha256
 
+from datetime import datetime, timedelta
 import re
 
 import tornado.escape
@@ -64,6 +65,46 @@ class BaseHandler(tornado.web.RequestHandler):
             raise tornado.gen.Return(app_info)
 
         @tornado.gen.coroutine
+        def get_user(self, uuid):
+            app_info = yield self.get_app_info()
+            collection_name_items = [self.context.get_app_id(), "event", "usr"]
+            canonical_collection_name = ".".join(collection_name_items)
+            connection = self.connection["insights"]
+            database = connection[app_info.cluster.db_name]
+            collection = database[canonical_collection_name]
+
+            doc = yield motor.Op(collection.find_one, {"uuid": uuid})
+            if doc is None:
+                raise Exception("User ID not found")
+
+            user = models.User(**doc)
+            raise tornado.gen.Return(user)
+
+        @tornado.gen.coroutine
+        def update_user(self, uuid, user_level, friends_count, last_login_at):
+            app_info = yield self.get_app_info()
+            collection_name_items = [self.context.get_app_id(), "event", "usr"]
+            canonical_collection_name = ".".join(collection_name_items)
+
+            connection = self.connection["insights"]
+            database = connection[app_info.cluster.db_name]
+            collection = database[canonical_collection_name]
+
+            result = yield motor.Op(collection.update, { "uuid": uuid },
+                                    {
+                                        '$set': { 'ul': user_level },
+                                        '$set': { 'f': friends_count },
+                                        '$set': { 'l_in': last_login_at },
+                                        #'$inc': { 'ln.' + str(days - 1): 1 }
+                                        '$inc': { 'ln.1': 1 }
+                                    }, multi=False)
+
+            if result is None:
+                raise Exception("User ID not found")
+
+            raise tornado.gen.Return(result)
+
+        @tornado.gen.coroutine
         def insert_legacy(self, app_info, doc):
             collection_name_items = [self.context.get_app_id(), "event", "all"]
             canonical_collection_name = ".".join(collection_name_items)
@@ -113,6 +154,15 @@ class ApplicationAddedHandler(BaseHandler):
 
         apa = models.ApplicationAdded(**self.context.arguments)
         yield apa.save(db_context=self.db_context, collection_name="apa", validate=True)
+
+        usr = models.User()
+        usr.user_uid = apa.user_uid
+        usr.friends_count = apa.friends_count
+        usr.user_level = apa.user_level
+        usr.created_at = apa.created_at
+        usr.last_login_at = datetime.utcnow()
+        yield usr.save(db_context=self.db_context, collection_name="usr", validate=True)
+
         self.write("1")
         self.finish()
 
@@ -133,6 +183,13 @@ class UserInformationHandler(BaseHandler):
     def get(self):
         cpu = models.UserInformation(**self.context.arguments)
         yield cpu.save(db_context=self.db_context, collection_name="cpu", validate=True)
+
+        # increase login count in usr collection, and update usr information
+        uuid = cpu.user_uid
+        user_level = cpu.user_level
+        friends_count = cpu.friends_count
+        last_login_at = cpu._dt
+        yield self.db_context.update_user(uuid, user_level, friends_count, last_login_at)
         self.write("1")
         self.finish()
 

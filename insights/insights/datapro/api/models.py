@@ -15,6 +15,7 @@ from mongoengine import ObjectIdField
 from mongoengine import IntField
 from mongoengine import BooleanField
 from mongoengine import LongField
+from mongoengine import FloatField
 from mongoengine import ListField
 from mongoengine import StringField
 from mongoengine import ValidationError
@@ -158,6 +159,38 @@ class User(Document):
         return result
 
 
+class UserRetention(Document):
+
+    _dt = DateTimeField(required=True)
+    title = StringField(required=True, db_field='t')
+    new_users = IntField(required=True, db_field='nu')
+    timestamp = IntField(db_field='ts')
+    retention = ListField(FloatField(), default=lambda: [False for x in range(MAX_RETENTION_DAYS)], db_field='ret')
+
+    def __init__(self, *args, **values):
+        super(Document, self).__init__(*args, **values)
+        self.initialize()
+
+    def initialize(self):
+        self._dt = datetime.utcnow()
+        self.title = str(datetime.utcnow().date())
+        # ts : timestamp
+        if self.timestamp is None:
+            self.timestamp = int(time.time())
+
+    def save(self, db_handler, app_id, collection_name, validate=False):
+        if validate:
+            try:
+                self.validate()
+            except ValidationError:
+                print 'result validation error.'
+                print ValidationError.to_dict()
+
+        doc = self.to_python()
+        result = db_handler.insert_to_processed(app_id=app_id, collection_name='ret', doc=doc)
+        return result
+
+
 class UserDistribution(BaseResult):
 
     def __init__(self, interval=None, *args, **values):
@@ -189,28 +222,6 @@ class UserDistributionByMinutesByMonth(BaseResult):
 
 class UserDistributionByMinutesByYear(BaseResult):
     pass
-
-
-class UserRetention(Document):
-
-    _dt = DateTimeField(required=True)
-    retention = ListField(BooleanField(), default=lambda: [False for x in range(300)], db_field='ret')
-
-    def __init__(self, *args, **values):
-        super(Document, self).__init__(*args, **values)
-        self.retention[0] = True
-
-    def setRetention(self, today):
-        self.retention[today - self._dt] = True
-
-    def save(self, db_handler, collection_name, validate=False):
-        prefix = ["%04d" % self._dt.year,
-            "%02d" % self._dt.month,
-            "%02d" % self._dt.day]
-
-        col_prefix = "_".join(prefix)
-        collection_name = col_prefix + collection_name
-        super(BaseResult, self).save(db_handler, collection_name, validate=False)
 
 
 class CustomEvent(Document):

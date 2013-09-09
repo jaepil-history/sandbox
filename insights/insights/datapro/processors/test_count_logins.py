@@ -26,7 +26,7 @@ def run(db_handler, start, end):
         elapsed = 0
         last_doc_id = None
         start_cal = time.time()
-        today = datetime.utcnow().date()
+        today = datetime.utcnow().date() # + timedelta(days=1)
         # print 'today: ' + str(today)
 
         for doc in db_handler.find_from_insights(app_id, 'cpu', start, end):
@@ -65,5 +65,6 @@ if __name__ == "__main__":
     yesterday = today - timedelta(days=1)
     start = datetime(yesterday.year, yesterday.month, yesterday.day, 00, 00, 00)
     end = datetime(today.year, today.month, today.day, 00, 00, 00)
-
+    print start
+    print end
     run(db_handler, start, end)

@@ -142,6 +142,28 @@ class DBHandler(object):
                                         '$inc': { 'ln.' + str(days - 1):1 }
                                     })
 
+        if diff_days > 0 and diff_days <= models.MAX_RETENTION_DAYS:
+                db_handler.update_user_login_at_processed(app_id, uuid, diff_days)
+
+        return result
+
+
+    def update_user_retention_at_processed(self, app_id, uuid, days):
+        if not isinstance(app_id, basestring):
+            app_id = str(app_id)
+
+        collection_name_items = [app_id, "processed", 'ret']
+        canonical_collection_name = ".".join(collection_name_items)
+        connection = self.connection["processed"]
+        database = connection[self.dbs["config"].mongodb_processed_db_name]
+        collection = database[canonical_collection_name]
+
+        result = collection.update( { "uuid": uuid },
+                                    {
+                                        # '$set': { 'ret.' + str(days - 1):True },
+                                        '$inc': { 'ln.' + str(days - 1):1 }
+                                    })
+
         return result
 
 
