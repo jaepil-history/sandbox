@@ -29,6 +29,9 @@ public class ChatProtocol {
         put("Message_SendReq", new TypeToken<Header<Message_SendReq>>(){}.getType());
         put("Message_SendAns", new TypeToken<Header<Message_SendAns>>(){}.getType());
         put("Message_NewNoti", new TypeToken<Header<Message_NewNoti>>(){}.getType());
+        put("Message_CancelReq", new TypeToken<Header<Message_CancelReq>>(){}.getType());
+        put("Message_CancelAns", new TypeToken<Header<Message_CancelAns>>(){}.getType());
+        put("Message_CancelNoti", new TypeToken<Header<Message_CancelNoti>>(){}.getType());
         put("Message_ReadReq", new TypeToken<Header<Message_ReadReq>>(){}.getType());
         put("Message_ReadAns", new TypeToken<Header<Message_ReadAns>>(){}.getType());
         put("Message_ReadNoti", new TypeToken<Header<Message_ReadNoti>>(){}.getType());
