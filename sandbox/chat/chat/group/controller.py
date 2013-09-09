@@ -15,7 +15,7 @@ import models
 def _save(group_info):
     config = app.config.appcfg
 
-    if config.redis.enabled:
+    if config.database.redis.enabled:
         redis = cache.get_connection()
         key = ("group.%s" % group_info.uid)
         json = group_info.to_json()
@@ -30,7 +30,7 @@ def _load(group_uid):
     config = app.config.appcfg
 
     group_info = None
-    if config.redis.enabled:
+    if config.database.redis.enabled:
         redis = cache.get_connection()
         key = ("group.%s" % group_uid)
         json = redis.get(name=key)
