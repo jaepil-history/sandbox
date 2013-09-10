@@ -6,6 +6,7 @@
 from datetime import datetime
 from datetime import timedelta
 
+print 5 % 28
 
 today = datetime.utcnow().date()
 yesterday = today - timedelta(days=1)

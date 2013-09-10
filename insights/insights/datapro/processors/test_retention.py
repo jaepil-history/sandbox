@@ -6,7 +6,7 @@
 from insights.datapro import settings
 
 from pymongo import MongoClient
-from insights.datapro.api.dbhandler_pymongo import DBHandler
+from insights.datapro.api.dbhandler import DBHandler
 from datetime import datetime, timedelta
 from insights.datapro.api import models
 import time
