@@ -126,6 +126,18 @@ class Group_InviteNoti(Message):
     invitee_uids = ListType(StringType(max_length=512), required=True)
 
 
+class Group_InfoReq(Message):
+    group_uid = StringType(max_length=512)
+    user_uid = StringType(required=True, max_length=512)
+
+
+class Group_InfoAns(Message):
+    request = ModelType(Group_InviteReq)
+    member_uids = ListType(StringType(max_length=512))
+    error_code = IntType(required=True)
+    error_message = StringType(required=True)
+
+
 # Message
 class MessageInfo(Message):
     uid = LongType(required=True)

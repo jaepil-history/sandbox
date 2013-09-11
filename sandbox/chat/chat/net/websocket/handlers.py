@@ -19,6 +19,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         "Group_JoinReq": net.protocols.Group_JoinReq,
         "Group_LeaveReq": net.protocols.Group_LeaveReq,
         "Group_InviteReq": net.protocols.Group_InviteReq,
+        "Group_InfoReq": net.protocols.Group_InfoReq,
         "Message_SendReq": net.protocols.Message_SendReq,
         "Message_CancelReq": net.protocols.Message_CancelReq,
         "Message_ReadReq": net.protocols.Message_ReadReq,
@@ -63,6 +64,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             self.group_leave(link=link, user_uid=user_uid, request=req)
         elif cmd == "Group_InviteReq":
             self.group_invite(link=link, user_uid=user_uid, request=req)
+        elif cmd == "Group_InfoReq":
+            self.group_info(link=link, user_uid=user_uid, request=req)
         elif cmd == "Message_SendReq":
             self.message_send(link=link, user_uid=user_uid, request=req)
         elif cmd == "Message_CancelReq":
@@ -152,6 +155,23 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
         ans = net.protocols.Group_InviteAns()
         ans.request = request
+        ans.error_code = error_code
+        ans.error_message = error_message
+        ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
+        self.write_message(ans_json)
+
+    def group_info(self, link, user_uid, request):
+        group_info = group.controller.find(group_uid=request.group_uid)
+        if group_info is not None:
+            error_code = 0
+            error_message = "OK"
+        else:
+            error_code = 100
+            error_message = "Cannot invite users"
+
+        ans = net.protocols.Group_InfoAns()
+        ans.request = request
+        ans.member_uids = [user_uid for user_uid in group_info.members]
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)

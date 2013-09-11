@@ -185,6 +185,22 @@ public class ChatConnector {
         sendMessage(message);
     }
 
+    public void getGroupInfo(String userUid, String groupUid,
+                             AsyncResult<ChatProtocol.Group_InfoAns> asyncResult)
+    {
+        ChatProtocol.Group_InfoReq req = new ChatProtocol.Group_InfoReq();
+        req.mUserUID = userUid;
+        req.mGroupUID = groupUid;
+
+        if (!mAsyncResultHandlers.containsKey("Group_InfoAns"))
+        {
+            mAsyncResultHandlers.put("Group_InfoAns", asyncResult);
+        }
+
+        String message = ChatProtocol.toJSON(userUid, req);
+        sendMessage(message);
+    }
+
     public void sendMessage(String senderUid, String targetUid, boolean isGroup,
                             String message, AsyncResult<ChatProtocol.Message_SendAns> asyncResult)
     {

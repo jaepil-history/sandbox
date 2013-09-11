@@ -25,6 +25,8 @@ public class ChatProtocol {
         put("Group_InviteReq", new TypeToken<Header<Group_InviteReq>>(){}.getType());
         put("Group_InviteAns", new TypeToken<Header<Group_InviteAns>>(){}.getType());
         put("Group_InviteNoti", new TypeToken<Header<Group_InviteNoti>>(){}.getType());
+        put("Group_InfoReq", new TypeToken<Header<Group_InfoReq>>(){}.getType());
+        put("Group_InfoAns", new TypeToken<Header<Group_InfoAns>>(){}.getType());
 
         put("Message_SendReq", new TypeToken<Header<Message_SendReq>>(){}.getType());
         put("Message_SendAns", new TypeToken<Header<Message_SendAns>>(){}.getType());
@@ -158,6 +160,24 @@ public class ChatProtocol {
         public String mUserUID;
         @SerializedName("invitee_uids")
         public String[] mInviteeUIDs;
+    }
+
+    public static class Group_InfoReq {
+        @SerializedName("group_uid")
+        public String mGroupUID;
+        @SerializedName("user_uid")
+        public String mUserUID;
+    }
+
+    public static class Group_InfoAns {
+        @SerializedName("request")
+        public Group_InfoReq mRequest;
+        @SerializedName("member_uids")
+        public String[] mMemberUIDs;
+        @SerializedName("error_code")
+        public int mErrorCode;
+        @SerializedName("error_message")
+        public String mErrorMessage;
     }
 
     // Message
