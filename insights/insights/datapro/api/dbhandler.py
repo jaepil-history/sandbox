@@ -93,6 +93,25 @@ class DBHandler(object):
         return result
 
 
+    def find_dau(self, app_id, start, end):
+        if not isinstance(app_id, basestring):
+            app_id = str(app_id)
+
+        app_info = self.get_app_info_from_appspand(app_id)
+        collection_name_items = [app_id, "event", "usr"]
+        canonical_collection_name = ".".join(collection_name_items)
+
+        connection = self.connection["insights"]
+        database = connection[app_info['cluster']['db_name']]
+        collection = database[canonical_collection_name]
+
+        result = collection.find({'l_in': {'$gte':start, '$lt':end}})
+        if result is None:
+            raise Exception("Zero counted")
+
+        return result
+
+
     def get_users_info_from_processed(self, app_id, *uuids):
         if not isinstance(app_id, basestring):
             app_id = str(app_id)
@@ -126,11 +145,11 @@ class DBHandler(object):
         return user_info
 
 
-    def update_user_login_at_processed(self, app_id, uuid, days):
+    def update_user_retention_at_processed(self, app_id, uuid, days):
         if not isinstance(app_id, basestring):
             app_id = str(app_id)
 
-        collection_name_items = [app_id, "processed", 'usr']
+        collection_name_items = [app_id, "processed", 'ret']
         canonical_collection_name = ".".join(collection_name_items)
         connection = self.connection["processed"]
         database = connection[self.dbs["config"].mongodb_processed_db_name]
@@ -161,7 +180,7 @@ class DBHandler(object):
         collection = database[canonical_collection_name]
 
         result = []
-        cursor = collection.find({'_dt': {'$gt':start, '$lte':end}})
+        cursor = collection.find({'_dt': {'$gte':start, '$lt':end}})
         for doc in cursor:
             result.append(doc)
         return result

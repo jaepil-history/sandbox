@@ -18,7 +18,7 @@ from mongoengine import ValidationError
 
 import tornado.gen
 
-MAX_RETENTION_DAYS = 21
+MAX_RETENTION_DAYS = 28
 
 class BaseDoc(Document):
     _dt = DateTimeField(required=True)
@@ -119,6 +119,29 @@ class ApplicationRemoved(BaseDoc):
     timestamp = IntField(db_field='ts')
 
 
+# usr
+class User(BaseDoc):
+    """
+    s: The UID of the user adding the application.
+    ul: The level of the user. Installation or reinstallation
+    f: The number of friends a user has.
+    data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
+        It must be base64-encoded.
+    ts: The ts in the Epoch time format.
+        Include this parameter to prevent the user's browser from caching the REST API call if sent
+        using JavaScript.
+    """
+
+    user_uid = LongField(required=True, db_field='uuid')
+    user_level = IntField(required=True, default=1, db_field='ul')
+    friends_count = IntField(db_field='f')
+    created_at = DateTimeField(required=True, db_field='c')
+    last_login_at = DateTimeField(required=True, db_field='l_in')
+    logins_a_day = ListField(IntField(), default=lambda: [0 for x in range(MAX_RETENTION_DAYS)], db_field='ln')
+    timestamp = IntField(db_field='ts')
+    # meta = {'collection': 'usr'}
+
+
 # cpu : login event
 class UserInformation(BaseDoc):
     """
@@ -137,27 +160,6 @@ class UserInformation(BaseDoc):
     friends_count = IntField(db_field='f')
     data = StringField()
     timestamp = IntField(db_field='ts')
-
-
-# # lgn
-# class Login(BaseDoc):
-#     """
-#     s: The UID of the user adding the application.
-#     ul: The level of the user.
-#     f: The number of friends a user has.
-#     data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
-#         It must be base64-encoded.
-#     ts: The ts in the Epoch time format.
-#         Include this parameter to prevent the user's browser from caching the REST API call if sent
-#         using JavaScript.
-#     """
-#
-#     _mt = StringField(default='lgn')
-#     user_uid = LongField(required=True, db_field='uuid')
-#     user_level = IntField(required=True, default=1, db_field='ul')
-#     friends_count = IntField(db_field='f')
-#     timestamp = IntField(db_field='ts')
-#     # meta = {'collection': 'lgn'}
 
 
 # lgt
@@ -179,6 +181,26 @@ class Logout(BaseDoc):
     friends_count = IntField(db_field='f')
     timestamp = IntField(db_field='ts')
     # meta = {'collection': 'lgt'}
+
+
+# dau : daily access users
+class DAU(BaseDoc):
+    """
+    s: The UID of the user.
+    f: The number of friends a user has.
+    ul: The level of user
+    data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
+        It must be base64-encoded.
+    ts: The ts in the Epoch time format.
+        Include this parameter to prevent the user's browser from caching the REST API call if sent
+        using JavaScript.
+    """
+
+    user_uid = LongField(required=True, db_field='uuid')
+    user_level = IntField(required=True, default=1, db_field='ul')
+    friends_count = IntField(db_field='f')
+    data = StringField()
+    timestamp = IntField(db_field='ts')
 
 
 # wid

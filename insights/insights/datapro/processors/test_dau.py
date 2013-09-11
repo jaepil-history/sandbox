@@ -6,7 +6,7 @@
 from insights.datapro import settings
 
 from pymongo import MongoClient
-from insights.datapro.api.dbhandler_pymongo import DBHandler
+from insights.datapro.api.dbhandler import DBHandler
 from datetime import datetime, timedelta
 from insights.datapro.api import models
 import time
@@ -21,21 +21,18 @@ def run(db_handler, start, end):
     app_ids = db_handler.get_app_ids_from_appspand()
 
     for app_id in app_ids:
-        print 'saving nru ...'
+        print 'calculating dau ...'
         counts = 0
         elapsed = 0
         last_doc_id = None
         start_cal = time.time()
 
-        for doc in db_handler.find_from_insights(app_id, 'apa', start, end):
+        dau = models.DAUDistribution()
+
+        for doc in db_handler.find_dau(app_id, start, end):
             counts += 1
             last_doc_id = doc['_id']
-            user = models.User()
-            user.created_at = doc['c']
-            user.friends_count = doc['f']
-            user.user_uid = doc['uuid']
-            user.user_level = doc['ul']
-            user.save(db_handler, app_id, 'usr', validate=True)
+            dau.accumulate(doc)
 
         print 'last_doc_id = ' + str(last_doc_id)
 
@@ -43,6 +40,13 @@ def run(db_handler, start, end):
         elapsed = (end_cal - start_cal) * 1000
         print 'time to write db: ' + str(elapsed) + 'msec'
         print 'counted items: ' + str(counts)
+
+        dau.counts = counts
+        dau.last_doc_id = last_doc_id
+        dau.runtime = elapsed
+
+        print dau.__dict__
+        dau.save(db_handler, app_id)
 
 
 if __name__ == "__main__":

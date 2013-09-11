@@ -6,7 +6,7 @@
 from insights.datapro import settings
 
 from pymongo import MongoClient
-from insights.datapro.api.dbhandler_pymongo import DBHandler
+from insights.datapro.api.dbhandler import DBHandler
 from datetime import datetime, timedelta
 from insights.datapro.api import models
 import time
@@ -21,25 +21,18 @@ def run(db_handler, start, end):
     app_ids = db_handler.get_app_ids_from_appspand()
 
     for app_id in app_ids:
-        print 'counting login ...'
+        print 'saving nru ...'
         counts = 0
         elapsed = 0
         last_doc_id = None
         start_cal = time.time()
-        today = datetime.utcnow().date()
-        # print 'today: ' + str(today)
 
-        for doc in db_handler.find_from_insights(app_id, 'cpu', start, end):
+        nru = models.NRUDistribution()
+
+        for doc in db_handler.find_from_insights(app_id, 'apa', start, end):
             counts += 1
             last_doc_id = doc['_id']
-            uuid = doc['uuid']
-            # print 'doc[_dt]: ' + str(doc['_dt'].date())
-            diff_days = today - doc['_dt'].date()
-            # print 'diff_days: ' + str(diff_days)
-            diff_days = diff_days.days
-            # print 'diff_days: ' + str(diff_days)
-            if diff_days > 0 and diff_days <= models.MAX_RETENTION_DAYS:
-                db_handler.update_user_login_at_processed(app_id, uuid, diff_days)
+            nru.accumulate(doc)
 
         print 'last_doc_id = ' + str(last_doc_id)
 
@@ -47,6 +40,13 @@ def run(db_handler, start, end):
         elapsed = (end_cal - start_cal) * 1000
         print 'time to write db: ' + str(elapsed) + 'msec'
         print 'counted items: ' + str(counts)
+
+        nru.counts = counts
+        nru.last_doc_id = last_doc_id
+        nru.runtime = elapsed
+
+        print nru.__dict__
+        nru.save(db_handler, app_id)
 
 
 if __name__ == "__main__":

@@ -12,14 +12,14 @@ from insights.datapro import __version__
 # from insights.datapro.system.daemon import Daemon
 # from insights.datapro.system import runner
 from insights.datapro import settings
-from insights.datapro.api.dbhandler_pymongo import DBHandler
+from insights.datapro.api.dbhandler import DBHandler
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 
 from processors import test_pymongo
 from processors import test_retention
 from processors import test_count_logins
-from processors import test_new_users
+from processors import test_nru
 
 # Keep all log files in one place
 LOGFILE = 'dataprod.log'
@@ -59,7 +59,7 @@ class DataProDaemon(object):
             print strftime("%a, %d %b %Y %X +0000", gmtime())
 
             # test_pymongo.run(self.db_handler)
-            test_new_users.run(self.db_handler, start, end)
+            test_nru.run(self.db_handler, start, end)
             test_count_logins.run(self.db_handler, start, end)
             # test_retention.run(self.db_handler, start, end)
 
