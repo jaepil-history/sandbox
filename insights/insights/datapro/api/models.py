@@ -83,7 +83,7 @@ class BaseResult(Document):
         return data
 
 
-    def save(self, db_handler, collection_name, validate=False):
+    def save(self, db_handler, app_id, collection_name, validate=False):
         if validate:
             try:
                 self.validate()
@@ -92,7 +92,19 @@ class BaseResult(Document):
                 print ValidationError.to_dict()
 
         doc = self.to_python()
-        result = db_handler.insert_to_processed(collection_name=collection_name, doc=doc)
+        result = db_handler.insert_to_processed(app_id=app_id, collection_name=collection_name, doc=doc)
+        return result
+
+    def upsert(self, db_handler, app_id, collection_name, query, validate=True):
+        if validate:
+            try:
+                self.validate()
+            except ValidationError:
+                print 'result validation error.'
+                print ValidationError.to_dict()
+
+        doc = self.to_python()
+        result = db_handler.upsert_to_processed(app_id=app_id, collection_name=collection_name, query=query, doc=doc)
         return result
 
     meta = {'allow_inheritance': True}
@@ -135,6 +147,18 @@ class NRUDistribution(BaseResult):
         result = db_handler.insert_to_processed(app_id=app_id, collection_name='nru', doc=doc)
         return result
 
+    def upsert(self, db_handler, app_id, query, validate=True):
+        if validate:
+            try:
+                self.validate()
+            except ValidationError:
+                print 'result validation error.'
+                print ValidationError.to_dict()
+
+        doc = self.to_python()
+        result = db_handler.upsert_to_processed(app_id=app_id, collection_name='nru', query=query, doc=doc)
+        return result
+
 
 # daily access users distribution by friends count and by level
 class DAUDistribution(BaseResult):
@@ -167,10 +191,23 @@ class DAUDistribution(BaseResult):
         result = db_handler.insert_to_processed(app_id=app_id, collection_name='dau', doc=doc)
         return result
 
+    def upsert(self, db_handler, app_id, query, validate=True):
+        if validate:
+            try:
+                self.validate()
+            except ValidationError:
+                print 'result validation error.'
+                print ValidationError.to_dict()
+
+        doc = self.to_python()
+        result = db_handler.upsert_to_processed(app_id=app_id, collection_name='dau', query=query, doc=doc)
+        return result
+
 
 class UserRetention(Document):
 
     _dt = DateTimeField(required=True)
+    #record_date = DateTimeField(required=True, db_field='s')
     title = StringField(required=True, db_field='t')
     new_users = IntField(required=True, db_field='nu')
     timestamp = IntField(db_field='ts')
@@ -182,12 +219,21 @@ class UserRetention(Document):
 
     def initialize(self):
         self._dt = datetime.utcnow()
-        self.title = str(datetime.utcnow().date())
+        self.start_date = self._dt.date()
+        self.title = str(self.start_date)
         # ts : timestamp
         if self.timestamp is None:
             self.timestamp = int(time.time())
 
-    def save(self, db_handler, app_id, collection_name, validate=False):
+    def to_python(self):
+        data = self.to_mongo()
+        data = bson.son.SON(data).to_dict()
+        return data
+
+    def set_retention(self, db_handler, app_id, usr):
+        pass
+
+    def save(self, db_handler, app_id, validate=True):
         if validate:
             try:
                 self.validate()
@@ -197,6 +243,18 @@ class UserRetention(Document):
 
         doc = self.to_python()
         result = db_handler.insert_to_processed(app_id=app_id, collection_name='ret', doc=doc)
+        return result
+
+    def upsert(self, db_handler, app_id, query, validate=True):
+        if validate:
+            try:
+                self.validate()
+            except ValidationError:
+                print 'result validation error.'
+                print ValidationError.to_dict()
+
+        doc = self.to_python()
+        result = db_handler.upsert_to_processed(app_id=app_id, collection_name='ret', query=query, doc=doc)
         return result
 
 

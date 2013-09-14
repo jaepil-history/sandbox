@@ -7,9 +7,8 @@ from insights.datapro import settings
 
 from pymongo import MongoClient
 from insights.datapro.api.dbhandler import DBHandler
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from insights.datapro.api import models
-import time
 
 def init_database(config):
     mongodb_client = MongoClient(host=config.mongodb_connection_uri,
@@ -21,27 +20,35 @@ def run(db_handler, start, end):
     app_ids = db_handler.get_app_ids_from_appspand()
 
     for app_id in app_ids:
+        print 'calculating nru ...'
         counts = 0
         elapsed = 0
         last_doc_id = None
-        start_cal = time.time()
+        start_cal = datetime.utcnow()
 
-        for doc in db_handler.find_from_insights(app_id, 'apa', start, end):
+        ret = models.UserRetention()
+        query = {'_dt': {'$gte':start, '$lt':end }}
+        ret.new_users = db_handler.find_from_insights(app_id, 'apa', query).count()
+
+
+        for doc in db_handler.find_from_insights(app_id, 'apa', query):
             counts += 1
             last_doc_id = doc['_id']
-            user = models.User()
-            user.created_at = doc['nru']
-            user.friends_count = doc['f']
-            user.user_uid = doc['uuid']
-            user.user_level = doc['ul']
-            user.save(db_handler, app_id, 'usr', validate=True)
+            ret.accumulate(doc)
 
         print 'last_doc_id = ' + str(last_doc_id)
 
-        end_cal = time.time()
-        elapsed = (end_cal - start_cal) * 1000
+        end_cal = datetime.utcnow()
+        elapsed = (end_cal - start_cal).microseconds / 1000
         print 'time to write db: ' + str(elapsed) + 'msec'
         print 'counted items: ' + str(counts)
+
+        ret.counts = counts
+        ret.last_doc_id = last_doc_id
+        ret.runtime = elapsed
+
+        print ret.__dict__
+        ret.save(db_handler, app_id)
 
 
 if __name__ == "__main__":
@@ -58,7 +65,7 @@ if __name__ == "__main__":
 
     today = datetime.utcnow().date() + timedelta(days=1)
     yesterday = today - timedelta(days=1)
-    start = datetime(yesterday.year, yesterday.month, yesterday.day, 00, 00, 00)
-    end = datetime(today.year, today.month, today.day, 00, 00, 00)
+    start = datetime.combine(yesterday, time())
+    end = datetime.combine(today, time())
 
     run(db_handler, start, end)

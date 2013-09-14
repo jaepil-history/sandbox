@@ -10,11 +10,19 @@ print 5 % 28
 
 today = datetime.utcnow().date()
 yesterday = today - timedelta(days=1)
+
+ref = '2013-09-01'
+date_ref = datetime.date(ref)
+
+print date_ref
+
 print 'today: ' + str(today)
 print 'yesterday: ' + str(yesterday)
 print 'year: ' + str(today.year)
 print 'month: ' + str(today.month)
 print 'day: ' + str(today.day)
+
+
 
 
 

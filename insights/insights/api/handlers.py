@@ -169,7 +169,7 @@ class ApplicationAddedHandler(BaseHandler):
         usr.last_login_at = datetime.utcnow()
         yield usr.save(db_context=self.db_context, collection_name="usr", validate=True)
 
-        insert dau table for the first time login
+        # insert dau table for the first time login
         today = datetime.utcnow().date()
         tomorrow = today + timedelta(days=1)
         start = datetime(today.year, today.month, today.day, 00, 00, 00)
