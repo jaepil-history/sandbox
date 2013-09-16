@@ -37,7 +37,7 @@ def on_message_send(sender_uid, group_uid, target_uids, message_info):
             group_uid = 0
         interop.controller.push(sender_uid=sender_uid,
                                 group_uid=group_uid,
-                                target_uids=target_uids,
+                                target_uids=offline_users,
                                 message_info=message_info)
 
 
