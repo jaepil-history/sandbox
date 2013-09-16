@@ -6,7 +6,7 @@ import queue.controller
 import models
 
 
-def create(user_uid, user_name, platform_id, device_token):
+def create(user_uid, user_name, platform_id=None, device_token=None):
     devices = []
     if platform_id is not None and device_token is not None:
         devices.append(models.DeviceInfo(platform_id=platform_id,
@@ -37,16 +37,15 @@ def find(user_uids):
     return users
 
 
-def login(user_uid, user_name, platform_id, device_token):
+def login(user_uid, user_name):
     user_info = find_one(user_uid=user_uid)
     if user_info is None:
         user_info = create(user_uid=user_uid,
-                           user_name=user_name,
-                           platform_id=platform_id,
-                           device_token=device_token)
-    else:
-        user_info.last_login_at = timestamp.get_timestamp()
-        user_info.save()
+                           user_name=user_name)
+
+    user_info.name = user_name
+    user_info.last_login_at = timestamp.get_timestamp()
+    user_info.save()
 
     return user_info
 

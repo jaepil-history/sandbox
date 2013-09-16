@@ -7,6 +7,7 @@ import tornado.websocket
 from log import logger
 import message.controller
 import group.controller
+import user.controller
 
 import net
 import net.protocols
@@ -95,6 +96,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             error_code = 100
             error_message = "Connection is duplicated"
 
+        user.controller.login(user_uid=user_uid, user_name=request.user_name)
+
         ans = net.protocols.User_LoginAns()
         ans.request = request
         ans.error_code = error_code
@@ -169,9 +172,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             error_code = 100
             error_message = "Cannot invite users"
 
+        members = user.controller.find(user_uids=[user_uid for user_uid in group_info.members])
+
         ans = net.protocols.Group_InfoAns()
         ans.request = request
-        ans.member_uids = [user_uid for user_uid in group_info.members]
+        ans.members = [net.protocols.UserInfo(user_uid=m.uid, user_name=m.name) for m in members]
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)

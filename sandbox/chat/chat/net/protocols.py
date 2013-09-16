@@ -63,6 +63,11 @@ class Message(Model):
 
 
 # User
+class UserInfo(Message):
+    user_uid = StringType(required=True, max_length=512)
+    user_name = StringType(required=True, max_length=512)
+
+
 class User_LoginReq(Message):
     user_uid = StringType(required=True, max_length=512)
     user_name = StringType(required=True, max_length=512)
@@ -133,7 +138,7 @@ class Group_InfoReq(Message):
 
 class Group_InfoAns(Message):
     request = ModelType(Group_InviteReq)
-    member_uids = ListType(StringType(max_length=512))
+    members = ListType(ModelType(UserInfo))
     error_code = IntType(required=True)
     error_message = StringType(required=True)
 

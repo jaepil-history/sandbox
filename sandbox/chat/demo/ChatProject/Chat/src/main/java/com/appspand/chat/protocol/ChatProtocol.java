@@ -70,6 +70,13 @@ public class ChatProtocol {
     }
 
     // User
+    public static class UserInfo {
+        @SerializedName("user_uid")
+        public String mUserUID;
+        @SerializedName("user_name")
+        public String mUserName;
+    }
+
     public static class User_LoginReq {
         @SerializedName("user_uid")
         public String mUserUID;
@@ -172,8 +179,8 @@ public class ChatProtocol {
     public static class Group_InfoAns {
         @SerializedName("request")
         public Group_InfoReq mRequest;
-        @SerializedName("member_uids")
-        public String[] mMemberUIDs;
+        @SerializedName("members")
+        public UserInfo mMembers;
         @SerializedName("error_code")
         public int mErrorCode;
         @SerializedName("error_message")
