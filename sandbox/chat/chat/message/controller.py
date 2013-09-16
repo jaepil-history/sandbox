@@ -116,25 +116,23 @@ def open_secret_message(sender_uid, target_uid, message_uid, is_group=False):
     group_uid = 0
     if is_group:
         group_uid = target_uid
-        group_info = _find_group(group_uid=target_uid)
-        target_uids = group_info.members
-    else:
-        target_uids = [target_uid]
 
     message_info = find_one(message_uid=message_uid)
-    if message_info:
-        if not message_info.is_secret:
-            raise ValueError("Cannot open public message")
+    if message_info is None:
+        raise KeyError("Invalid message ID")
 
-        message_info.unveil_count += 1
-        if message_info.unveil_count < message_info.recipient_count:
-            message_info.save()
-        else:
-            message_info.delete()
+    if not message_info.is_secret:
+        raise ValueError("Cannot open public message")
+
+    message_info.unveil_count += 1
+    if message_info.unveil_count < message_info.recipient_count:
+        message_info.save()
+    else:
+        message_info.delete()
 
     event.controller.on_message_open(sender_uid=sender_uid,
                                      group_uid=group_uid,
-                                     target_uids=target_uids,
+                                     target_uid=message_info.sender_uid,
                                      message_uid=message_uid)
 
     return message_info
