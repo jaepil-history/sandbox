@@ -98,6 +98,7 @@ class Group_JoinReq(Message):
 
 class Group_JoinAns(Message):
     request = ModelType(Group_JoinReq)
+    invitees = ListType(ModelType(UserInfo))
     error_code = IntType(required=True)
     error_message = StringType(required=True)
 
@@ -120,7 +121,7 @@ class Group_LeaveAns(Message):
 
 class Group_LeaveNoti(Message):
     group_uid = StringType(required=True, max_length=512)
-    user_uid = StringType(required=True, max_length=512)
+    user_info = ModelType(UserInfo, required=True)
 
 
 class Group_InviteReq(Message):
@@ -131,6 +132,7 @@ class Group_InviteReq(Message):
 
 class Group_InviteAns(Message):
     request = ModelType(Group_InviteReq)
+    invitees = ListType(ModelType(UserInfo))
     error_code = IntType(required=True)
     error_message = StringType(required=True)
 
@@ -138,7 +140,7 @@ class Group_InviteAns(Message):
 class Group_InviteNoti(Message):
     group_uid = StringType(required=True, max_length=512)
     user_uid = StringType(required=True, max_length=512)
-    invitee_uids = ListType(StringType(max_length=512), required=True)
+    invitees = ListType(ModelType(UserInfo))
 
 
 class Group_InfoReq(Message):

@@ -5,6 +5,7 @@ from net.link_manager import LinkManager
 import net.protocols
 
 import interop.controller
+import user.controller
 
 
 def _send_message(sender_uid, target_uids, data):
@@ -81,10 +82,22 @@ def on_input_stopped(group_uid, user_uid):
 
 
 def on_user_invited(group_uid, user_uid, invitee_uids):
+    user_info = user.controller.find(user_uids=invitee_uids)
+    if user_info is None:
+        raise KeyError("Unknown user ID")
+
+    member_info = user.controller.find(user_uids=invitee_uids)
+    members = []
+    for m in member_info:
+        user_info = net.protocols.UserInfo()
+        user_info.user_uid = m.uid
+        user_info.user_name = m.name
+        members.append(user_info)
+
     noti = net.protocols.Group_InviteNoti()
     noti.group_uid = group_uid
     noti.user_uid = user_uid
-    noti.invitee_uids = invitee_uids
+    noti.invitees = members
     noti_str = net.protocols.to_json(user_uid=user_uid, message=noti)
 
     offline_users = _send_message(sender_uid=user_uid,
@@ -106,9 +119,15 @@ def on_user_joined(user_uid, group_uid):
 
 
 def on_user_leaved(user_uid, group_uid, target_uids):
+    user_info = user.controller.find_one(user_uid=user_uid)
+    if user_info is None:
+        raise KeyError("Unknown user ID")
+
     noti = net.protocols.Group_LeaveNoti()
     noti.group_uid = group_uid
-    noti.user_uid = user_uid
+    noti.user_info = net.protocols.UserInfo()
+    noti.user_info.user_uid = user_info.uid
+    noti.user_info.user_name = user_info.name
     noti_str = net.protocols.to_json(user_uid=user_uid, message=noti)
 
     offline_users = _send_message(sender_uid=user_uid,

@@ -143,8 +143,17 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             error_code = 100
             error_message = "Cannot join group"
 
+        member_info = user.controller.find(user_uids=request.invitee_uids)
+        members = []
+        for m in member_info:
+            user_info = net.protocols.UserInfo()
+            user_info.user_uid = m.uid
+            user_info.user_name = m.name
+            members.append(user_info)
+
         ans = net.protocols.Group_JoinAns()
         ans.request = request
+        ans.invitees = members
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
@@ -181,8 +190,17 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             error_code = 100
             error_message = "Cannot invite users"
 
+        member_info = user.controller.find(user_uids=request.invitee_uids)
+        members = []
+        for m in member_info:
+            user_info = net.protocols.UserInfo()
+            user_info.user_uid = m.uid
+            user_info.user_name = m.name
+            members.append(user_info)
+
         ans = net.protocols.Group_InviteAns()
         ans.request = request
+        ans.invitees = members
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)

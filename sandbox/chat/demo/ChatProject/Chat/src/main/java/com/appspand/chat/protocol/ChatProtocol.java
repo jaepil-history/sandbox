@@ -121,6 +121,8 @@ public class ChatProtocol {
     public static class Group_JoinAns {
         @SerializedName("request")
         public Group_JoinReq mRequest;
+        @SerializedName("invitees")
+        public UserInfo[] mInvitees;
         @SerializedName("error_code")
         public int mErrorCode;
         @SerializedName("error_message")
@@ -153,8 +155,8 @@ public class ChatProtocol {
     public static class Group_LeaveNoti {
         @SerializedName("group_uid")
         public String mGroupUID;
-        @SerializedName("user_uid")
-        public String mUserUID;
+        @SerializedName("user_info")
+        public UserInfo mUserInfo;
     }
 
     public static class Group_InviteReq {
@@ -169,6 +171,8 @@ public class ChatProtocol {
     public static class Group_InviteAns {
         @SerializedName("request")
         public Group_InviteReq mRequest;
+        @SerializedName("invitees")
+        public UserInfo[] mInvitees;
         @SerializedName("error_code")
         public int mErrorCode;
         @SerializedName("error_message")
@@ -180,8 +184,8 @@ public class ChatProtocol {
         public String mGroupUID;
         @SerializedName("user_uid")
         public String mUserUID;
-        @SerializedName("invitee_uids")
-        public String[] mInviteeUIDs;
+        @SerializedName("invitees")
+        public UserInfo[] mInvitees;
     }
 
     public static class Group_InfoReq {
