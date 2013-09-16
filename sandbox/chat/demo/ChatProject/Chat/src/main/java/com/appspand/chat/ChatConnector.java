@@ -254,7 +254,7 @@ public class ChatConnector {
     }
 
     public void openMessage(String senderUid, String targetUid, boolean isGroup,
-                            long messageUid, AsyncResult<ChatProtocol.Message_CancelAns> asyncResult)
+                            long messageUid, AsyncResult<ChatProtocol.Message_OpenAns> asyncResult)
     {
         ChatProtocol.Message_OpenReq req = new ChatProtocol.Message_OpenReq();
         req.mSenderUID = senderUid;
