@@ -2,6 +2,7 @@
 
 from util import timestamp
 
+import message.controller
 import queue.controller
 import models
 
@@ -52,3 +53,7 @@ def login(user_uid, user_name):
 
 def logout(user_uid):
     pass
+
+
+def unregister(user_uid):
+    return message.controller.clear_all(user_uid=user_uid, target_uid=0, is_group=False)

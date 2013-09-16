@@ -17,6 +17,7 @@ from net.websocket.link import WebSocketLink
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
     MessageDispatcher = {
         "User_LoginReq": net.protocols.User_LoginReq,
+        "User_UnregisterReq": net.protocols.User_UnregisterReq,
         "Group_JoinReq": net.protocols.Group_JoinReq,
         "Group_LeaveReq": net.protocols.Group_LeaveReq,
         "Group_InviteReq": net.protocols.Group_InviteReq,
@@ -59,6 +60,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
         if cmd == "User_LoginReq":
             self.user_login(link=link, user_uid=user_uid, request=req)
+        elif cmd == "User_UnregisterReq":
+            self.user_unregister(link=link, user_uid=user_uid, request=req)
         elif cmd == "Group_JoinReq":
             self.group_join(link=link, user_uid=user_uid, request=req)
         elif cmd == "Group_LeaveReq":
@@ -108,6 +111,25 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def user_logout(self, link, user_uid, request):
         pass
 
+    def user_unregister(self, link, user_uid, request):
+        self.user_uid = request.user_uid
+
+        if net.LinkManager.instance().login(user_uid=user_uid, link=link):
+            error_code = 0
+            error_message = "OK"
+        else:
+            error_code = 100
+            error_message = "Connection is duplicated"
+
+        user.controller.unregister(user_uid=user_uid)
+
+        ans = net.protocols.User_UnregisterAns()
+        ans.request = request
+        ans.error_code = error_code
+        ans.error_message = error_message
+        ans_json = net.protocols.to_json(user_uid=self.user_uid, message=ans)
+        self.write_message(ans_json)
+
     def group_join(self, link, user_uid, request):
         group_info = group.controller.join(group_uid=request.group_uid,
                                            user_uid=request.user_uid,
@@ -129,6 +151,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message(ans_json)
 
     def group_leave(self, link, user_uid, request):
+        message.controller.clear_all(user_uid=request.user_uid,
+                                     target_uid=request.group_uid,
+                                     is_group=True)
         group_info = group.controller.leave(group_uid=request.group_uid,
                                             user_uid=request.user_uid)
         if group_info is not None:
@@ -172,11 +197,18 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             error_code = 100
             error_message = "Cannot invite users"
 
-        members = user.controller.find(user_uids=[user_uid for user_uid in group_info.members])
+        # member_info = user.controller.find(user_uids=[user_uid for user_uid in group_info.members])
+        member_info = user.controller.find(user_uids=group_info.members)
+        members = []
+        for m in member_info:
+            user_info = net.protocols.UserInfo()
+            user_info.user_uid = m.uid
+            user_info.user_name = m.name
+            members.append(user_info)
 
         ans = net.protocols.Group_InfoAns()
         ans.request = request
-        ans.members = [net.protocols.UserInfo(user_uid=m.uid, user_name=m.name) for m in members]
+        ans.members = members
         ans.error_code = error_code
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)

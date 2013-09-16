@@ -136,6 +136,21 @@ public class ChatConnector {
         sendMessage(mLastLoginStr);
     }
 
+    public void unregister(String userUid,
+                           AsyncResult<ChatProtocol.User_UnregisterAns> asyncResult)
+    {
+        ChatProtocol.User_UnregisterReq req = new ChatProtocol.User_UnregisterReq();
+        req.mUserUID = userUid;
+
+        if (!mAsyncResultHandlers.containsKey("User_UnregisterAns"))
+        {
+            mAsyncResultHandlers.put("User_UnregisterAns", asyncResult);
+        }
+
+        String message = ChatProtocol.toJSON(userUid, req);
+        sendMessage(message);
+    }
+
     public void joinGroup(String userUid, String[] invitees,
                           AsyncResult<ChatProtocol.Group_JoinAns> asyncResult)
     {

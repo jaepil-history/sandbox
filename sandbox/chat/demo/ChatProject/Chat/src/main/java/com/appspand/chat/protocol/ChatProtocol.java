@@ -15,6 +15,7 @@ public class ChatProtocol {
     private static final Map<String, Type> TypeMap = new HashMap<String, Type>(){{
         put("User_LoginReq", new TypeToken<Header<User_LoginReq>>(){}.getType());
         put("User_LoginAns", new TypeToken<Header<User_LoginAns>>(){}.getType());
+        put("User_UnregisterAns", new TypeToken<Header<User_UnregisterAns>>(){}.getType());
 
         put("Group_JoinReq", new TypeToken<Header<Group_JoinReq>>(){}.getType());
         put("Group_JoinAns", new TypeToken<Header<Group_JoinAns>>(){}.getType());
@@ -87,6 +88,20 @@ public class ChatProtocol {
     public static class User_LoginAns {
         @SerializedName("request")
         public User_LoginReq mRequest;
+        @SerializedName("error_code")
+        public int mErrorCode;
+        @SerializedName("error_message")
+        public String mErrorMessage;
+    }
+
+    public static class User_UnregisterReq {
+        @SerializedName("user_uid")
+        public String mUserUID;
+    }
+
+    public static class User_UnregisterAns {
+        @SerializedName("request")
+        public User_UnregisterReq mRequest;
         @SerializedName("error_code")
         public int mErrorCode;
         @SerializedName("error_message")
@@ -180,7 +195,7 @@ public class ChatProtocol {
         @SerializedName("request")
         public Group_InfoReq mRequest;
         @SerializedName("members")
-        public UserInfo mMembers;
+        public UserInfo[] mMembers;
         @SerializedName("error_code")
         public int mErrorCode;
         @SerializedName("error_message")

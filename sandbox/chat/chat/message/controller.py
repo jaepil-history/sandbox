@@ -103,6 +103,46 @@ def find(message_uids):
     return messages
 
 
+def clear_all(user_uid, target_uid, is_group=False):
+    group_uid = 0
+    if is_group:
+        group_uid = target_uid
+        group_info = _find_group(group_uid=target_uid)
+        dest_uids = group_info.members
+    else:
+        dest_uids = [target_uid]
+
+    queue_info = queue.controller.find_one(user_uid=user_uid)
+    if queue_info is None:
+        return False
+
+    messages = find(queue_info.message_uids)
+    for message_info in messages:
+        if is_group:
+            if group_uid != 0 and message_info.group_uid != group_uid:
+                continue
+        else:
+            if target_uid != 0 and message_info.sender_uid != target_uid:
+                continue
+
+        message_info.countdown -= 1
+        if message_info.countdown > 0:
+            message_info.save()
+        else:
+            message_info.delete()
+
+        queue_info.message_uids.remove(message_info.uid)
+
+    queue_info.save()
+
+    event.controller.on_message_read(user_uid=user_uid,
+                                     group_uid=group_uid,
+                                     target_uids=dest_uids,
+                                     messages=messages)
+
+    return True
+
+
 def read(user_uid, target_uid, message_uids, is_group=False):
     group_uid = 0
     if is_group:

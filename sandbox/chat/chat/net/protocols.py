@@ -79,6 +79,16 @@ class User_LoginAns(Message):
     error_message = StringType(required=True)
 
 
+class User_UnregisterReq(Message):
+    user_uid = StringType(required=True, max_length=512)
+
+
+class User_UnregisterAns(Message):
+    request = ModelType(User_UnregisterReq)
+    error_code = IntType(required=True)
+    error_message = StringType(required=True)
+
+
 # Group
 class Group_JoinReq(Message):
     group_uid = StringType(max_length=512)
