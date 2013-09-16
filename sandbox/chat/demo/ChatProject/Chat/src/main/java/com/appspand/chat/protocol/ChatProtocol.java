@@ -35,6 +35,9 @@ public class ChatProtocol {
         put("Message_CancelReq", new TypeToken<Header<Message_CancelReq>>(){}.getType());
         put("Message_CancelAns", new TypeToken<Header<Message_CancelAns>>(){}.getType());
         put("Message_CancelNoti", new TypeToken<Header<Message_CancelNoti>>(){}.getType());
+        put("Message_OpenReq", new TypeToken<Header<Message_OpenReq>>(){}.getType());
+        put("Message_OpenAns", new TypeToken<Header<Message_OpenAns>>(){}.getType());
+        put("Message_OpenNoti", new TypeToken<Header<Message_OpenNoti>>(){}.getType());
         put("Message_ReadReq", new TypeToken<Header<Message_ReadReq>>(){}.getType());
         put("Message_ReadAns", new TypeToken<Header<Message_ReadAns>>(){}.getType());
         put("Message_ReadNoti", new TypeToken<Header<Message_ReadNoti>>(){}.getType());
@@ -222,6 +225,12 @@ public class ChatProtocol {
         public int mIssuedAt;
         @SerializedName("expires_at")
         public int mExpiresAt;
+        @SerializedName("is_secret")
+        public boolean mIsSecret;
+        @SerializedName("recipient_count")
+        public int mRecipientCount;
+        @SerializedName("unveil_count")
+        public int mUnveilCount;
     }
 
     public static class Message_SendReq {
@@ -233,6 +242,8 @@ public class ChatProtocol {
         public boolean mIsGroup;
         @SerializedName("message")
         public String mMessage;
+        @SerializedName("is_secret")
+        public boolean mIsSecret;
     }
 
     public static class Message_SendAns {
@@ -274,6 +285,37 @@ public class ChatProtocol {
     public static class Message_CancelNoti {
         @SerializedName("message_info")
         public MessageInfo mMessageInfo;
+    }
+
+    public static class Message_OpenReq {
+        @SerializedName("sender_uid")
+        public String mSenderUID;
+        @SerializedName("target_uid")
+        public String mTargetUID;
+        @SerializedName("is_group")
+        public boolean mIsGroup;
+        @SerializedName("message_uid")
+        public long mMessageUID;
+    }
+
+    public static class Message_OpenAns {
+        @SerializedName("request")
+        public Message_OpenReq mRequest;
+        @SerializedName("error_code")
+        public int mErrorCode;
+        @SerializedName("error_message")
+        public String mErrorMessage;
+    }
+
+    public static class Message_OpenNoti {
+        @SerializedName("sender_uid")
+        public String mSenderUID;
+        @SerializedName("target_uid")
+        public String mTargetUID;
+        @SerializedName("is_group")
+        public boolean mIsGroup;
+        @SerializedName("message_uid")
+        public long mMessageUID;
     }
 
     public static class Message_ReadReq {

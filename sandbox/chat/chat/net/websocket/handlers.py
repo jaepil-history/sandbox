@@ -236,6 +236,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         message_info = message.controller.send(sender_uid=request.sender_uid,
                                                target_uid=request.target_uid,
                                                message=request.message,
+                                               is_secret=request.is_secret,
                                                is_group=request.is_group)
 
         mi = net.protocols.MessageInfo()
@@ -257,28 +258,51 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message(ans_json)
 
     def message_cancel(self, link, user_uid, request):
-        message_info = message.controller.cancel(sender_uid=request.sender_uid,
-                                                 target_uid=request.target_uid,
-                                                 message_uid=request.message_uid,
-                                                 is_group=request.is_group)
+        error_code = 0
+        error_message = "OK"
 
-        mi = net.protocols.MessageInfo()
+        try:
+            message_info = message.controller.cancel(sender_uid=request.sender_uid,
+                                                     target_uid=request.target_uid,
+                                                     message_uid=request.message_uid,
+                                                     is_group=request.is_group)
+            if message_info is None:
+                error_code = 100
+                error_message = "Cannot cancel message"
+        except ValueError as e:
+            error_code = 200
+            error_message = e.message
+        finally:
+            ans = net.protocols.Message_CancelAns()
+            ans.request = request
+            ans.error_code = error_code
+            ans.error_message = error_message
+            ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
+            self.write_message(ans_json)
 
-        if message_info is not None:
-            mi.from_mongo_engine(message_info)
-            error_code = 0
-            error_message = "OK"
-        else:
-            error_code = 100
-            error_message = "Cannot send a message"
+    def message_open(self, link, user_uid, request):
+        error_code = 0
+        error_message = "OK"
 
-        ans = net.protocols.Message_CancelAns()
-        ans.request = request
-        ans.error_code = error_code
-        ans.error_message = error_message
-        ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
-        self.write_message(ans_json)
-
+        try:
+            message_info = message.controller.open_secret_message(
+                sender_uid=request.sender_uid,
+                target_uid=request.target_uid,
+                message_uid=request.message_uid,
+                is_group=request.is_group)
+            if message_info is None:
+                error_code = 100
+                error_message = "Cannot open message"
+        except ValueError as e:
+            error_code = 200
+            error_message = e.message
+        finally:
+            ans = net.protocols.Message_OpenAns()
+            ans.request = request
+            ans.error_code = error_code
+            ans.error_message = error_message
+            ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
+            self.write_message(ans_json)
 
     def message_read(self, link, user_uid, request):
         message_info = message.controller.read(user_uid=request.user_uid,

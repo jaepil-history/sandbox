@@ -2,6 +2,7 @@
 
 from mongoengine import Document
 from mongoengine import EmbeddedDocument
+from mongoengine import BooleanField
 from mongoengine import DateTimeField
 from mongoengine import EmbeddedDocumentField
 from mongoengine import IntField
@@ -21,6 +22,9 @@ class Message(Document):
     countdown = IntField(required=True)
     issued_at = IntField(required=True)
     expires_at = IntField(required=True)
+    is_secret = BooleanField(default=False)
+    recipient_count = IntField(default=0)
+    unveil_count = IntField(default=0)
 
     meta = {
         "indexes": [

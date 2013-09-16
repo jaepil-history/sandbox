@@ -193,7 +193,7 @@ public class ChatRoomActivity extends Activity {
             String finalMessage = mMyID + "(" + gmtTime + ") : " + msg;
 
             ChatApplication application = (ChatApplication)getApplication();
-            application.getChatConnector().sendMessage(mMyID, mRoomID, false, msg,
+            application.getChatConnector().sendMessage(mMyID, mRoomID, false, msg, false,
                     new ChatConnector.AsyncResult<ChatProtocol.Message_SendAns>() {
                         @Override
                         public void handle(ChatProtocol.Message_SendAns response) {

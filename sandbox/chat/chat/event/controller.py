@@ -56,6 +56,27 @@ def on_message_cancel(sender_uid, group_uid, target_uids, message_info):
         pass
 
 
+def on_message_open(sender_uid, group_uid, target_uids, message_uid):
+    noti = net.protocols.Message_OpenNoti()
+    noti.sender_uid = sender_uid
+    if group_uid:
+        noti.target_uid = group_uid
+        noti.is_group = True
+    else:
+        noti.target_uid = target_uids[0]
+        noti.is_group = False
+
+    noti.group_uid = group_uid
+    noti.target_uids = target_uids
+    noti.message_uid = message_uid
+    noti_str = net.protocols.to_json(user_uid=sender_uid, message=noti)
+
+    offline_users = _send_message(sender_uid=sender_uid,
+                                  target_uids=target_uids, data=noti_str)
+    if offline_users:
+        pass
+
+
 def on_message_read(user_uid, group_uid, target_uids, messages):
     message_info = []
     for doc in messages:

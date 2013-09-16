@@ -17,7 +17,22 @@ def _find_group(group_uid):
     return group_info
 
 
-def send(sender_uid, target_uid, message, is_group=False):
+def find_one(message_uid):
+    return models.Message.objects(uid=message_uid).first()
+
+
+def find(message_uids):
+    result = models.Message.objects(uid__in=message_uids)
+
+    messages = []
+    if result is not None:
+        for m in result:
+            messages.append(m)
+
+    return messages
+
+
+def send(sender_uid, target_uid, message, is_secret=False, is_group=False):
     group_uid = None
     if is_group:
         group_uid = target_uid
@@ -31,10 +46,15 @@ def send(sender_uid, target_uid, message, is_group=False):
     message_uid = idgen.get_next_id()
     issued_at = timestamp.get_timestamp()
     expires_at = 0
+    recipient_count = countdown
+    unveil_count = 0
     message_info = models.Message(uid=message_uid,
                                   sender_uid=sender_uid, group_uid=group_uid,
                                   message=message, countdown=countdown,
-                                  issued_at=issued_at, expires_at=expires_at)
+                                  issued_at=issued_at, expires_at=expires_at,
+                                  is_secret=is_secret,
+                                  recipient_count=recipient_count,
+                                  unveil_count=unveil_count)
     message_info.save()
 
     for user_uid in target_uids:
@@ -70,6 +90,10 @@ def cancel(sender_uid, target_uid, message_uid, is_group=False):
         target_uids = [target_uid]
 
     message_info = find_one(message_uid=message_uid)
+    if not message_info.is_secret:
+        raise ValueError("Cannot cancel public message")
+    if message_info.unveil_count > 0:
+        raise ValueError("Cannot cancel unveiled message")
 
     for user_uid in target_uids:
         if sender_uid != user_uid:
@@ -88,19 +112,32 @@ def cancel(sender_uid, target_uid, message_uid, is_group=False):
     return message_info
 
 
-def find_one(message_uid):
-    return models.Message.objects(uid=message_uid).first()
+def open_secret_message(sender_uid, target_uid, message_uid, is_group=False):
+    group_uid = 0
+    if is_group:
+        group_uid = target_uid
+        group_info = _find_group(group_uid=target_uid)
+        target_uids = group_info.members
+    else:
+        target_uids = [target_uid]
 
+    message_info = find_one(message_uid=message_uid)
+    if message_info:
+        if not message_info.is_secret:
+            raise ValueError("Cannot open public message")
 
-def find(message_uids):
-    result = models.Message.objects(uid__in=message_uids)
+        message_info.unveil_count += 1
+        if message_info.unveil_count < message_info.recipient_count:
+            message_info.save()
+        else:
+            message_info.delete()
 
-    messages = []
-    if result is not None:
-        for m in result:
-            messages.append(m)
+    event.controller.on_message_open(sender_uid=sender_uid,
+                                     group_uid=group_uid,
+                                     target_uids=target_uids,
+                                     message_uid=message_uid)
 
-    return messages
+    return message_info
 
 
 def clear_all(user_uid, target_uid, is_group=False):
@@ -168,7 +205,11 @@ def read(user_uid, target_uid, message_uids, is_group=False):
         if message_info.countdown > 0:
             message_info.save()
         else:
-            message_info.delete()
+            if message_info.is_secret and\
+                message_info.unveil_count < message_info.recipient_count:
+                message_info.save()
+            else:
+                message_info.delete()
 
     event.controller.on_message_read(user_uid=user_uid,
                                      group_uid=group_uid,

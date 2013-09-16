@@ -164,6 +164,9 @@ class MessageInfo(Message):
     countdown = IntType(required=True)
     issued_at = IntType(required=True)
     expires_at = IntType(required=True)
+    is_secret = BooleanType(default=False)
+    recipient_count = IntType(default=0)
+    unveil_count = IntType(default=0)
 
     def from_mongo_engine(self, document):
         self.uid = document.uid
@@ -173,6 +176,9 @@ class MessageInfo(Message):
         self.countdown = document.countdown
         self.issued_at = document.issued_at
         self.expires_at = document.expires_at
+        self.is_secret = document.is_secret
+        self.recipient_count = document.recipient_count
+        self.unveil_count = document.unveil_count
 
     def to_mongo_engine(self, document):
         document.uid = self.uid
@@ -182,6 +188,9 @@ class MessageInfo(Message):
         document.countdown = self.countdown
         document.issued_at = self.issued_at
         document.expires_at = self.expires_at
+        document.is_secret = self.is_secret
+        document.recipient_count = self.recipient_count
+        document.unveil_count = self.unveil_count
 
 
 class Message_SendReq(Message):
@@ -189,6 +198,7 @@ class Message_SendReq(Message):
     target_uid = StringType(required=True, max_length=512)
     is_group = BooleanType(required=True)
     message = StringType(required=True, max_length=10240)
+    is_secret = BooleanType(default=False)
 
 
 class Message_SendAns(Message):
@@ -217,6 +227,26 @@ class Message_CancelAns(Message):
 
 class Message_CancelNoti(Message):
     message_info = ModelType(MessageInfo, required=True)
+
+
+class Message_OpenReq(Message):
+    sender_uid = StringType(required=True, max_length=512)
+    target_uid = StringType(required=True, max_length=512)
+    is_group = BooleanType(required=True)
+    message_uid = LongType(required=True)
+
+
+class Message_OpenAns(Message):
+    request = ModelType(Message_CancelReq)
+    error_code = IntType(required=True)
+    error_message = StringType(required=True)
+
+
+class Message_OpenNoti(Message):
+    sender_uid = StringType(required=True, max_length=512)
+    target_uid = StringType(required=True, max_length=512)
+    is_group = BooleanType(required=True)
+    message_uid = LongType(required=True)
 
 
 class Message_ReadReq(Message):

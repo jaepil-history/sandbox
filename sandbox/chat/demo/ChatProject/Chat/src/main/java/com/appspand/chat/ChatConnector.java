@@ -69,7 +69,7 @@ public class ChatConnector {
                         String cmd = command.getString("cmd");
                         if (cmd.equals("Group_JoinNoti") || cmd.equals("Group_LeaveNoti")
                                 || cmd.equals("Group_InviteNoti") || cmd.equals("Message_NewNoti")
-                                || cmd.equals("Message_ReadNoti")) {
+                                || cmd.equals("Message_ReadNoti") || cmd.equals("Message_OpenNoti")) {
                             onNotificationEvent(cmd, payload);
                         } else {
                             AsyncResult handler = mAsyncResultHandlers.remove(cmd);
@@ -217,13 +217,15 @@ public class ChatConnector {
     }
 
     public void sendMessage(String senderUid, String targetUid, boolean isGroup,
-                            String message, AsyncResult<ChatProtocol.Message_SendAns> asyncResult)
+                            String message, boolean isSecret,
+                            AsyncResult<ChatProtocol.Message_SendAns> asyncResult)
     {
         ChatProtocol.Message_SendReq req = new ChatProtocol.Message_SendReq();
         req.mSenderUID = senderUid;
         req.mTargetUID = targetUid;
         req.mIsGroup = isGroup;
         req.mMessage = message;
+        req.mIsSecret = isSecret;
 
         if (!mAsyncResultHandlers.containsKey("Message_SendAns"))
         {
@@ -245,6 +247,23 @@ public class ChatConnector {
         if (!mAsyncResultHandlers.containsKey("Message_CancelAns"))
         {
             mAsyncResultHandlers.put("Message_CancelAns", asyncResult);
+        }
+
+        sendMessage(ChatProtocol.toJSON(senderUid, req));
+    }
+
+    public void openMessage(String senderUid, String targetUid, boolean isGroup,
+                            long messageUid, AsyncResult<ChatProtocol.Message_CancelAns> asyncResult)
+    {
+        ChatProtocol.Message_OpenReq req = new ChatProtocol.Message_OpenReq();
+        req.mSenderUID = senderUid;
+        req.mTargetUID = targetUid;
+        req.mIsGroup = isGroup;
+        req.mMessageUID = messageUid;
+
+        if (!mAsyncResultHandlers.containsKey("Message_OpenAns"))
+        {
+            mAsyncResultHandlers.put("Message_OpenAns", asyncResult);
         }
 
         sendMessage(ChatProtocol.toJSON(senderUid, req));
