@@ -24,8 +24,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         "Group_InfoReq": net.protocols.Group_InfoReq,
         "Message_SendReq": net.protocols.Message_SendReq,
         "Message_CancelReq": net.protocols.Message_CancelReq,
+        "Message_OpenReq": net.protocols.Message_OpenReq,
         "Message_ReadReq": net.protocols.Message_ReadReq,
-        "Message_GetReq": net.protocols.Message_GetReq
+        "Message_GetReq": net.protocols.Message_GetReq,
+        "Message_ClearReq": net.protocols.Message_ClearReq
     }
 
     def open(self):
@@ -74,10 +76,14 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             self.message_send(link=link, user_uid=user_uid, request=req)
         elif cmd == "Message_CancelReq":
             self.message_cancel(link=link, user_uid=user_uid, request=req)
+        elif cmd == "Message_OpenReq":
+            self.message_open(link=link, user_uid=user_uid, request=req)
         elif cmd == "Message_ReadReq":
             self.message_read(link=link, user_uid=user_uid, request=req)
         elif cmd == "Message_GetReq":
             self.message_get(link=link, user_uid=user_uid, request=req)
+        elif cmd == "Message_ClearReq":
+            self.message_clear(link=link, user_uid=user_uid, request=req)
         else:
             #self.unknown_cmd(link=link, user_uid=user_uid, request=req)
             pass
@@ -160,24 +166,28 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message(ans_json)
 
     def group_leave(self, link, user_uid, request):
-        message.controller.clear_all(user_uid=request.user_uid,
-                                     target_uid=request.group_uid,
-                                     is_group=True)
-        group_info = group.controller.leave(group_uid=request.group_uid,
-                                            user_uid=request.user_uid)
-        if group_info is not None:
-            error_code = 0
-            error_message = "OK"
-        else:
-            error_code = 100
-            error_message = "Cannot leave group"
+        error_code = 0
+        error_message = "OK"
 
-        ans = net.protocols.Group_LeaveAns()
-        ans.request = request
-        ans.error_code = error_code
-        ans.error_message = error_message
-        ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
-        self.write_message(ans_json)
+        try:
+            message.controller.clear_all(user_uid=request.user_uid,
+                                         target_uid=request.group_uid,
+                                         is_group=True)
+            group_info = group.controller.leave(group_uid=request.group_uid,
+                                                user_uid=request.user_uid)
+            if group_info is None:
+                error_code = 100
+                error_message = "Cannot leave group"
+        except Exception as e:
+            error_code = 200
+            error_message = e.message
+        finally:
+            ans = net.protocols.Group_LeaveAns()
+            ans.request = request
+            ans.error_code = error_code
+            ans.error_message = error_message
+            ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
+            self.write_message(ans_json)
 
     def group_invite(self, link, user_uid, request):
         group_info = group.controller.invite(group_uid=request.group_uid,
@@ -357,3 +367,22 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         ans.error_message = error_message
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
         self.write_message(ans_json)
+
+    def message_clear(self, link, user_uid, request):
+        error_code = 0
+        error_message = "OK"
+
+        try:
+            message.controller.clear_all(user_uid=request.user_uid,
+                                         target_uid=request.target_uid,
+                                         is_group=False)
+        except KeyError as e:
+            error_code = 100
+            error_message = e.message
+        finally:
+            ans = net.protocols.Message_ClearAns()
+            ans.request = request
+            ans.error_code = error_code
+            ans.error_message = error_message
+            ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
+            self.write_message(ans_json)

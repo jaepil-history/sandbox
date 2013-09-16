@@ -43,6 +43,8 @@ public class ChatProtocol {
         put("Message_ReadNoti", new TypeToken<Header<Message_ReadNoti>>(){}.getType());
         put("Message_GetReq", new TypeToken<Header<Message_GetReq>>(){}.getType());
         put("Message_GetAns", new TypeToken<Header<Message_GetAns>>(){}.getType());
+        put("Message_ClearReq", new TypeToken<Header<Message_ClearReq>>(){}.getType());
+        put("Message_ClearAns", new TypeToken<Header<Message_ClearAns>>(){}.getType());
     }};
 
     public static class Header<T> {
@@ -365,6 +367,22 @@ public class ChatProtocol {
         public Message_GetReq mRequest;
         @SerializedName("message_info")
         public MessageInfo[] mMessageInfo;
+        @SerializedName("error_code")
+        public int mErrorCode;
+        @SerializedName("error_message")
+        public String mErrorMessage;
+    }
+
+    public static class Message_ClearReq {
+        @SerializedName("user_uid")
+        public String mUserUID;
+        @SerializedName("target_uid")
+        public String mTargetUID;
+    }
+
+    public static class Message_ClearAns {
+        @SerializedName("request")
+        public Message_ClearAns mRequest;
         @SerializedName("error_code")
         public int mErrorCode;
         @SerializedName("error_message")

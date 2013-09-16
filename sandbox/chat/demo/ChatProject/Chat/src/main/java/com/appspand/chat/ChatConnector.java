@@ -69,7 +69,8 @@ public class ChatConnector {
                         String cmd = command.getString("cmd");
                         if (cmd.equals("Group_JoinNoti") || cmd.equals("Group_LeaveNoti")
                                 || cmd.equals("Group_InviteNoti") || cmd.equals("Message_NewNoti")
-                                || cmd.equals("Message_ReadNoti") || cmd.equals("Message_OpenNoti")) {
+                                || cmd.equals("Message_ReadNoti") || cmd.equals("Message_OpenNoti")
+                                || cmd.equals("Message_CancelNoti")) {
                             onNotificationEvent(cmd, payload);
                         } else {
                             AsyncResult handler = mAsyncResultHandlers.remove(cmd);
@@ -301,6 +302,20 @@ public class ChatConnector {
         if (!mAsyncResultHandlers.containsKey("Message_ReadAns"))
         {
             mAsyncResultHandlers.put("Message_ReadAns", asyncResult);
+        }
+
+        sendMessage(ChatProtocol.toJSON(userUid, req));
+    }
+
+    public void clearMessages(String userUid, String targetUid,
+                              AsyncResult<ChatProtocol.Message_ClearAns> asyncResult) {
+        ChatProtocol.Message_ClearReq req = new ChatProtocol.Message_ClearReq();
+        req.mUserUID = userUid;
+        req.mTargetUID = targetUid;
+
+        if (!mAsyncResultHandlers.containsKey("Message_ClearAns"))
+        {
+            mAsyncResultHandlers.put("Message_ClearAns", asyncResult);
         }
 
         sendMessage(ChatProtocol.toJSON(userUid, req));

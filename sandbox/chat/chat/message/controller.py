@@ -144,14 +144,15 @@ def clear_all(user_uid, target_uid, is_group=False):
     group_uid = 0
     if is_group:
         group_uid = target_uid
-        group_info = _find_group(group_uid=target_uid)
-        dest_uids = group_info.members
+        # group_info = _find_group(group_uid=target_uid)
+        # dest_uids = group_info.members
     else:
-        dest_uids = [target_uid]
+        # dest_uids = [target_uid]
+        pass
 
     queue_info = queue.controller.find_one(user_uid=user_uid)
     if queue_info is None:
-        return False
+        raise KeyError("Unknown user ID")
 
     messages = find(queue_info.message_uids)
     for message_info in messages:
@@ -166,16 +167,20 @@ def clear_all(user_uid, target_uid, is_group=False):
         if message_info.countdown > 0:
             message_info.save()
         else:
-            message_info.delete()
+            if message_info.is_secret and\
+                message_info.unveil_count < message_info.recipient_count:
+                message_info.save()
+            else:
+                message_info.delete()
 
         queue_info.message_uids.remove(message_info.uid)
 
     queue_info.save()
 
-    event.controller.on_message_read(user_uid=user_uid,
-                                     group_uid=group_uid,
-                                     target_uids=dest_uids,
-                                     messages=messages)
+    # event.controller.on_message_read(user_uid=user_uid,
+    #                                  group_uid=group_uid,
+    #                                  target_uids=dest_uids,
+    #                                  messages=messages)
 
     return True
 

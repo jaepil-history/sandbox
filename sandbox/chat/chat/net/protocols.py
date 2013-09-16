@@ -281,3 +281,14 @@ class Message_GetAns(Message):
     message_info = ListType(ModelType(MessageInfo))
     error_code = IntType(required=True)
     error_message = StringType(required=True)
+
+
+class Message_ClearReq(Message):
+    user_uid = StringType(required=True, max_length=512)
+    target_uid = StringType(required=True, max_length=512)
+
+
+class Message_ClearAns(Message):
+    request = ModelType(Message_GetReq)
+    error_code = IntType(required=True)
+    error_message = StringType(required=True)
