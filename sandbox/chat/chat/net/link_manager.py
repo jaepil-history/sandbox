@@ -66,14 +66,14 @@ class LinkManager(object):
                 if link:
                     online.append(link)
                 else:
-                    offline.append(link)
+                    offline.append(link_ids)
         elif user_uids:
             for user_uid in user_uids:
                 link = self.auth_links.get(user_uid, None)
                 if link:
                     online.append(link)
                 else:
-                    offline.append(link)
+                    offline.append(user_uid)
 
         return online, offline
 
