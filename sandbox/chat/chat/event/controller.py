@@ -31,9 +31,8 @@ def on_message_send(sender_uid, group_uid, target_uids, message_info):
     noti.message_info = mi
     noti_str = net.protocols.to_json(user_uid=sender_uid, message=noti)
 
-    result = _send_message(sender_uid=sender_uid,
-                           target_uids=target_uids, data=noti_str)
-    offline_users = result[1]
+    online_users, offline_users = _send_message(sender_uid=sender_uid,
+                                                target_uids=target_uids, data=noti_str)
     if offline_users:
         if group_uid is None:
             group_uid = 0
@@ -51,9 +50,8 @@ def on_message_cancel(sender_uid, group_uid, target_uids, message_info):
     noti.message_info = mi
     noti_str = net.protocols.to_json(user_uid=sender_uid, message=noti)
 
-    result = _send_message(sender_uid=sender_uid,
-                           target_uids=target_uids, data=noti_str)
-    offline_users = result[1]
+    online_users, offline_users = _send_message(sender_uid=sender_uid,
+                                                target_uids=target_uids, data=noti_str)
     if offline_users:
         pass
 
@@ -71,9 +69,8 @@ def on_message_open(sender_uid, group_uid, target_uid, message_uid):
     noti.message_uid = message_uid
     noti_str = net.protocols.to_json(user_uid=sender_uid, message=noti)
 
-    result = _send_message(sender_uid=sender_uid,
-                           target_uids=[target_uid], data=noti_str)
-    offline_users = result[1]
+    online_users, offline_users = _send_message(sender_uid=sender_uid,
+                                                target_uids=[target_uid], data=noti_str)
     if offline_users:
         pass
 
@@ -89,9 +86,8 @@ def on_message_read(user_uid, group_uid, target_uids, messages):
     noti.message_info = message_info
     noti_str = net.protocols.to_json(user_uid=user_uid, message=noti)
 
-    result = _send_message(sender_uid=user_uid,
-                           target_uids=target_uids, data=noti_str)
-    offline_users = result[1]
+    online_users, offline_users = _send_message(sender_uid=user_uid,
+                                                target_uids=target_uids, data=noti_str)
     if offline_users:
         pass
 
@@ -123,9 +119,8 @@ def on_user_invited(group_uid, user_uid, invitee_uids):
     noti.invitees = members
     noti_str = net.protocols.to_json(user_uid=user_uid, message=noti)
 
-    result = _send_message(sender_uid=user_uid,
-                           target_uids=invitee_uids, data=noti_str)
-    offline_users = result[1]
+    online_users, offline_users = _send_message(sender_uid=user_uid,
+                                                target_uids=invitee_uids, data=noti_str)
     if offline_users:
         pass
 
@@ -154,8 +149,7 @@ def on_user_leaved(user_uid, group_uid, target_uids):
     noti.user_info.user_name = user_info.name
     noti_str = net.protocols.to_json(user_uid=user_uid, message=noti)
 
-    result = _send_message(sender_uid=user_uid,
-                           target_uids=target_uids, data=noti_str)
-    offline_users = result[1]
+    online_users, offline_users = _send_message(sender_uid=user_uid,
+                                                target_uids=target_uids, data=noti_str)
     if offline_users:
         pass
