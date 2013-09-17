@@ -178,11 +178,11 @@ $(document).ready(function() {
             if ( dateRange == "custom" ) {
                 $('#act_date_from').datetimepicker("option",{minDate:null});        //-> 'minDate' 설정 초기화
             } else {
-                hDate = -1; //-> 기준 날짜 (어제)
-                minDate = - parseInt(dateRange);
+                startDate = - parseInt(dateRange);
+                endDate = -1; // 기준 날짜 (어제)
                 return {
-                    minDate: minDate,
-                    maxDate: hDate
+                    minDate: startDate,
+                    maxDate: endDate
                 }
             }
         },
@@ -201,11 +201,11 @@ $(document).ready(function() {
             if ( dateRange == "custom" ) {
                 $('#act_date_to').datetimepicker("option",{minDate:null});        //-> 'minDate' 설정 초기화
             } else {
-                hDate = -1; //-> 기준 날짜 (어제)
-                minDate = - parseInt(dateRange);
+                startDate = - parseInt(dateRange);
+                endDate = -1; // 기준 날짜 (어제)
                 return {
-                    minDate: minDate,
-                    maxDate: hDate
+                    minDate: startDate,
+                    maxDate: endDate
                 }
             }
         },
@@ -224,11 +224,11 @@ $(document).ready(function() {
             if ( dateRange == "custom" ) {
                 $('#money_date_from').datetimepicker("option",{minDate:null});        //-> 'minDate' 설정 초기화
             } else {
-                hDate = -1; //-> 기준 날짜 (어제)
-                minDate = - parseInt(dateRange);
+                startDate = - parseInt(dateRange);
+                endDate = -1; // 기준 날짜 (어제)
                 return {
-                    minDate: minDate,
-                    maxDate: hDate
+                    minDate: startDate,
+                    maxDate: endDate
                 }
             }
         },
@@ -247,11 +247,11 @@ $(document).ready(function() {
             if ( dateRange == "custom" ) {
                 $('#money_date_to').datetimepicker("option",{minDate:null});        //-> 'minDate' 설정 초기화
             } else {
-                hDate = -1; //-> 기준 날짜 (어제)
-                minDate = - parseInt(dateRange);
+                startDate = - parseInt(dateRange);
+                endDate = -1; // 기준 날짜 (어제)
                 return {
-                    minDate: minDate,
-                    maxDate: hDate
+                    minDate: startDate,
+                    maxDate: endDate
                 }
             }
         },
