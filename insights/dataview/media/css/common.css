@@ -6,7 +6,7 @@ html {width:100%;}
 body {font-size:11px;font-family:verdana;color:#504f4f;}
 img {border:0;vertical-align:top;}
 h1,h2,h3,h4,h5,h6 {font-size:100%;}
-ul,ol,li {list-style-type:none;}
+/*ul,ol,li {list-style-type:none;}*/
 fieldset {border:0;}
 select, textarea {font-size:1em}
 legend {display:none;}
@@ -22,3 +22,9 @@ a:hover {text-decoration:none;}
 .tabMenu li {float:left; display:inline-block; padding:5px 10px; font:12px "Verdana"; color:#FFF; line-height:14px; background:#8c8c8c;border-radius:4px 4px 0 0; margin-right:1px;}
 .tabMenu li.on { background:#4b2e66;  padding:5px 10px; border:0; border-radius:4px 4px 0 0;}
 .tabMenu li:hover { background:#786689;  padding:5px 10px; border:0; border-radius:4px 4px 0 0;}
+
+select {border:1px soild #ececec; height:20px; font:12px "Verdana"; padding-left:5px;}
+select.year {width:75px; }
+select.month {width:45px;}
+select.date {width:45px;}
+select.group {width:80px;}

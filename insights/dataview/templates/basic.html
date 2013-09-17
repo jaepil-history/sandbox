@@ -14,11 +14,133 @@
 <!-- sub menu -->
 <h3>Activity</h3>
 <!-- chart view -->
-<div class="chart"></div>
+<div class="chart">
+    <form action="http://localhost:8888/basic" id="filter-form">
+        <table>
+            <tr>
+                <th align=left>
+                    <label for="charts">Select charts</label>
+                </th>
+                <th align=left>
+                    <label for="date_range">Date Range</label>
+                </th>
+                <th align=left>
+                    <label for="">From</label>
+                </th>
+                <th align=left>
+                    <label for="">To</label>
+                </th>
+                <th align=left>
+                    <label for="">Group</label>
+                </th>
+                <th align=left>
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <select id='charts-select' name='charts' style="width:150px;">
+                        <option  value="all">All</option>
+                        <option  value="dau">DAU</option>
+                        <option  value="apa">Installed</option>
+                        <option  value="apr">Uninstalled</option>
+                        <option  value="inv">Invite Count</option>
+                        <option  value="lgn">Login Count</option>
+                        <option  value="ret">Retention</option>
+                    </select>
+                </td>
+                <td>
+                    <select id='daterange-select' name="daterange" style="width:150px;" >
+                        <option  value="day">Last 24 hours</option>
+                        <option  value="week">Last 7 days</option>
+                        <option  value="month">Last 30 days</option>
+                        <option  value="custom">Custom Range</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" name="date_from" id="act_date_from" />
+                </td>
+                <td>
+                    <input type="text" name="date_to" id="act_date_to" />
+                </td>
+                <td>
+                    <select id='group-select' name="group" style="width:100px;" >
+                        <option  value="none">없음</option>
+                        <option  value="level">레벨별</option>
+                        <option  value="friends">친구수별</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="submit" class="button update" value="Update" />
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
 <!-- sub menu -->
 <h3>Monetization</h3>
 <!-- chart view -->
-<div class="chart"></div>
+<div class="chart">
+    <form action="http://localhost:8888/basic" id="filter-form">
+        <table>
+            <tr>
+                <th align=left>
+                    <label for="charts">Select charts</label>
+                </th>
+                <th align=left>
+                    <label for="date_range">Date Range</label>
+                </th>
+                <th align=left>
+                    <label for="">From</label>
+                </th>
+                <th align=left>
+                    <label for="">To</label>
+                </th>
+                <th align=left>
+                    <label for="">Group</label>
+                </th>
+                <th align=left>
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <select id='charts-select' name='charts' style="width:150px;">
+                        <option  value="all">All</option>
+                        <option  value="dau">DAU</option>
+                        <option  value="apa">Installed</option>
+                        <option  value="apr">Uninstalled</option>
+                        <option  value="inv">Invite Count</option>
+                        <option  value="lgn">Login Count</option>
+                        <option  value="ret">Retention</option>
+                    </select>
+                </td>
+                <td>
+                    <select id='daterange-select' name="daterange" style="width:150px;" >
+                        <option  value="day">Last 24 hours</option>
+                        <option  value="week">Last 7 days</option>
+                        <option  value="month">Last 30 days</option>
+                        <option  value="custom">Custom Range</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" name="date_from" id="money_date_from" />
+                </td>
+                <td>
+                    <input type="text" name="date_to" id="money_date_to" />
+                </td>
+                <td>
+                    <select id='group-select' name="group" style="width:100px;" >
+                        <option  value="none">없음</option>
+                        <option  value="level">레벨별</option>
+                        <option  value="friends">친구수별</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="submit" class="button update" value="Update" />
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
 <!-- sub menu -->
 <h3>Events</h3>
 <!-- chart view -->
@@ -34,4 +156,42 @@
 <!-- chart view -->
 <div class="chart"></div>
 </div>
+{% endblock %}
+
+{% block js %}
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script>
+$(function() {
+    $("#act_date_from").datepicker(
+            {dateFormat:'yy-mm-dd'
+            ,changeMonth:true
+            ,changeYear:true
+            ,showButtonPanel:true
+            }
+    );
+    $("#act_date_to").datepicker(
+            {dateFormat:'yy-mm-dd'
+            ,changeMonth:true
+            ,changeYear:true
+            ,showButtonPanel:true
+            }
+    );
+    $("#money_date_from").datepicker(
+            {dateFormat:'yy-mm-dd'
+            ,changeMonth:true
+            ,changeYear:true
+            ,showButtonPanel:true
+            }
+    );
+    $("#money_date_to").datepicker(
+            {dateFormat:'yy-mm-dd'
+            ,changeMonth:true
+            ,changeYear:true
+            ,showButtonPanel:true
+            }
+    );
+});
+</script>
 {% endblock %}
