@@ -20,7 +20,7 @@ def _send_message(sender_uid, target_uids, data):
     for link in online:
         link.send(data)
 
-    return offline
+    return online, offline
 
 
 def on_message_send(sender_uid, group_uid, target_uids, message_info):
@@ -31,8 +31,8 @@ def on_message_send(sender_uid, group_uid, target_uids, message_info):
     noti.message_info = mi
     noti_str = net.protocols.to_json(user_uid=sender_uid, message=noti)
 
-    (online_users, offline_users) = _send_message(sender_uid=sender_uid,
-                                                  target_uids=target_uids, data=noti_str)
+    online_users, offline_users = _send_message(sender_uid=sender_uid,
+                                                target_uids=target_uids, data=noti_str)
     if offline_users:
         if group_uid is None:
             group_uid = 0
