@@ -4,6 +4,7 @@ from dataview.core import settings
 from dataview.views.base import BaseView
 from dataview.utils.dates import (
         datestring_to_utc_datetime,
+        datestring_to_utc_date,
         datetime_to_unixtime,
         utc_unixtime_to_localtime,
         localtime_utc_timedelta,
@@ -37,45 +38,45 @@ class IndexView(BaseView):
     def get(self):
 
         # category = self.get_argument('category', None)
-        # print 'category: ' + str(category)
-        selected_chart = self.get_argument('selected_chart', 'all')
-        date_range = self.get_argument('date_range', '1')
-        date_from = self.get_argument('date_from', False)
-        date_to = self.get_argument('date_to', False)
-        group = self.get_argument('group', 'None')
+        selected_chart = self.get_argument('selected_chart', None)
+        date_range = self.get_argument('date_range', None)
+        date_from = self.get_argument('date_from', None)
+        date_to = self.get_argument('date_to', None)
+        group = self.get_argument('group', None)
 
-        print self.request.uri
-        print 'selected_chart: ' + str(selected_chart)
-        print 'date_range: ' + str(date_range)
-        print 'group: ' + str(group)
+        if selected_chart is None:
+            selected_chart = 'all'
 
-        if date_range == '1' or None:
-            print date_range
-        elif date_range == '7':
-            print date_range
-        elif date_range == '30':
-            print date_range
+        if date_range is None:
+            date_range = '1'
+
+        if group is None:
+            group = 'None'
+
+        if date_range != 'custom':
+            period = int(date_range)
+            if date_from is None or date_from == 'None':
+                day = timedelta(days=period) # timedelta(hours=24)
+                date_from = str(self.now - day)
+
+            if date_to is None or date_to == 'None':
+                day = timedelta(days=1) # timedelta(hours=24)
+                date_to = str(self.now - day)
+
         elif date_range == 'custom':
-            print date_range
-        else:
-            pass
+            date_from = datestring_to_utc_date(date_from)
+            date_to = datestring_to_utc_date(date_to)
+            print 'date_from is ' + str(date_from)
+            print 'date_to is ' + str(date_to)
+            if (self.now - date_from).days < 1:
+                self.write('date_from is past than today')
+            if (self.now - date_to).days < 1:
+                self.write('date_to is past than today')
+            if (date_to - date_from).days < 0:
+                self.write('date_from is past than date_to')
 
-        if date_from:
-            print 'if: ' + str(date_from)
-            date_from = datestring_to_utc_datetime(date_from)
-        # Default - 24 hours period
         else:
-            day = timedelta(hours=24)
-            date_from = self.now - day
-            print 'else: ' + str(date_from)
-
-        if date_to:
-            date_to = datestring_to_utc_datetime(date_to)
-        else:
-            date_to = self.now
-
-        date_from = datetime_to_unixtime(date_from)
-        date_to = datetime_to_unixtime(date_to)
+            print 'date_range is not proper'
 
         all_processed_list = settings.PROCESSED_LIST
 
@@ -90,8 +91,8 @@ class IndexView(BaseView):
         # processed_data = processed_data_model.get_processed_data(processed_list, date_from, date_to)
 
         # Convert the dates to local time for display
-        date_from = utc_unixtime_to_localtime(date_from)
-        date_to = utc_unixtime_to_localtime(date_to)
+        # date_from = utc_unixtime_to_localtime(date_from)
+        # date_to = utc_unixtime_to_localtime(date_to)
 
         # Get the difference between UTC and localtime - used to display
         # the ticks in the charts
