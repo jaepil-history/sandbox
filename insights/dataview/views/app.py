@@ -16,17 +16,104 @@ from dataview.views.models import (
         user_model
         )
 
+
+class MainView(BaseView):
+
+    def initialize(self):
+        super(MainView, self).initialize()
+
+    @authenticated
+    def get(self):
+        self.redirect('/index')
+
+
 class IndexView(BaseView):
 
     def initialize(self):
         super(IndexView, self).initialize()
+        self.current_page = 'index'
 
     @authenticated
     def get(self):
 
-        self.render("index.html",
-                current_page='index',
-                )
+        # category = self.get_argument('category', None)
+        # print 'category: ' + str(category)
+        selected_chart = self.get_argument('selected_chart', 'all')
+        date_range = self.get_argument('date_range', '1')
+        date_from = self.get_argument('date_from', False)
+        date_to = self.get_argument('date_to', False)
+        group = self.get_argument('group', 'None')
+
+        print self.request.uri
+        print 'selected_chart: ' + str(selected_chart)
+        print 'date_range: ' + str(date_range)
+        print 'group: ' + str(group)
+
+        if date_range == '1' or None:
+            print date_range
+        elif date_range == '7':
+            print date_range
+        elif date_range == '30':
+            print date_range
+        elif date_range == 'custom':
+            print date_range
+        else:
+            pass
+
+        if date_from:
+            print 'if: ' + str(date_from)
+            date_from = datestring_to_utc_datetime(date_from)
+        # Default - 24 hours period
+        else:
+            day = timedelta(hours=24)
+            date_from = self.now - day
+            print 'else: ' + str(date_from)
+
+        if date_to:
+            date_to = datestring_to_utc_datetime(date_to)
+        else:
+            date_to = self.now
+
+        date_from = datetime_to_unixtime(date_from)
+        date_to = datetime_to_unixtime(date_to)
+
+        all_processed_list = settings.PROCESSED_LIST
+
+        if selected_chart:
+            processed_list = selected_chart
+        else:
+            processed_list = all_processed_list
+
+        print 'processed_list: ' + str(processed_list)
+        print 'all_list: ' + str(all_processed_list)
+
+        # processed_data = processed_data_model.get_processed_data(processed_list, date_from, date_to)
+
+        # Convert the dates to local time for display
+        date_from = utc_unixtime_to_localtime(date_from)
+        date_to = utc_unixtime_to_localtime(date_to)
+
+        # Get the difference between UTC and localtime - used to display
+        # the ticks in the charts
+        zone_difference = localtime_utc_timedelta()
+
+        # Get the max date - utc, converted to localtime
+        max_date = utc_now_to_localtime()
+
+        self.render('index.html',
+                current_page=self.current_page,
+                # all_processed_list=all_processed_list,
+                # processed_list=processed_list,
+                # selected_data=selected_data,
+                # processed_data=processed_data,
+                selected_chart=selected_chart,
+                date_range=date_range,
+                date_from=date_from,
+                date_to=date_to,
+                group=group
+                # zone_difference=zone_difference,
+                # max_date=max_date
+        )
 
 
 class BasicView(BaseView):

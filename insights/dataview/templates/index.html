@@ -11,6 +11,72 @@
 {% endblock %}
 
 {% block content %}
+<h2>
+    <form action="{{ base_url|url('index') }}">
+        <table>
+            <tr>
+                <th align=left>
+                    <label for="selected_chart">Select charts</label>
+                </th>
+                <th align=left>
+                    <label for="date_range">Date Range</label>
+                </th>
+                <th align=left>
+                    <label for="date_from">From</label>
+                </th>
+                <th align=left>
+                    <label for="date_to">To</label>
+                </th>
+                <th align=left>
+                    <label for="group">Group</label>
+                </th>
+                <th align=left>
+                </th>
+            </tr>
+             <tr>
+                <td>
+                    <select id='selected_chart' name='selected_chart' style="width:150px;">
+                        <option {% if selected_chart == 'all' %}selected="selected"{% endif %} value="all">All</option>
+                        <option {% if selected_chart == 'dau' %}selected="selected"{% endif %} value="dau">Dau</option>
+                        <option {% if selected_chart == 'installs' %}selected="selected"{% endif %} value="installs">Installed</option>
+                        <option {% if selected_chart == 'removals' %}selected="selected"{% endif %} value="removals">Uninstalled</option>
+                        <option {% if selected_chart == 'invites' %}selected="selected"{% endif %} value="invites">Invite Counts</option>
+                        <option {% if selected_chart == 'logins' %}selected="selected"{% endif %} value="logins">Login Counts</option>
+                        <option {% if selected_chart == 'retention' %}selected="selected"{% endif %} value="retention">Retention</option>
+                        <option {% if selected_chart == 'return' %}selected="selected"{% endif %} value="return">Returning Users</option>
+                        <option {% if selected_chart == 'viral' %}selected="selected"{% endif %} value="viral">Virality</option>
+                        <option {% if selected_chart == selected_chart == 'revenue' %}selected="selected"{% endif %} value="revenue">Revenue</option>
+                        <option {% if selected_chart == 'items' %}selected="selected"{% endif %} value="items">Items</option>
+                    </select>
+                </td>
+                <td>
+                    <select id='date_range' name="date_range" style="width:150px;" >
+                        <option {% if date_range == '1' %}selected="selected"{% endif %} value="1">Last 1 day</option>
+                        <option {% if date_range == '7' %}selected="selected"{% endif %} value="7">Last 7 days</option>
+                        <option {% if date_range == '30' %}selected="selected"{% endif %} value="30">Last 30 days</option>
+                        <option {% if date_range == 'custom' %}selected="selected"{% endif %} value="custom">Custom Range</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" name="date_from" id="date_from" style="width:210px;" value="{{ date_from|date }}"/>
+                </td>
+                <td>
+                    <input type="text" name="date_to" id="date_to" style="width:210px;" value="{{ date_to|date }}"/>
+                </td>
+                <td>
+                    <select id='group' name="group" style="width:120px;" >
+                        <option {% if group == 'None' %}selected="selected"{% endif %} value="None">없음</option>
+                        <option {% if group == 'level' %}selected="selected"{% endif %} value="level">레벨별</option>
+                        <option {% if group == 'friends' %}selected="selected"{% endif %} value="friends">친구수별</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="submit" class="button update" value="Update" />
+                </td>
+            </tr>
+        </table>
+    </form>
+</h2>
 <div>
 <!--ㅡMain Menu -->
 <h2>Dashboard</h2>
@@ -18,131 +84,13 @@
 <h3>Activity</h3>
 <!-- chart view -->
 <div class="chart">
-    <form action="http://localhost:8888/index" id="act_filter-form">
-        <table>
-            <tr>
-                <th align=left>
-                    <label for="act_charts">Select charts</label>
-                </th>
-                <th align=left>
-                    <label for="act_date_range">Date Range</label>
-                </th>
-                <th align=left>
-                    <label for="">From</label>
-                </th>
-                <th align=left>
-                    <label for="">To</label>
-                </th>
-                <th align=left>
-                    <label for="">Group</label>
-                </th>
-                <th align=left>
-                </th>
-            </tr>
-            <tr>
-                <td>
-                    <select id='act_charts_select' name='act_charts' style="width:150px;">
-                        <option  value="all">All</option>
-                        <option  value="dau">DAU</option>
-                        <option  value="apa">Installed</option>
-                        <option  value="apr">Uninstalled</option>
-                        <option  value="inv">Invite Count</option>
-                        <option  value="lgn">Login Count</option>
-                        <option  value="ret">Retention</option>
-                    </select>
-                </td>
-                <td>
-                    <select id='act_date_range_select' name="act_date_range" style="width:150px;" >
-                        <option  value="1">Last 1 day</option>
-                        <option  value="7k">Last 7 days</option>
-                        <option  value="30">Last 30 days</option>
-                        <option  value="custom">Custom Range</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="text" name="act_date_from" id="act_date_from" />
-                </td>
-                <td>
-                    <input type="text" name="act_date_to" id="act_date_to" />
-                </td>
-                <td>
-                    <select id='act_group_select' name="act_group" style="width:100px;" >
-                        <option  value="none">없음</option>
-                        <option  value="level">레벨별</option>
-                        <option  value="friends">친구수별</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="submit" class="button update" value="Update" />
-                </td>
-            </tr>
-        </table>
-    </form>
+
+
 </div>
 <!-- sub menu -->
 <h3>Monetization</h3>
 <!-- chart view -->
 <div class="chart">
-    <form action="http://localhost:8888/index" id="mony_filter-form">
-        <table>
-            <tr>
-                <th align=left>
-                    <label for="money_charts">Select charts</label>
-                </th>
-                <th align=left>
-                    <label for="money_date_range">Date Range</label>
-                </th>
-                <th align=left>
-                    <label for="">From</label>
-                </th>
-                <th align=left>
-                    <label for="">To</label>
-                </th>
-                <th align=left>
-                    <label for="">Group</label>
-                </th>
-                <th align=left>
-                </th>
-            </tr>
-            <tr>
-                <td>
-                    <select id='money_charts_select' name='money_charts' style="width:150px;">
-                        <option  value="all">All</option>
-                        <option  value="dau">DAU</option>
-                        <option  value="apa">Installed</option>
-                        <option  value="apr">Uninstalled</option>
-                        <option  value="inv">Invite Count</option>
-                        <option  value="lgn">Login Count</option>
-                        <option  value="ret">Retention</option>
-                    </select>
-                </td>
-                <td>
-                    <select id='money_date_range_select' name="money_date_range" style="width:150px;" >
-                        <option  value="1">Last 1 day</option>
-                        <option  value="7">Last 7 days</option>
-                        <option  value="30">Last 30 days</option>
-                        <option  value="custom">Custom Range</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="text" name="money_date_from" id="money_date_from" />
-                </td>
-                <td>
-                    <input type="text" name="money_date_to" id="money_date_to" />
-                </td>
-                <td>
-                    <select id='money_group_select' name="money_group" style="width:100px;" >
-                        <option  value="none">없음</option>
-                        <option  value="level">레벨별</option>
-                        <option  value="friends">친구수별</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="submit" class="button update" value="Update" />
-                </td>
-            </tr>
-        </table>
-    </form>
 </div>
 <!-- sub menu -->
 <h3>Events</h3>
@@ -168,15 +116,15 @@
 <script type="text/javascript" src='/media/js/jquery-ui-timepicker-addon.js'></script>
 <script>
 $(document).ready(function() {
-    $("#act_date_from").datepicker({
+    $("#date_from").datepicker({
         dateFormat:'yy-mm-dd',
         changeMonth:true,
         changeYear:true,
         showButtonPanel:true,
         beforeShow: function(element, object) {
-            dateRange = $("#act_date_range_select option:selected").val();
+            dateRange = $("#date_range option:selected").val();
             if ( dateRange == "custom" ) {
-                $('#act_date_from').datetimepicker("option",{minDate:null});        //-> 'minDate' 설정 초기화
+                $('#date_from').datetimepicker("option",{minDate:null});        //-> 'minDate' 설정 초기화
             } else {
                 startDate = - parseInt(dateRange);
                 endDate = -1; // 기준 날짜 (어제)
@@ -191,61 +139,15 @@ $(document).ready(function() {
         onSelect: function (selectedDateTime){
         }
     });
-    $("#act_date_to").datepicker({
+    $("#date_to").datepicker({
         dateFormat:'yy-mm-dd',
         changeMonth:true,
         changeYear:true,
         showButtonPanel:true,
         beforeShow: function(element, object) {
-            dateRange = $("#act_date_range_select option:selected").val();
+            dateRange = $("#date_range option:selected").val();
             if ( dateRange == "custom" ) {
-                $('#act_date_to').datetimepicker("option",{minDate:null});        //-> 'minDate' 설정 초기화
-            } else {
-                startDate = - parseInt(dateRange);
-                endDate = -1; // 기준 날짜 (어제)
-                return {
-                    minDate: startDate,
-                    maxDate: endDate
-                }
-            }
-        },
-        onClose : function(dateText, inst) {
-        },
-        onSelect: function (selectedDateTime){
-        }
-    });
-    $("#money_date_from").datepicker({
-        dateFormat:'yy-mm-dd',
-        changeMonth:true,
-        changeYear:true,
-        showButtonPanel:true,
-        beforeShow: function(element, object) {
-            dateRange = $("#money_date_range_select option:selected").val();
-            if ( dateRange == "custom" ) {
-                $('#money_date_from').datetimepicker("option",{minDate:null});        //-> 'minDate' 설정 초기화
-            } else {
-                startDate = - parseInt(dateRange);
-                endDate = -1; // 기준 날짜 (어제)
-                return {
-                    minDate: startDate,
-                    maxDate: endDate
-                }
-            }
-        },
-        onClose : function(dateText, inst) {
-        },
-        onSelect: function (selectedDateTime){
-        }
-    });
-    $("#money_date_to").datepicker({
-        dateFormat:'yy-mm-dd',
-        changeMonth:true,
-        changeYear:true,
-        showButtonPanel:true,
-        beforeShow: function(element, object) {
-            dateRange = $("#money_date_range_select option:selected").val();
-            if ( dateRange == "custom" ) {
-                $('#money_date_to').datetimepicker("option",{minDate:null});        //-> 'minDate' 설정 초기화
+                $('#date_to').datetimepicker("option",{minDate:null});        //-> 'minDate' 설정 초기화
             } else {
                 startDate = - parseInt(dateRange);
                 endDate = -1; // 기준 날짜 (어제)
