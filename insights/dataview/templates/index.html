@@ -116,6 +116,7 @@
 <script type="text/javascript" src='/media/js/jquery-ui-timepicker-addon.js'></script>
 <script>
 $(document).ready(function() {
+    var endDate = -1; // 기준일: 하루전
     $("#date_from").datepicker({
         dateFormat:'yy-mm-dd',
         changeMonth:true,
@@ -124,10 +125,12 @@ $(document).ready(function() {
         beforeShow: function(element, object) {
             dateRange = $("#date_range option:selected").val();
             if ( dateRange == "custom" ) {
-                $('#date_from').datetimepicker("option",{minDate:null});        //-> 'minDate' 설정 초기화
+                return {
+                    minDate: null,
+                    maxDate: endDate
+                }
             } else {
                 startDate = - parseInt(dateRange);
-                endDate = -1; // 기준 날짜 (어제)
                 return {
                     minDate: startDate,
                     maxDate: endDate
@@ -147,10 +150,12 @@ $(document).ready(function() {
         beforeShow: function(element, object) {
             dateRange = $("#date_range option:selected").val();
             if ( dateRange == "custom" ) {
-                $('#date_to').datetimepicker("option",{minDate:null});        //-> 'minDate' 설정 초기화
+                return {
+                    minDate: null,
+                    maxDate: endDate
+                }
             } else {
                 startDate = - parseInt(dateRange);
-                endDate = -1; // 기준 날짜 (어제)
                 return {
                     minDate: startDate,
                     maxDate: endDate
@@ -163,6 +168,5 @@ $(document).ready(function() {
         }
     });
 });
-
 </script>
 {% endblock %}

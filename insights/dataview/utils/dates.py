@@ -59,13 +59,14 @@ def datestring_to_utc_datetime(datestring, format="%d-%m-%Y-%H:%M", _timezone=No
 def datestring_to_utc_date(datestring, format="%Y-%m-%d", _timezone=None):
     _timezone = _timezone if _timezone else settings.TIMEZONE
     _datetime = datetime.strptime(datestring, format)
-    local_timezone = timezone(_timezone)
+    # local_timezone = timezone(_timezone)
 
     # Adjust for Daylight savings time
-    local_datetime = local_timezone.localize(_datetime)
-    utc_datetime =  local_datetime.astimezone(pytz.UTC)
+    # local_datetime = local_timezone.localize(_datetime)
+    # utc_datetime =  local_datetime.astimezone(pytz.UTC)
 
-    return utc_datetime.date()
+    # return utc_datetime.date()
+    return _datetime.date()
 
     
 # Internal function, always pass UTC date objects

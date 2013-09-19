@@ -12,7 +12,7 @@ from dataview.utils.dates import (
         )
 from dataview.views.models import (
         processed_data_model,
-        dashboard_model,        
+        dashboard_model,
         discovery_model,
         user_model
         )
@@ -55,28 +55,20 @@ class IndexView(BaseView):
 
         if date_range != 'custom':
             period = int(date_range)
-            if date_from is None or date_from == 'None':
-                day = timedelta(days=period) # timedelta(hours=24)
-                date_from = str(self.now - day)
-
-            if date_to is None or date_to == 'None':
-                day = timedelta(days=1) # timedelta(hours=24)
-                date_to = str(self.now - day)
-
+            date_from = self.now - timedelta(days=period)
+            date_to = self.now - timedelta(days=1)
         elif date_range == 'custom':
             date_from = datestring_to_utc_date(date_from)
             date_to = datestring_to_utc_date(date_to)
-            print 'date_from is ' + str(date_from)
-            print 'date_to is ' + str(date_to)
-            if (self.now - date_from).days < 1:
-                self.write('date_from is past than today')
-            if (self.now - date_to).days < 1:
-                self.write('date_to is past than today')
             if (date_to - date_from).days < 0:
-                self.write('date_from is past than date_to')
-
+                temp = date_from
+                date_from = date_to
+                date_to = temp
         else:
             print 'date_range is not proper'
+
+        # date_from = str(date_from)
+        # date_to = str(date_to)
 
         all_processed_list = settings.PROCESSED_LIST
 
@@ -121,13 +113,81 @@ class BasicView(BaseView):
 
     def initialize(self):
         super(BasicView, self).initialize()
+        self.current_page = 'basic'
 
     @authenticated
     def get(self):
 
-        self.render("basic.html",
-                current_page='basic',
-                )
+        # category = self.get_argument('category', None)
+        selected_chart = self.get_argument('selected_chart', None)
+        date_range = self.get_argument('date_range', None)
+        date_from = self.get_argument('date_from', None)
+        date_to = self.get_argument('date_to', None)
+        group = self.get_argument('group', None)
+
+        if selected_chart is None:
+            selected_chart = 'all'
+
+        if date_range is None:
+            date_range = '1'
+
+        if group is None:
+            group = 'None'
+
+        if date_range != 'custom':
+            period = int(date_range)
+            date_from = self.now - timedelta(days=period)
+            date_to = self.now - timedelta(days=1)
+        elif date_range == 'custom':
+            date_from = datestring_to_utc_date(date_from)
+            date_to = datestring_to_utc_date(date_to)
+            if (date_to - date_from).days < 0:
+                temp = date_from
+                date_from = date_to
+                date_to = temp
+        else:
+            print 'date_range is not proper'
+
+        # date_from = str(date_from)
+        # date_to = str(date_to)
+
+        all_processed_list = settings.PROCESSED_LIST
+
+        if selected_chart:
+            processed_list = selected_chart
+        else:
+            processed_list = all_processed_list
+
+        print 'processed_list: ' + str(processed_list)
+        print 'all_list: ' + str(all_processed_list)
+
+        # processed_data = processed_data_model.get_processed_data(processed_list, date_from, date_to)
+
+        # Convert the dates to local time for display
+        # date_from = utc_unixtime_to_localtime(date_from)
+        # date_to = utc_unixtime_to_localtime(date_to)
+
+        # Get the difference between UTC and localtime - used to display
+        # the ticks in the charts
+        zone_difference = localtime_utc_timedelta()
+
+        # Get the max date - utc, converted to localtime
+        max_date = utc_now_to_localtime()
+
+        self.render('basic.html',
+                current_page=self.current_page,
+                # all_processed_list=all_processed_list,
+                # processed_list=processed_list,
+                # selected_data=selected_data,
+                # processed_data=processed_data,
+                selected_chart=selected_chart,
+                date_range=date_range,
+                date_from=date_from,
+                date_to=date_to,
+                group=group
+                # zone_difference=zone_difference,
+                # max_date=max_date
+        )
 
 
 class AnalyticsView(BaseView):
@@ -175,7 +235,7 @@ class DashboardView(BaseView):
 
         try:
             system_check_first = active_system_checks[0]
-        except IndexError: 
+        except IndexError:
             system_check_first = False
 
         last_system_check = dashboard_model.get_last_system_check(active_system_checks)
