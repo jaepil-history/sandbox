@@ -1,5 +1,7 @@
 from datetime import timedelta
-from tornado.web import authenticated
+from tornado import web
+from tornado import gen
+
 from dataview.core import settings
 from dataview.views.base import BaseView
 from dataview.utils.dates import (
@@ -23,7 +25,7 @@ class MainView(BaseView):
     def initialize(self):
         super(MainView, self).initialize()
 
-    @authenticated
+    @web.authenticated
     def get(self):
         self.redirect('/index')
 
@@ -34,7 +36,9 @@ class IndexView(BaseView):
         super(IndexView, self).initialize()
         self.current_page = 'index'
 
-    @authenticated
+    @web.authenticated
+    @web.asynchronous
+    @gen.coroutine
     def get(self):
 
         # category = self.get_argument('category', None)
@@ -80,35 +84,43 @@ class IndexView(BaseView):
         print 'processed_list: ' + str(processed_list)
         print 'all_list: ' + str(all_processed_list)
 
-        dummy_data = {}
-
         # processed_data = processed_data_model.get_processed_data(processed_list, date_from, date_to)
 
-        # Convert the dates to local time for display
-        # date_from = utc_unixtime_to_localtime(date_from)
-        # date_to = utc_unixtime_to_localtime(date_to)
+        # {'title',data_array} dictionary format
+        dummy_data = {
+            "dau": [1, 2, 3, 4, 5],
+            "installs": [6, 7, 8, 9, 10],
+            "removals": [11, 12, 13, 14, 15],
+            "invites": [16, 17, 18, 19, 20],
+            "logins": [21, 22, 23, 24, 25],
+            "retention": [26, 27, 28, 29, 30],
+            "viral": [31, 32, 33, 34, 35],
+            "return": [36, 37, 38, 39, 40],
+            "revenue": [41, 42, 43, 44, 45],
+            "items": [46, 47, 48, 49, 50]
+            }
 
-        # Get the difference between UTC and localtime - used to display
-        # the ticks in the charts
-        zone_difference = localtime_utc_timedelta()
+        processed_data = {}
 
-        # Get the max date - utc, converted to localtime
-        max_date = utc_now_to_localtime()
+        if selected_chart == 'all':
+            processed_data = dummy_data
+        else:
+            processed_data[selected_chart] = dummy_data[selected_chart]
+
+        print processed_data
 
         self.render('index.html',
                 current_page=self.current_page,
-                # all_processed_list=all_processed_list,
+                all_processed_list=all_processed_list,
                 # processed_list=processed_list,
-                # selected_data=selected_data,
-                # processed_data=processed_data,
+                processed_data=processed_data,
                 selected_chart=selected_chart,
                 date_range=date_range,
                 date_from=date_from,
                 date_to=date_to,
                 group=group
-                # zone_difference=zone_difference,
-                # max_date=max_date
         )
+        self.finish()
 
 
 class BasicView(BaseView):
@@ -117,7 +129,9 @@ class BasicView(BaseView):
         super(BasicView, self).initialize()
         self.current_page = 'basic'
 
-    @authenticated
+    @web.authenticated
+    @web.asynchronous
+    @gen.coroutine
     def get(self):
 
         # category = self.get_argument('category', None)
@@ -190,6 +204,7 @@ class BasicView(BaseView):
                 # zone_difference=zone_difference,
                 # max_date=max_date
         )
+        self.finish()
 
 
 class AnalyticsView(BaseView):
@@ -197,12 +212,15 @@ class AnalyticsView(BaseView):
     def initialize(self):
         super(AnalyticsView, self).initialize()
 
-    @authenticated
+    @web.authenticated
+    @web.asynchronous
+    @gen.coroutine
     def get(self):
 
         self.render("analytics.html",
                 current_page='analytics',
                 )
+        self.finish()
 
 
 class OperationView(BaseView):
@@ -210,12 +228,15 @@ class OperationView(BaseView):
     def initialize(self):
         super(OperationView, self).initialize()
 
-    @authenticated
+    @web.authenticated
+    @web.asynchronous
+    @gen.coroutine
     def get(self):
 
         self.render("operation.html",
                 current_page='operation',
                 )
+        self.finish()
 
 
 class DashboardView(BaseView):
@@ -223,7 +244,9 @@ class DashboardView(BaseView):
     def initialize(self):
         super(DashboardView, self).initialize()
 
-    @authenticated
+    @web.authenticated
+    @web.asynchronous
+    @gen.coroutine
     def get(self):
 
         active_process_checks = settings.PROCESS_CHECKS
@@ -250,6 +273,7 @@ class DashboardView(BaseView):
                 system_check_first=system_check_first,
                 process_check_first=process_check_first,
                 )
+        self.finish()
 
 
 class DiscoveryView(BaseView):
@@ -258,7 +282,9 @@ class DiscoveryView(BaseView):
         super(DiscoveryView, self).initialize()
         self.current_page = 'discovery'
 
-    @authenticated
+    @web.authenticated
+    @web.asynchronous
+    @gen.coroutine
     def get(self):
 
         checked_list = self.get_arguments('checked_list', None)
@@ -315,7 +341,7 @@ class DiscoveryView(BaseView):
                 zone_difference=zone_difference,
                 max_date=max_date
                 )
-
+            self.finish()
 
 
 class ProcessedDataView(BaseView):
@@ -324,7 +350,9 @@ class ProcessedDataView(BaseView):
         super(ProcessedDataView, self).initialize()
         self.current_page = 'processed_data'
 
-    @authenticated
+    @web.authenticated
+    @web.asynchronous
+    @gen.coroutine
     def get(self):
 
         category = self.get_argument('category', None)
@@ -421,6 +449,7 @@ class ProcessedDataView(BaseView):
                 zone_difference=zone_difference,
                 max_date=max_date
         )
+        self.finish()
 
 
 class SettingsView(BaseView):
@@ -429,7 +458,9 @@ class SettingsView(BaseView):
         super(SettingsView, self).initialize()
         self.current_page = 'settings'
 
-    @authenticated
+    @web.authenticated
+    @web.asynchronous
+    @gen.coroutine
     def get(self):
 
         # Get the max date - utc, converted to localtime
@@ -439,6 +470,7 @@ class SettingsView(BaseView):
             max_date=max_date,
             current_page=self.current_page
         )
+        self.finish()
 
 
 class SettingsChangePasswordView(BaseView):
@@ -447,7 +479,7 @@ class SettingsChangePasswordView(BaseView):
         super(SettingsChangePasswordView, self).initialize()
         self.current_page = 'settings'
 
-    @authenticated
+    @web.authenticated
     def post(self):
 
         new_password = self.get_argument('new-password')

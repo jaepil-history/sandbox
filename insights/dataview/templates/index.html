@@ -16,7 +16,7 @@
         <table>
             <tr>
                 <th align=left>
-                    <label for="selected_chart">Select charts</label>
+                    <label for="selected_chart">Select chart</label>
                 </th>
                 <th align=left>
                     <label for="date_range">Date Range</label>
@@ -82,34 +82,25 @@
 <h2>Dashboard</h2>
 <!-- sub menu -->
 <h3>Activity</h3>
-<!-- chart view -->
-<div class="chart">
-    <!-- Graphs ========================================================================= -->
-    <div class="container-fluid" id="container1" style="min-width: 400px; height: 400px; margin: auto"></div>
-    <hr>
-    <div class="container-fluid" id="container2" style="min-width: 400px; height: 400px; margin: auto"></div>
-    <hr>
-    <div class="row-fluid">
-        <div class="span6" id="container3" style="min-width: 400px; height: 600px; margin: auto"></div>
-        <div class="span6" id="container4" style="min-width: 400px; height: 600px; margin-left: 10px; margin-right: 10px">
-            <label for="target-distance">타겟과의 거리(단위: meter)</label>
-            <input type="text" id="target-distance" value="5" style="width:70px; text-align:right">
-            <input id="reload" type="submit" value="연사 재계산">
-            <div id="resultArea">
-                <table id="result0"></table>
-                <!--<div id="result-pager"></div>-->
-                <table id="result1"></table>
-                <table id="result2"></table>
-                <table id="result3"></table>
-                <table id="result4"></table>
-            </div>
-        </div>
-    </div>
+<!-- Graphs ========================================================================= -->
+<div class="row-fluid">
+{% if selected_chart == 'all' %}
+    {% for title in all_processed_list  %}
+    {% set sanitized_title = title|clean_slashes %}
+        <h2>{{ title }}</h2>
+        <div class="span6" id="{{ sanitized_data }}_container" style="min-width: 400px; height: 600px; margin: auto"></div>
+    {% endfor %}
+{% else %}{# if-selected_chart #}
+    <h2>{{ selected_chart }}</h2>
+    <div class="span6" id="{{ selected_chart }}_container" style="min-width: 400px; height: 600px; margin: auto"></div>
+{% endif %}{# selected_chart #}
 </div>
 <!-- sub menu -->
 <h3>Monetization</h3>
 <!-- chart view -->
+
 <div class="chart">
+
 </div>
 <!-- sub menu -->
 <h3>Events</h3>
@@ -133,8 +124,13 @@
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 <script src='/media/js/jquery-ui-timepicker-addon.js'></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/highcharts-more.js"></script>
+<script src="http://code.highcharts.com/modules/data.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
 <script>
-$(document).ready(function() {
+//$(document).ready(function(processed_data) {
+$(function()  {
     var endDate = -1; // 기준일: 하루전
     $("#date_from").datepicker({
         dateFormat:'yy-mm-dd',
@@ -186,11 +182,65 @@ $(document).ready(function() {
         onSelect: function (selectedDateTime){
         }
     });
+
+    var range = [5, 10, 15, 20, 25, 30]
+
+    {% for data in processed_data  %}
+    {% set sanitized_data = data|clean_slashes %}
+    var {{ sanitized_data }}_series = []
+
+    print(processed_data['{{ sanitized_data }}'])
+
+    var {{ sanitized_data }}_chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{{ sanitized_data }}_container',
+            type: 'line',
+            marginRight: 130,
+            marginBottom: 60
+        },
+        title: {
+            text: '줌아웃 조준 사격시 명중률과 거리에 따른 데미지 기대값',
+            x: -20 //center
+        },
+        subtitle: {
+            text: '타겟 헤드를 기준으로 했을 때',
+            x: -20
+        },
+        xAxis: {
+            categories: range,
+            title: {
+                text: '거리(meter)',
+                y: 20
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Damage(HP)'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            formatter: function() {
+                return '<b>'+ this.series.name +'</b><br/>'+
+                    this.x +': '+ this.y +'HP';
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'top',
+            x: -10,
+            y: 30,
+            borderWidth: 0
+        },
+        series: {{ sanitized_data }}_series
+    });
+{% endfor %}{# data #}
 });
 </script>
-<script src="http://code.highcharts.com/highcharts.js"></script>
-<script src="http://code.highcharts.com/highcharts-more.js"></script>
-<script src="http://code.highcharts.com/modules/data.js"></script>
-<script src="http://code.highcharts.com/modules/exporting.js"></script>
-<script src='/media/js/mycharts.js'></script>
+<!--<script src='/media/js/mycharts.js'></script>-->
 {% endblock %}
