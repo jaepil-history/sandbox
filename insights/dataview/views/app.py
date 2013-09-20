@@ -80,6 +80,8 @@ class IndexView(BaseView):
         print 'processed_list: ' + str(processed_list)
         print 'all_list: ' + str(all_processed_list)
 
+        dummy_data = {}
+
         # processed_data = processed_data_model.get_processed_data(processed_list, date_from, date_to)
 
         # Convert the dates to local time for display

@@ -11,10 +11,10 @@ print 5 % 28
 today = datetime.utcnow().date()
 yesterday = today - timedelta(days=1)
 
-ref = '2013-09-01'
-date_ref = datetime.date(ref)
-
-print date_ref
+# ref = '2013-09-01'
+# date_ref = datetime.date(ref)
+#
+# print date_ref
 
 print 'today: ' + str(today)
 print 'yesterday: ' + str(yesterday)
@@ -26,8 +26,8 @@ print 'day: ' + str(today.day)
 
 
 
-now = datetime.utcnow().today()
-print now
+now = datetime.utcnow().today().date()
+print 'now: ' + str(now)
 
 prefix = ["%04d" % now.year,
             "%02d" % now.month,

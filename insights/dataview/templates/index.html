@@ -84,8 +84,27 @@
 <h3>Activity</h3>
 <!-- chart view -->
 <div class="chart">
-
-
+    <!-- Graphs ========================================================================= -->
+    <div class="container-fluid" id="container1" style="min-width: 400px; height: 400px; margin: auto"></div>
+    <hr>
+    <div class="container-fluid" id="container2" style="min-width: 400px; height: 400px; margin: auto"></div>
+    <hr>
+    <div class="row-fluid">
+        <div class="span6" id="container3" style="min-width: 400px; height: 600px; margin: auto"></div>
+        <div class="span6" id="container4" style="min-width: 400px; height: 600px; margin-left: 10px; margin-right: 10px">
+            <label for="target-distance">타겟과의 거리(단위: meter)</label>
+            <input type="text" id="target-distance" value="5" style="width:70px; text-align:right">
+            <input id="reload" type="submit" value="연사 재계산">
+            <div id="resultArea">
+                <table id="result0"></table>
+                <!--<div id="result-pager"></div>-->
+                <table id="result1"></table>
+                <table id="result2"></table>
+                <table id="result3"></table>
+                <table id="result4"></table>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- sub menu -->
 <h3>Monetization</h3>
@@ -113,7 +132,7 @@
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-<script type="text/javascript" src='/media/js/jquery-ui-timepicker-addon.js'></script>
+<script src='/media/js/jquery-ui-timepicker-addon.js'></script>
 <script>
 $(document).ready(function() {
     var endDate = -1; // 기준일: 하루전
@@ -169,4 +188,9 @@ $(document).ready(function() {
     });
 });
 </script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/highcharts-more.js"></script>
+<script src="http://code.highcharts.com/modules/data.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+<script src='/media/js/mycharts.js'></script>
 {% endblock %}

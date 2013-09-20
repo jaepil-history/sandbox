@@ -13,7 +13,7 @@ class BaseView(tornado.web.RequestHandler):
 
     def initialize(self):
         self.session = self._create_session()
-        self.now = datetime.utcnow().date()
+        self.now = datetime.utcnow().today().date()
         self.acl = settings.ACL
 
         # Template variables. Passing that dictionary to Jinja

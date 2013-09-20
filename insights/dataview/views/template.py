@@ -3,7 +3,7 @@ from datetime import datetime, time
 import re
 
 from jinja2 import Environment, FileSystemLoader
-# import pytz
+import pytz
 
 from dataview.core import settings
 from dataview.settings import TEMPLATES_DIR

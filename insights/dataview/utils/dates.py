@@ -59,6 +59,8 @@ def datestring_to_utc_datetime(datestring, format="%d-%m-%Y-%H:%M", _timezone=No
 def datestring_to_utc_date(datestring, format="%Y-%m-%d", _timezone=None):
     _timezone = _timezone if _timezone else settings.TIMEZONE
     _datetime = datetime.strptime(datestring, format)
+    # print 'today: ' + str(datetime.today())
+    # print 'today.date: ' + str(datetime.today().date())
     # local_timezone = timezone(_timezone)
 
     # Adjust for Daylight savings time
@@ -67,6 +69,23 @@ def datestring_to_utc_date(datestring, format="%Y-%m-%d", _timezone=None):
 
     # return utc_datetime.date()
     return _datetime.date()
+
+
+# Converts date strings: '2011-07-31' to an UTC datetime.date object using the
+# timezone in the config file
+# The _timezone parameter is used only in the test suite
+def datestring_to_local_date(datestring, format="%Y-%m-%d", _timezone=None):
+    _timezone = _timezone if _timezone else settings.TIMEZONE
+    _datetime = datetime.strptime(datestring, format)
+    local_timezone = timezone(_timezone)
+    # print 'today: ' + str(datetime.today())
+    # print 'today.date: ' + str(datetime.today().date())
+
+    # Adjust for Daylight savings time
+    local_datetime = local_timezone.localize(_datetime)
+    utc_datetime =  local_datetime.astimezone(pytz.UTC)
+
+    return local_datetime.date()
 
     
 # Internal function, always pass UTC date objects
