@@ -1,0 +1,56 @@
+%YAML 1.1
+---
+application:
+  title: Appspand IDGen Service configuration for local environment
+  module: appspand.idgen.main:main
+  version: 1.0
+  revision: 1
+  stage: local
+
+# Debugging
+debug: true
+
+# Logging
+logging:
+  access:
+    level: debug
+    path: ../log/idgen
+    filename: access.log
+  application:
+    level: debug
+    path: ../log/idgen
+    filename: application.log
+  general:
+    level: debug
+    path: ../log/idgen
+    filename: general.log
+
+# Identity
+server:
+  # host: idgen.service.local.appspandapp.com
+  host: localhost
+  port: 8200
+
+# Security
+security:
+  secret_key: d971be102d063e96f542bcbd6c788d6b290e274104596d66cfb97d58aa9377c1
+
+# Databases
+database:
+  mongodb:
+    - alias: idgen
+      connection_uri: mongodb://localhost:27017/idgen-local
+      connection_pool: 3
+      timeout: 5000
+
+  redis:
+    alias: idgen
+    enabled: true
+    connection_uri: redis://localhost:6379/0
+    connection_pool: 3
+    timeout: 5000
+    host: localhost
+    port: 6379
+    password: !!str
+    db: 0
+...
