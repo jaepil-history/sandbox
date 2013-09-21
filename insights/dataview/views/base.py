@@ -117,6 +117,6 @@ class BaseView(tornado.web.RequestHandler):
     def render(self, template, *args, **kwargs):
         kwargs['app'] = self.template_vars
         rendered_template = jinja_render(template, *args, **kwargs)
-
+        # print 'render_template: ' + rendered_template
         self.write(rendered_template)
 

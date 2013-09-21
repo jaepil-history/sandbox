@@ -37,21 +37,19 @@ class IndexView(BaseView):
         self.current_page = 'index'
 
     @web.authenticated
-    @web.asynchronous
-    @gen.coroutine
+    # @web.asynchronous
+    # @gen.coroutine
     def get(self):
 
         # category = self.get_argument('category', None)
-        selected_chart = self.get_argument('selected_chart', None)
+        charts = self.get_arguments('charts', None)
         date_range = self.get_argument('date_range', None)
         date_from = self.get_argument('date_from', None)
         date_to = self.get_argument('date_to', None)
         group = self.get_argument('group', None)
 
-        print 'request: ' + self.request.uri
-
-        if selected_chart is None:
-            selected_chart = 'all'
+        # if charts is None:
+        #     charts = 'all'
 
         if date_range is None:
             date_range = '1'
@@ -73,11 +71,13 @@ class IndexView(BaseView):
         else:
             print 'date_range is not proper'
 
-        all_charts = settings.PROCESSED_LIST
-        charts_list = []
+        # date_from = str(date_from)
+        # date_to = str(date_to)
 
-        if selected_chart != 'all':
-            charts_list.append(selected_chart)
+        all_charts = settings.PROCESSED_LIST
+
+        if len(charts) > 0:
+            charts_list = charts
         else:
             charts_list = all_charts
 
@@ -86,6 +86,18 @@ class IndexView(BaseView):
 
         # charts_data = processed_data_model.get_processed_data(charts_list, date_from, date_to)
 
+        # dummy_data = {
+        #     "dau": {'data':[1, 2, 3, 4, 5]},
+        #     "installs": {'data':[6, 7, 8, 9, 10]},
+        #     "removals": {'data':[11, 12, 13, 14, 15]},
+        #     "invites": {'data':[16, 17, 18, 19, 20]},
+        #     "logins": {'data':[21, 22, 23, 24, 25]},
+        #     "retention": {'data':[26, 27, 28, 29, 30]},
+        #     "viral": {'data':[31, 32, 33, 34, 35]},
+        #     "return": {'data':[36, 37, 38, 39, 40]},
+        #     "revenue": {'data':[41, 42, 43, 44, 45]},
+        #     "items": {'data':[46, 47, 48, 49, 50]}
+        #     }
         # {'title',data_array} dictionary format
         dummy_data = {
             "dau": [1, 2, 3, 4, 5],
@@ -103,22 +115,31 @@ class IndexView(BaseView):
         charts_data = {}
 
         for title in charts_list:
-            charts_data[title] = dummy_data[title]
+            if title != 'all':
+                charts_data[title] = dummy_data[title]
 
         print 'charts_data: ' + str(charts_data)
+
+                # current_page=self.current_page,
+                # all_processes_checks=all_processes_checks,
+                # processes_checks=processes_checks,
+                # processes=processes,
+                # process_data=process_data,
+                # date_from=date_from,
+                # date_to=date_to
 
         self.render('index.html',
                 current_page=self.current_page,
                 all_charts=all_charts,
                 charts_list=charts_list,
-                selected_chart=selected_chart,
+                charts=charts,
                 charts_data=charts_data,
                 date_range=date_range,
                 date_from=date_from,
                 date_to=date_to,
                 group=group
         )
-        self.finish()
+        # self.finish()
 
 
 class BasicView(BaseView):

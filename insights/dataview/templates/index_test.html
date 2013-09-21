@@ -127,13 +127,27 @@
 <script src="http://code.highcharts.com/modules/data.js"></script>
 <script src="http://code.highcharts.com/modules/exporting.js"></script>
 <script>
+//$(document).ready(function(processed_data) {
 $(function()  {
+//    $('#selected_chart').change(function(){
+//       if( !$(this).data('removedPlaceHolder'))
+//       {
+//          $(this).find('option:first').remove();
+//          $(this).data('removedPlaceHolder', true);
+//       }
+//    });
 
     var range = [5, 10, 15, 20, 25, 30]
 
     {% for chart in charts_list  %}
     {% if charts_data[chart].__len__() > 0 %}
     var {{ chart }}_series = [];
+    // {{ charts_data['dau'] }}
+    // {{ charts_data["{{chart}}"] }}
+    // [1,2,3,4,5]
+
+//    alert('{{ chart }}');
+//    data = {{ charts_data}}
 
     {{ chart }}_series.push({name: "{{ chart }}", data: {{ charts_data[chart] }} });
 

@@ -6,6 +6,12 @@
 from datetime import datetime
 from datetime import timedelta
 
+a = [1, 2, 4]
+
+print a.__len__()
+print len(a)
+
+
 print 5 % 28
 
 today = datetime.utcnow().date()
@@ -21,9 +27,6 @@ print 'yesterday: ' + str(yesterday)
 print 'year: ' + str(today.year)
 print 'month: ' + str(today.month)
 print 'day: ' + str(today.day)
-
-
-
 
 
 now = datetime.utcnow().today().date()
