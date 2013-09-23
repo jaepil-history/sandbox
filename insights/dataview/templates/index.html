@@ -36,17 +36,10 @@
              <tr>
                 <td>
                     <select id='selected_chart' name='selected_chart' style="width:150px;">
-                        <option {% if selected_chart == 'all' %}selected="selected"{% endif %} value="all">All</option>
-                        <option {% if selected_chart == 'dau' %}selected="selected"{% endif %} value="dau">Dau</option>
-                        <option {% if selected_chart == 'installs' %}selected="selected"{% endif %} value="installs">Installed</option>
-                        <option {% if selected_chart == 'removals' %}selected="selected"{% endif %} value="removals">Uninstalled</option>
-                        <option {% if selected_chart == 'invites' %}selected="selected"{% endif %} value="invites">Invite Counts</option>
-                        <option {% if selected_chart == 'logins' %}selected="selected"{% endif %} value="logins">Login Counts</option>
-                        <option {% if selected_chart == 'retention' %}selected="selected"{% endif %} value="retention">Retention</option>
-                        <option {% if selected_chart == 'return' %}selected="selected"{% endif %} value="return">Returning Users</option>
-                        <option {% if selected_chart == 'viral' %}selected="selected"{% endif %} value="viral">Virality</option>
-                        <option {% if selected_chart == selected_chart == 'revenue' %}selected="selected"{% endif %} value="revenue">Revenue</option>
-                        <option {% if selected_chart == 'items' %}selected="selected"{% endif %} value="items">Items</option>
+                        {% for c in all_charts  %}
+                            <option {% if c in charts_list %}selected='selected' {% endif %} value="{{ c }}">{{ c }}</option>
+                        {% endfor %}
+                        <!--<option {% if selected_chart == 'DAU' %}selected="selected"{% endif %} value="DAU">DAU</option>-->
                     </select>
                 </td>
                 <td>
@@ -87,10 +80,10 @@
 {% for chart in charts_list  %}
     <h2>{{ chart }}</h2>
     {% if charts_data[chart].__len__() > 0 %}
-        <div class="span6" id="{{ chart }}_container" style="min-width: 400px; height: 600px; margin: auto"></div>
+        <div class="span6" id="{{ chart }}_container" style="min-width: 400px; height: 400px; margin: auto"></div>
     {% else %}
         <div class='message'>No data</div>
-    {% endif %}{# len #}
+    {% endif %}{# if_charts_data #}
 {% endfor %}
 </div>
 <!-- sub menu -->
@@ -145,23 +138,23 @@ $(function()  {
             marginBottom: 60
         },
         title: {
-            text: '줌아웃 조준 사격시 명중률과 거리에 따른 데미지 기대값',
+            text: '{{ chart }}',
             x: -20 //center
         },
         subtitle: {
-            text: '타겟 헤드를 기준으로 했을 때',
+            text: '',
             x: -20
         },
         xAxis: {
             categories: range,
             title: {
-                text: '거리(meter)',
+                text: 'date',
                 y: 20
             }
         },
         yAxis: {
             title: {
-                text: 'Damage(HP)'
+                text: 'number'
             },
             plotLines: [{
                 value: 0,

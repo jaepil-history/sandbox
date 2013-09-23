@@ -1,0 +1,16 @@
+<!-- Graphs ========================================================================= -->
+<div id="charts" class="row-fluid">
+<!--{% if charts_list.__len__() 1 == 1 %}-->
+{% for chart in charts_list  %}
+    <h2>{{ chart }}</h2>
+    {% if charts_data[chart].__len__() > 0 %}
+        <div class="span6" id="{{ chart }}_container" style="min-width: 400px; height: 400px; margin: auto"></div>
+    {% else %}
+        <div class='message'>No data</div>
+    {% endif %}{# if_charts_data #}
+{% endfor %}
+<!--{% else %}-->
+    <!--<div class="span6" id="container3" style="min-width: 400px; height: 400px; margin: auto"></div>-->
+    <!--<div class="span6" id="container4" style="min-width: 400px; height: 400px; margin-left: 10px; margin-right: 10px">-->
+<!--{% endif %}{# if_charts_list #}-->
+</div>

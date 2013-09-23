@@ -50,8 +50,8 @@ class IndexView(BaseView):
 
         print 'request: ' + self.request.uri
 
-        if selected_chart is None:
-            selected_chart = 'all'
+        # if selected_chart is None:
+        #     selected_chart = 'All'
 
         if date_range is None:
             date_range = '1'
@@ -76,7 +76,7 @@ class IndexView(BaseView):
         all_charts = settings.PROCESSED_LIST
         charts_list = []
 
-        if selected_chart != 'all':
+        if selected_chart is not None:
             charts_list.append(selected_chart)
         else:
             charts_list = all_charts
@@ -88,16 +88,16 @@ class IndexView(BaseView):
 
         # {'title',data_array} dictionary format
         dummy_data = {
-            "dau": [1, 2, 3, 4, 5],
-            "installs": [6, 7, 8, 9, 10],
-            "removals": [11, 12, 13, 14, 15],
-            "invites": [16, 17, 18, 19, 20],
-            "logins": [21, 22, 23, 24, 25],
-            "retention": [26, 27, 28, 29, 30],
-            "viral": [31, 32, 33, 34, 35],
-            "return": [36, 37, 38, 39, 40],
-            "revenue": [41, 42, 43, 44, 45],
-            "items": [46, 47, 48, 49, 50]
+            "DAU": [1, 2, 3, 4, 5],
+            "Installs": [6, 7, 8, 9, 10],
+            "Removals": [11, 12, 13, 14, 15],
+            "Invites": [16, 17, 18, 19, 20],
+            "Logins": [21, 22, 23, 24, 25],
+            "Retention": [26, 27, 28, 29, 30],
+            "Virality": [31, 32, 33, 34, 35],
+            "Returning": [36, 37, 38, 39, 40],
+            "Revenue": [41, 42, 43, 44, 45],
+            "Items": [46, 47, 48, 49, 50]
             }
 
         charts_data = {}
