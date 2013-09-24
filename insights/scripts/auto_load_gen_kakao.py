@@ -27,8 +27,9 @@ import settings
 options = settings.parse_options()
 
 class InsightsClient(object):
-    # INSIGHTS_API_URL = "http://api.insights.appspand.com:8001/api/v1/"
-    INSIGHTS_API_URL = "http://localhost:8001/api/v1/"
+    INSIGHTS_API_URL = "http://api.insights.appspand.com:8001/api/v1/"
+    # INSIGHTS_API_URL = "http://192.168.0.170:8001/api/v1/"
+    # INSIGHTS_API_URL = "http://localhost:8001/api/v1/"
 
     def __init__(self, app_id):
         self.app_id = app_id
@@ -168,7 +169,7 @@ def main(options):
     http_clients = []
     for app in apps:
         http_clients.append(InsightsClient(app_id=str(app['_id'])))
-        for uuid in range(45000, 50000):
+        for uuid in range(50000, 51000):
             http_client = http_clients[apps.index(app)]
             # client actions
             http_client.track_apa(uuid)
@@ -188,10 +189,10 @@ def main(options):
     # for app in apps:
     #     http_clients.append(InsightsClient(app_id=str(app['_id'])))
 
-    for i in range(8000):
+    for i in range(1000):
         # client and user are picked randomly
         http_client = http_clients[random.randint(0, len(apps) - 1)]
-        uuid = random.randint(1000, 50000)
+        uuid = random.randint(1000, 51000)
         # client actions
         # time.sleep(0.2 * random.random())
         http_client.track_cpu(uuid)

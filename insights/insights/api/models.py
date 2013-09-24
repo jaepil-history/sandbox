@@ -142,7 +142,9 @@ class User(BaseDoc):
     # meta = {'collection': 'usr'}
 
 
-# cpu : login event
+# cpu : sends user information in a common place in your application, such as a landing page or post-login page,
+# and include the call to send this cpu message on these pages. Additionally, we recommend a cookie is also set to check
+# if the user data was retrieved and sent for that day.
 class UserInformation(BaseDoc):
     """
     s: The UID of the user.
@@ -224,10 +226,32 @@ class Withdrawal(BaseDoc):
     # meta = {'collection': 'wid'}
 
 
-# mtu
+# icu :  to track the consumption of items by users.
+class ItemConsumption(BaseDoc):
+    """
+    s: The UID of the user.
+    data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
+        It must be base64-encoded.
+    ts: The ts in the Epoch time format.
+        Include this parameter to prevent the user's browser from caching the REST API call if sent
+        using JavaScript.
+    """
+
+    _mt = StringField(default='icu')
+    user_uid = LongField(required=True, db_field='uuid')
+    user_level = IntField(required=True, default=1, db_field='ul')
+    friends_count = IntField(db_field='f')
+    item_id = IntField(required=True, db_field='iid')
+    timestamp = IntField(db_field='ts')
+
+
+# mtu :  to track revenue and monetization transactions by users.
 class RevenueTracking(BaseDoc):
     """
     s: The UID of the user.
+    v: The revenue value which must be passed in cents.
+        Example: $1.25 should be passed as 125. Can be either a positive or negative integer.
+        The maximum value that can be passed is 1000000 ($10,000).
     data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
         It must be base64-encoded.
     ts: The ts in the Epoch time format.
@@ -240,7 +264,8 @@ class RevenueTracking(BaseDoc):
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     item_id = IntField(required=True, db_field='iid')
-    amount = FloatField(required=True, db_field='a')
+    currency = IntField(required=True, db_field='cu') # USD:0, KWN:1, YEN:2, ...
+    value = IntField(required=True, db_field='v')
     timestamp = IntField(db_field='ts')
 
 
@@ -278,6 +303,7 @@ class InviteSent(BaseDoc):
     """
 
     _mt = StringField(default='ins')
+    user_uid = LongField(required=True, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     data = StringField()
@@ -298,8 +324,74 @@ class InviteReceived(BaseDoc):
     """
 
     _mt = StringField(default='inr')
+    user_uid = LongField(required=True, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
+    data = StringField()
+    timestamp = IntField(db_field='ts')
+
+
+# rcv
+class Received(BaseDoc):
+    """
+    s: The UID of the user adding the application.
+    ul: The level of the user.
+    f: The number of friends a user has.
+    data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
+        It must be base64-encoded.
+    ts: The ts in the Epoch time format.
+        Include this parameter to prevent the user's browser from caching the REST API call if sent
+        using JavaScript.
+    """
+
+    _mt = StringField(default='rcv')
+    user_uid = LongField(required=True, db_field='uuid')
+    user_level = IntField(required=True, default=1, db_field='ul')
+    friends_count = IntField(db_field='f')
+    data = StringField()
+    timestamp = IntField(db_field='ts')
+
+
+# its
+class ItemSent(BaseDoc):
+    """
+    s: The UID of the user adding the application.
+    ul: The level of the user.
+    f: The number of friends a user has.
+    data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
+        It must be base64-encoded.
+    ts: The ts in the Epoch time format.
+        Include this parameter to prevent the user's browser from caching the REST API call if sent
+        using JavaScript.
+    """
+
+    _mt = StringField(default='its')
+    user_uid = LongField(required=True, db_field='uuid')
+    user_level = IntField(required=True, default=1, db_field='ul')
+    friends_count = IntField(db_field='f')
+    item_id = IntField(required=True, db_field='iid')
+    data = StringField()
+    timestamp = IntField(db_field='ts')
+
+
+# itr
+class ItemReceived(BaseDoc):
+    """
+    s: The UID of the user adding the application.
+    ul: The level of the user.
+    f: The number of friends a user has.
+    data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
+        It must be base64-encoded.
+    ts: The ts in the Epoch time format.
+        Include this parameter to prevent the user's browser from caching the REST API call if sent
+        using JavaScript.
+    """
+
+    _mt = StringField(default='itr')
+    user_uid = LongField(required=True, db_field='uuid')
+    user_level = IntField(required=True, default=1, db_field='ul')
+    friends_count = IntField(db_field='f')
+    item_id = IntField(required=True, db_field='iid')
     data = StringField()
     timestamp = IntField(db_field='ts')
 
@@ -332,6 +424,7 @@ class PageRequest(BaseDoc):
 # gci
 class GoalCounts(BaseDoc):
     _mt = StringField(default='gci')
+    user_uid = LongField(required=True, db_field='uuid')
     data = StringField()
     timestamp = IntField(db_field='ts')
 

@@ -49,8 +49,9 @@ def api_main(args, config):
         options=config,
         mongodb_client=mongodb_client
     )
+    application.add_handlers(config.host, urls.handlers)
     # application.add_handlers("api.insights.appspand.com", urls.handlers)
-    application.add_handlers("localhost", urls.handlers)
+    # application.add_handlers("localhost", urls.handlers)
 
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(config.port)
