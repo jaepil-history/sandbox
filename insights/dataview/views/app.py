@@ -41,7 +41,6 @@ class IndexView(BaseView):
     @gen.coroutine
     def get(self):
 
-        # category = self.get_argument('category', None)
         selected_chart = self.get_argument('selected_chart', None)
         date_range = self.get_argument('date_range', None)
         date_from = self.get_argument('date_from', None)
@@ -49,9 +48,6 @@ class IndexView(BaseView):
         group = self.get_argument('group', None)
 
         print 'request: ' + self.request.uri
-
-        # if selected_chart is None:
-        #     selected_chart = 'All'
 
         if date_range is None:
             date_range = '1'
@@ -132,15 +128,13 @@ class BasicView(BaseView):
     @gen.coroutine
     def get(self):
 
-        # category = self.get_argument('category', None)
         selected_chart = self.get_argument('selected_chart', None)
         date_range = self.get_argument('date_range', None)
         date_from = self.get_argument('date_from', None)
         date_to = self.get_argument('date_to', None)
         group = self.get_argument('group', None)
 
-        if selected_chart is None:
-            selected_chart = 'all'
+        print 'request: ' + self.request.uri
 
         if date_range is None:
             date_range = '1'
@@ -162,45 +156,50 @@ class BasicView(BaseView):
         else:
             print 'date_range is not proper'
 
-        # date_from = str(date_from)
-        # date_to = str(date_to)
+        all_charts = settings.PROCESSED_LIST
+        charts_list = []
 
-        all_processed_list = settings.PROCESSED_LIST
-
-        if selected_chart:
-            processed_list = selected_chart
+        if selected_chart is not None:
+            charts_list.append(selected_chart)
         else:
-            processed_list = all_processed_list
+            charts_list = all_charts
 
-        print 'processed_list: ' + str(processed_list)
-        print 'all_list: ' + str(all_processed_list)
+        print 'charts_list: ' + str(charts_list)
+        print 'all_list: ' + str(all_charts)
 
-        # processed_data = processed_data_model.get_processed_data(processed_list, date_from, date_to)
+        # charts_data = processed_data_model.get_processed_data(charts_list, date_from, date_to)
 
-        # Convert the dates to local time for display
-        # date_from = utc_unixtime_to_localtime(date_from)
-        # date_to = utc_unixtime_to_localtime(date_to)
+        # {'title',data_array} dictionary format
+        dummy_data = {
+            "DAU": [1, 2, 3, 4, 5],
+            "Installs": [6, 7, 8, 9, 10],
+            "Removals": [11, 12, 13, 14, 15],
+            "Invites": [16, 17, 18, 19, 20],
+            "Logins": [21, 22, 23, 24, 25],
+            "Retention": [26, 27, 28, 29, 30],
+            "Virality": [31, 32, 33, 34, 35],
+            "Returning": [36, 37, 38, 39, 40],
+            "Revenue": [41, 42, 43, 44, 45],
+            "Items": [46, 47, 48, 49, 50]
+            }
 
-        # Get the difference between UTC and localtime - used to display
-        # the ticks in the charts
-        zone_difference = localtime_utc_timedelta()
+        charts_data = {}
 
-        # Get the max date - utc, converted to localtime
-        max_date = utc_now_to_localtime()
+        for title in charts_list:
+            charts_data[title] = dummy_data[title]
+
+        print 'charts_data: ' + str(charts_data)
 
         self.render('basic.html',
                 current_page=self.current_page,
-                # all_processed_list=all_processed_list,
-                # processed_list=processed_list,
-                # selected_data=selected_data,
-                # processed_data=processed_data,
+                all_charts=all_charts,
+                charts_list=charts_list,
                 selected_chart=selected_chart,
+                charts_data=charts_data,
                 date_range=date_range,
                 date_from=date_from,
                 date_to=date_to,
                 group=group
-                # zone_difference=zone_difference,
-                # max_date=max_date
         )
         self.finish()
 

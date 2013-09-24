@@ -9,7 +9,7 @@
 
 {% block content %}
 <h2>
-    <form action="{{ base_url|url('basic') }}">
+    <form action="{{ base_url|url('index') }}">
         <table>
             <tr>
                 <th align=left>
@@ -33,17 +33,10 @@
              <tr>
                 <td>
                     <select id='selected_chart' name='selected_chart' style="width:150px;">
-                        <option {% if selected_chart == 'all' %}selected="selected"{% endif %} value="all">All</option>
-                        <option {% if selected_chart == 'dau' %}selected="selected"{% endif %} value="dau">Dau</option>
-                        <option {% if selected_chart == 'installs' %}selected="selected"{% endif %} value="installs">Installed</option>
-                        <option {% if selected_chart == 'removals' %}selected="selected"{% endif %} value="removals">Uninstalled</option>
-                        <option {% if selected_chart == 'invites' %}selected="selected"{% endif %} value="invites">Invite Counts</option>
-                        <option {% if selected_chart == 'logins' %}selected="selected"{% endif %} value="logins">Login Counts</option>
-                        <option {% if selected_chart == 'retention' %}selected="selected"{% endif %} value="retention">Retention</option>
-                        <option {% if selected_chart == 'return' %}selected="selected"{% endif %} value="return">Returning Users</option>
-                        <option {% if selected_chart == 'viral' %}selected="selected"{% endif %} value="viral">Virality</option>
-                        <option {% if selected_chart == selected_chart == 'revenue' %}selected="selected"{% endif %} value="revenue">Revenue</option>
-                        <option {% if selected_chart == 'items' %}selected="selected"{% endif %} value="items">Items</option>
+                        {% for c in all_charts  %}
+                            <option {% if c in charts_list %}selected='selected' {% endif %} value="{{ c }}">{{ c }}</option>
+                        {% endfor %}
+                        <!--<option {% if selected_chart == 'DAU' %}selected="selected"{% endif %} value="DAU">DAU</option>-->
                     </select>
                 </td>
                 <td>
@@ -79,15 +72,23 @@
 <h2>Dashboard</h2>
 <!-- sub menu -->
 <h3>Activity</h3>
-<!-- chart view -->
-<div class="chart">
-
-
+<!-- Graphs ========================================================================= -->
+<div id="charts" class="row-fluid">
+{% for chart in charts_list  %}
+    <h2>{{ chart }}</h2>
+    {% if charts_data[chart].__len__() > 0 %}
+        <div class="span6" id="{{ chart }}_container" style="min-width: 400px; height: 400px; margin: auto"></div>
+    {% else %}
+        <div class='message'>No data</div>
+    {% endif %}{# if_charts_data #}
+{% endfor %}
 </div>
 <!-- sub menu -->
 <h3>Monetization</h3>
 <!-- chart view -->
+
 <div class="chart">
+
 </div>
 <!-- sub menu -->
 <h3>Events</h3>
@@ -111,8 +112,74 @@
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 <script src='/media/js/jquery-ui-timepicker-addon.js'></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/highcharts-more.js"></script>
+<script src="http://code.highcharts.com/modules/data.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
 <script>
-$(document).ready(function() {
+$(function()  {
+
+    var range = [5, 10, 15, 20, 25, 30]
+
+    {% for chart in charts_list  %}
+    {% if charts_data[chart].__len__() > 0 %}
+    var {{ chart }}_series = [];
+
+    {{ chart }}_series.push({name: "{{ chart }}", data: {{ charts_data[chart] }} });
+
+    var {{ chart }}_chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{{ chart }}_container',
+            type: 'line',
+            marginRight: 130,
+            marginBottom: 60
+        },
+        title: {
+            text: '{{ chart }}',
+            x: -20 //center
+        },
+        subtitle: {
+            text: '',
+            x: -20
+        },
+        xAxis: {
+            categories: range,
+            title: {
+                text: 'date',
+                y: 20
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'number'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            formatter: function() {
+                return '<b>'+ this.series.name +'</b><br/>'+
+                    this.x +': '+ this.y +'HP';
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'top',
+            x: -10,
+            y: 30,
+            borderWidth: 0
+        },
+        series: {{ chart }}_series
+    });
+    {% else %}
+        alert('There is no data');
+    {% endif %}{# len #}
+    {% endfor %}{# chart #}
+
     var endDate = -1; // 기준일: 하루전
     $("#date_from").datepicker({
         dateFormat:'yy-mm-dd',
@@ -164,6 +231,7 @@ $(document).ready(function() {
         onSelect: function (selectedDateTime){
         }
     });
+
 });
 </script>
 {% endblock %}

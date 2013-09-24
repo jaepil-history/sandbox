@@ -73,40 +73,6 @@ class DashboardModel(BaseModel):
         return process_check
 
 
-class DiscoveryModel(BaseModel):
-    
-    def __init__(self):
-        super(DiscoveryModel, self).__init__()
-
-    """
-    Return pymongo object of processed data
-    """
-    def get_data(self, checked_list, date_from, date_to):
-        
-        process_data = {}
-        for process in checked_list:
-            row = self.mongo.get_collection(process)
-            cursor = row.find({"time": {"$gte": date_from, '$lte': date_to}}).sort('time', ASCENDING) 
-            
-            process_data[process] = cursor
-
-        return process_data
-
-    """
-    Used in the Javascript calendar - doesn't permit checks for dates before this date
-    """
-    def get_first_check_date(self):
-        row = self.mongo.get_collection('cpu')
-        start_date = row.find_one()
-
-        if start_date != None:
-            start_date = start_date.get('time', 0)
-        else:
-            start_date = 0
-
-        return start_date
-
-
 class ProcessedDataModel(BaseModel):
 
     def __init__(self):
@@ -115,21 +81,21 @@ class ProcessedDataModel(BaseModel):
     """
     Return pymongo object of processed data
     """
-    def get_processed_data(self, active_checks, date_from, date_to):
+    def get_processed_data(self, selected_data, date_from, date_to, group):
 
-        checks = {}
+        data = {}
 
-        for check in active_checks:
+        for check in selected_data:
             row = self.mongo.get_collection(check)
 
             if row is None:
                 print 'collection is None'
                 try:
-                    checks[check] = row.find({"time": {"$gte": date_from,"$lte": date_to }}).sort('time', ASCENDING)
+                    data[check] = row.find({"_dt": {"$gte": date_from,"$lte": date_to }}).sort('_dt', ASCENDING)
                 except IndexError:
-                    checks[check] = False
+                    data[check] = False
 
-        return checks
+        return data
 
     """
     Used in the Javascript calendar - doesn't permit checks for dates before this date
@@ -182,5 +148,4 @@ class UserModel(BaseModel):
 
 processed_data_model = ProcessedDataModel()
 dashboard_model = DashboardModel()
-discovery_model = DiscoveryModel()
 user_model = UserModel()

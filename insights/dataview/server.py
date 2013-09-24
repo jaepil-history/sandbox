@@ -9,9 +9,7 @@ from dataview.views.app import(
         BasicView,
         AnalyticsView,
         OperationView,
-        ProcessedDataView,
         DashboardView,
-        DiscoveryView,
         SettingsView,
         SettingsChangePasswordView)
 from dataview.views.auth import LoginView, CreateUserView, LogoutView
