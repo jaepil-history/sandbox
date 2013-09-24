@@ -5,7 +5,7 @@ import calendar
 from pytz import timezone
 import pytz
 
-from dataview.core import settings
+from dataview.config import settings
 
 
 def localtime_utc_timedelta(_timezone=None):

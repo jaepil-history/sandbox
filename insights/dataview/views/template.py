@@ -5,8 +5,8 @@ import re
 from jinja2 import Environment, FileSystemLoader
 import pytz
 
-from dataview.core import settings
-from dataview.settings import TEMPLATES_DIR
+from dataview.config import settings
+from dataview.defaults import TEMPLATES_DIR
 from dataview.utils.dates import utc_unixtime_to_localtime
 from dataview.libs.jinja2htmlcompress import SelectiveHTMLCompress
 

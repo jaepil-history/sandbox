@@ -13,9 +13,8 @@ from dataview.views.app import(
         SettingsView,
         SettingsChangePasswordView)
 from dataview.views.auth import LoginView, CreateUserView, LogoutView
-from dataview.settings import PROJECT_ROOT
-from dataview.core import settings
-from dataview.views.api import ApiLogs, ApiException
+from dataview.defaults import PROJECT_ROOT
+from dataview.config import settings
 
 
 login_url = "{0}:{1}/login".format(settings.WEB_APP['host'], settings.WEB_APP['port'])\
@@ -41,9 +40,6 @@ handlers = [
 	(r"/login", LoginView),
 	(r"/logout", LogoutView),
 	(r"/create_user", CreateUserView),
-	# API
-	(r"/api/log/{0}".format(settings.SECRET_KEY), ApiLogs),
-	(r"/api/exception/{0}".format(settings.SECRET_KEY), ApiException),
 	# Static
 	(r"/media/(.*)", tornado.web.StaticFileHandler, {"path": app_settings['static_path']})
 ]

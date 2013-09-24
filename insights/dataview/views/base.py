@@ -4,7 +4,7 @@ from os import getenv
 import tornado.web
 from dataview import __version__
 
-from dataview.core import settings
+from dataview.config import settings
 from dataview.libs.session import MongoDBSession
 from dataview.views.template import render as jinja_render
 

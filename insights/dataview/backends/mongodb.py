@@ -3,8 +3,7 @@ try:
 except ImportError:
     pymongo = None
 
-from dataview.core.exceptions import ImproperlyConfigured
-from dataview.core import settings
+from dataview.config import settings
 
 
 class MongoBackend():
@@ -20,11 +19,6 @@ class MongoBackend():
     valid_collections = settings.PROCESSED_LIST + internal_collections
 
     def __init__(self):
-        if not pymongo:
-            raise ImproperlyConfigured(
-                    "You need to install the pymongo library to use the "
-                    "MongoDB backend.")
-
         self._database = None
         self._connection = None
 

@@ -2,7 +2,7 @@ from datetime import timedelta
 from tornado import web
 from tornado import gen
 
-from dataview.core import settings
+from dataview.config import settings
 from dataview.views.base import BaseView
 from dataview.utils.dates import (
         datestring_to_utc_datetime,
@@ -15,7 +15,6 @@ from dataview.utils.dates import (
 from dataview.views.models import (
         processed_data_model,
         dashboard_model,
-        discovery_model,
         user_model
         )
 
