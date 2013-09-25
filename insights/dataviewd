@@ -14,7 +14,7 @@ import sys
 
 from dataview.daemon import Daemon
 from dataview.server import application
-from dataview.core import settings
+from dataview.config import settings
 from dataview import __version__
 import tornado.ioloop
 
