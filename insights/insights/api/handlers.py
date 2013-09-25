@@ -67,7 +67,10 @@ class BaseHandler(tornado.web.RequestHandler):
         @tornado.gen.coroutine
         def get_user(self, collection_name, uuid, start=None, end=None):
             app_info = yield self.get_app_info()
-            collection_name_items = [self.context.get_app_id(), "event", collection_name]
+            now = datetime.utcnow().today().date()
+            middle = ["%04d" % now.year, "%02d" % now.month]
+            middle_name = ".".join(middle)
+            collection_name_items = [self.context.get_app_id(), middle_name, collection_name]
             canonical_collection_name = ".".join(collection_name_items)
             connection = self.connection["insights"]
             database = connection[app_info.cluster.db_name]
@@ -111,7 +114,10 @@ class BaseHandler(tornado.web.RequestHandler):
 
         @tornado.gen.coroutine
         def insert_legacy(self, app_info, doc):
-            collection_name_items = [self.context.get_app_id(), "event", "all"]
+            now = datetime.utcnow().today().date()
+            middle = ["%04d" % now.year, "%02d" % now.month]
+            middle_name = ".".join(middle)
+            collection_name_items = [self.context.get_app_id(), middle_name, "all"]
             canonical_collection_name = ".".join(collection_name_items)
 
             connection = self.connection["insights"]
@@ -128,7 +134,10 @@ class BaseHandler(tornado.web.RequestHandler):
             app_info = yield self.get_app_info()
             yield self.insert_legacy(app_info=app_info, doc=doc)
 
-            collection_name_items = [self.context.get_app_id(), "event", collection_name]
+            now = datetime.utcnow().today().date()
+            middle = ["%04d" % now.year, "%02d" % now.month]
+            middle_name = ".".join(middle)
+            collection_name_items = [self.context.get_app_id(), middle_name, collection_name]
             canonical_collection_name = ".".join(collection_name_items)
 
             connection = self.connection["insights"]
@@ -169,20 +178,6 @@ class ApplicationAddedHandler(BaseHandler):
         usr.last_login_at = datetime.utcnow()
         yield usr.save(db_context=self.db_context, collection_name="usr", validate=True)
 
-        # insert dau table for the first time login
-        today = datetime.utcnow().date()
-        tomorrow = today + timedelta(days=1)
-        start = datetime(today.year, today.month, today.day, 00, 00, 00)
-        end = datetime(tomorrow.year, tomorrow.month, tomorrow.day, 00, 00, 00)
-        diff_days = (today - apa._dt.date()).days
-        isExist = yield self.db_context.get_user('dau', apa.user_uid, start, end)
-        if diff_days == 0 and isExist is None:
-            dau = models.DAU()
-            dau.user_uid = apa.user_uid
-            dau.user_level = apa.user_level
-            dau.friends_count = apa.friends_count
-            yield dau.save(db_context=self.db_context, collection_name="dau", validate=True)
-
         self.write("1")
         self.finish()
 
@@ -211,20 +206,96 @@ class UserInformationHandler(BaseHandler):
         last_login_at = cpu._dt
         yield self.db_context.update_user(uuid, user_level, friends_count, last_login_at)
 
-        # insert dau table for the first time login
-        today = datetime.utcnow().date()
-        tomorrow = today + timedelta(days=1)
-        start = datetime(today.year, today.month, today.day, 00, 00, 00)
-        end = datetime(tomorrow.year, tomorrow.month, tomorrow.day, 00, 00, 00)
-        diff_days = (today - cpu._dt.date()).days
-        isExist = yield self.db_context.get_user('dau', cpu.user_uid, start, end)
-        if diff_days == 0 and isExist is None:
-            dau = models.DAU()
-            dau.user_uid = cpu.user_uid
-            dau.user_level = cpu.user_level
-            dau.friends_count = cpu.friends_count
-            yield dau.save(db_context=self.db_context, collection_name="dau", validate=True)
+        self.write("1")
+        self.finish()
 
+
+class LogoutHandler(BaseHandler):
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self):
+        lgt = models.Logout(**self.context.arguments)
+        yield lgt.save(db_context=self.db_context, collection_name="lgt", validate=True)
+        self.write("1")
+        self.finish()
+
+
+class WithdrawalHandler(BaseHandler):
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self):
+        wid = models.Withdrawal(**self.context.arguments)
+        yield wid.save(db_context=self.db_context, collection_name="wid", validate=True)
+        self.write("1")
+        self.finish()
+
+
+class InviteSentHandler(BaseHandler):
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self):
+        ins = models.InviteSent(**self.context.arguments)
+        yield ins.save(db_context=self.db_context, collection_name="ins", validate=True)
+        self.write("1")
+        self.finish()
+
+
+class MessageReceivedHandler(BaseHandler):
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self):
+        msr = models.MessageReceived(**self.context.arguments)
+        yield msr.save(db_context=self.db_context, collection_name="msr", validate=True)
+        self.write("1")
+        self.finish()
+
+
+class ItemSentHandler(BaseHandler):
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self):
+        its = models.ItemSent(**self.context.arguments)
+        yield its.save(db_context=self.db_context, collection_name="its", validate=True)
+        self.write("1")
+        self.finish()
+
+
+class ItemReceivedHandler(BaseHandler):
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self):
+        itr = models.ItemReceived(**self.context.arguments)
+        yield itr.save(db_context=self.db_context, collection_name="itr", validate=True)
+        self.write("1")
+        self.finish()
+
+
+class RevenueTrackingHandler(BaseHandler):
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self):
+        mtu = models.RevenueTracking(**self.context.arguments)
+        yield mtu.save(db_context=self.db_context, collection_name="mtu", validate=True)
+        self.write("1")
+        self.finish()
+
+
+class ItemConsumptionHandler(BaseHandler):
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self):
+        icu = models.ItemConsumption(**self.context.arguments)
+        yield icu.save(db_context=self.db_context, collection_name="icu", validate=True)
+        self.write("1")
+        self.finish()
+
+
+class InGameResultHandler(BaseHandler):
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self):
+        igr = models.InGameResult(**self.context.arguments)
+        yield igr.save(db_context=self.db_context, collection_name="igr", validate=True)
         self.write("1")
         self.finish()
 
@@ -239,28 +310,6 @@ class CustomEventHandler(BaseHandler):
         self.finish()
 
 
-class InviteSentHandler(BaseHandler):
-    pass
-
-
-class InviteReceivedHandler(BaseHandler):
-    pass
-
-
-class GoalCountsHandler(BaseHandler):
-    pass
-
-
-class RevenueTrackingHandler(BaseHandler):
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
-    def get(self):
-        mtu = models.RevenueTracking(**self.context.arguments)
-        yield mtu.save(db_context=self.db_context, collection_name="mtu", validate=True)
-        self.write("1")
-        self.finish()
-
-
 class PageRequestHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.coroutine
@@ -269,6 +318,14 @@ class PageRequestHandler(BaseHandler):
         yield pgr.save(db_context=self.db_context, collection_name="pgr", validate=True)
         self.write("1")
         self.finish()
+
+
+class InviteReceivedHandler(BaseHandler):
+    pass
+
+
+class GoalCountsHandler(BaseHandler):
+    pass
 
 
 class StreamPostHandler(BaseHandler):

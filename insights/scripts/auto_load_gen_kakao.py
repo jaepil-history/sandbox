@@ -80,14 +80,73 @@ class InsightsClient(object):
         url = self.make_request(self.app_id, "cpu", params)
         self.send_request(url)
 
+    def track_lgt(self, uuid):
+        params = {
+            "uuid": uuid,
+            "f": random.randint(0, 1000),
+            "ul": random.randint(1, 100)
+        }
+
+        url = self.make_request(self.app_id, "lgt", params)
+        self.send_request(url)
+
+    def track_wid(self, uuid):
+        params = {
+            "uuid": uuid,
+            "f": random.randint(0, 1000),
+            "ul": random.randint(1, 100)
+        }
+
+        url = self.make_request(self.app_id, "wid", params)
+        self.send_request(url)
+
     def track_evt(self):
         pass
 
-    def track_ins(self):
-        pass
+    def track_ins(self, uuid):
+        params = {
+            "uuid": uuid,
+            "f": random.randint(0, 1000),
+            "ul": random.randint(1, 100)
+        }
+
+        url = self.make_request(self.app_id, "ins", params)
+        self.send_request(url)
 
     def track_inr(self):
         pass
+
+    def track_msr(self, uuid):
+        params = {
+            "uuid": uuid,
+            "f": random.randint(0, 1000),
+            "ul": random.randint(1, 100)
+        }
+
+        url = self.make_request(self.app_id, "msr", params)
+        self.send_request(url)
+
+    def track_its(self, uuid):
+        params = {
+            "uuid": uuid,
+            "f": random.randint(0, 1000),
+            "ul": random.randint(1, 100),
+            "iid": random.randint(1, 30)
+        }
+
+        url = self.make_request(self.app_id, "its", params)
+        self.send_request(url)
+
+    def track_itr(self, uuid):
+        params = {
+            "uuid": uuid,
+            "f": random.randint(0, 1000),
+            "ul": random.randint(1, 100),
+            "iid": random.randint(1, 30)
+        }
+
+        url = self.make_request(self.app_id, "itr", params)
+        self.send_request(url)
 
     def track_gci(self):
         pass
@@ -98,10 +157,33 @@ class InsightsClient(object):
             "f": random.randint(0, 1000),
             "ul": random.randint(1, 100),
             "iid": random.randint(1, 30),
-            "a": random.random() * 1000
+            "cu": random.randint(0, 1),
+            "v": random.randint(100, 50000)
         }
 
         url = self.make_request(self.app_id, "mtu", params)
+        self.send_request(url)
+
+    def track_icu(self, uuid):
+        params = {
+            "uuid": uuid,
+            "f": random.randint(0, 1000),
+            "ul": random.randint(1, 100),
+            "iid": random.randint(1, 30)
+        }
+
+        url = self.make_request(self.app_id, "icu", params)
+        self.send_request(url)
+
+    def track_igr(self, uuid):
+        params = {
+            "uuid": uuid,
+            "f": random.randint(0, 1000),
+            "ul": random.randint(1, 100),
+            "data": random.randint(1, 30)
+        }
+
+        url = self.make_request(self.app_id, "igr", params)
         self.send_request(url)
 
     def track_pgr(self, uuid):
@@ -169,12 +251,11 @@ def main(options):
     http_clients = []
     for app in apps:
         http_clients.append(InsightsClient(app_id=str(app['_id'])))
-        for uuid in range(50000, 51000):
+        for uuid in range(10000, 20000):
             http_client = http_clients[apps.index(app)]
             # client actions
             http_client.track_apa(uuid)
 
-    #
     # for uuid in range(10000, 20000):
     #     # client and user are picked randomly
     #     http_client = http_clients[random.randint(0, len(apps) - 1)]
@@ -189,15 +270,21 @@ def main(options):
     # for app in apps:
     #     http_clients.append(InsightsClient(app_id=str(app['_id'])))
 
-    for i in range(1000):
+    for i in range(20000):
         # client and user are picked randomly
         http_client = http_clients[random.randint(0, len(apps) - 1)]
-        uuid = random.randint(1000, 51000)
+        uuid = random.randint(10000, 20000)
         # client actions
-        # time.sleep(0.2 * random.random())
         http_client.track_cpu(uuid)
-        http_client.track_pgr(uuid)
+        http_client.track_lgt(uuid)
+        http_client.track_wid(uuid)
+        http_client.track_ins(uuid)
+        http_client.track_msr(uuid)
+        http_client.track_its(uuid)
+        http_client.track_itr(uuid)
         http_client.track_mtu(uuid)
+        http_client.track_icu(uuid)
+        http_client.track_igr(uuid)
 
 
 if __name__ == "__main__":
