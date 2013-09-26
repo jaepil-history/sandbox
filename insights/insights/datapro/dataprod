@@ -8,8 +8,8 @@ import time
 import logging
 
 from insights.datapro import __version__
-from insights.datapro.system.daemon import Daemon
-from insights.datapro.system import runner
+from insights.system.daemon import Daemon
+from insights.system import runner
 from insights.datapro import settings
 from insights.datapro.api.dbhandler import DBHandler
 from pymongo import MongoClient
