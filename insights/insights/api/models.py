@@ -125,8 +125,10 @@ class User(BaseDoc):
     s: The UID of the user adding the application.
     ul: The level of the user. Installation or reinstallation
     f: The number of friends a user has.
-    data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
-        It must be base64-encoded.
+    c: created datetime
+    l_in: last login datetime
+    ln: login count a day
+    w: withdrawal
     ts: The ts in the Epoch time format.
         Include this parameter to prevent the user's browser from caching the REST API call if sent
         using JavaScript.
@@ -138,6 +140,7 @@ class User(BaseDoc):
     created_at = DateTimeField(required=True, db_field='c')
     last_login_at = DateTimeField(required=True, db_field='l_in')
     logins_a_day = ListField(IntField(), default=lambda: [0 for x in range(MAX_RETENTION_DAYS)], db_field='ln')
+    withdrawal = BooleanField(default=False, db_field='w')
     timestamp = IntField(db_field='ts')
     # meta = {'collection': 'usr'}
 

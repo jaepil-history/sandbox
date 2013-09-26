@@ -7,9 +7,8 @@ from datetime import datetime
 from datetime import timedelta
 
 
-print 'datetime.utcnow().date(): ' + str(datetime.utcnow().date())
-print 'datetime.utcnow().today(): ' + str(datetime.utcnow().today())
-print 'datetime.utcnow().today().date(): ' + str(datetime.utcnow().today().date())
+print 'datetime.utcnow(): ' + str(datetime.utcnow())
+print 'datetime.today(): ' + str(datetime.today())
 
 
 today = datetime.utcnow().date()
@@ -27,7 +26,7 @@ print 'month: ' + str(today.month)
 print 'day: ' + str(today.day)
 
 
-now = datetime.utcnow().today().date()
+now = datetime.utcnow().date()
 print 'now: ' + str(now)
 
 prefix = ["%04d" % now.year,

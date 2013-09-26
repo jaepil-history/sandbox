@@ -65,29 +65,9 @@ class BaseHandler(tornado.web.RequestHandler):
             raise tornado.gen.Return(app_info)
 
         @tornado.gen.coroutine
-        def get_user(self, collection_name, uuid, start=None, end=None):
-            app_info = yield self.get_app_info()
-            now = datetime.utcnow().today().date()
-            middle = ["%04d" % now.year, "%02d" % now.month]
-            middle_name = ".".join(middle)
-            collection_name_items = [self.context.get_app_id(), middle_name, collection_name]
-            canonical_collection_name = ".".join(collection_name_items)
-            connection = self.connection["insights"]
-            database = connection[app_info.cluster.db_name]
-            collection = database[canonical_collection_name]
-
-            doc = yield motor.Op(collection.find_one, {"uuid": uuid, '_dt': {'$gte':start, '$lt':end}})
-            if doc is None:
-                raise tornado.gen.Return(None)
-                # raise Exception("User ID not found")
-
-            user = models.User(**doc)
-            raise tornado.gen.Return(user)
-
-        @tornado.gen.coroutine
         def update_user(self, uuid, user_level, friends_count, last_login_at):
             app_info = yield self.get_app_info()
-            collection_name_items = [self.context.get_app_id(), "event", "usr"]
+            collection_name_items = [self.context.get_app_id(), "usr"]
             canonical_collection_name = ".".join(collection_name_items)
 
             connection = self.connection["insights"]
@@ -114,7 +94,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
         @tornado.gen.coroutine
         def insert_legacy(self, app_info, doc):
-            now = datetime.utcnow().today().date()
+            now = datetime.utcnow().date()
             middle = ["%04d" % now.year, "%02d" % now.month]
             middle_name = ".".join(middle)
             collection_name_items = [self.context.get_app_id(), middle_name, "all"]
@@ -128,25 +108,27 @@ class BaseHandler(tornado.web.RequestHandler):
 
         @tornado.gen.coroutine
         def insert(self, collection_name, doc):
+            app_info = yield self.get_app_info()
+
             if collection_name is None:
                 raise Exception("Collection name is not specified")
+            elif collection_name == 'usr':
+                collection_name_items = [self.context.get_app_id(), collection_name]
+            else:
+                yield self.insert_legacy(app_info=app_info, doc=doc)
+                now = datetime.utcnow().date()
+                middle = ["%04d" % now.year, "%02d" % now.month]
+                middle_name = ".".join(middle)
+                collection_name_items = [self.context.get_app_id(), middle_name, collection_name]
 
-            app_info = yield self.get_app_info()
-            yield self.insert_legacy(app_info=app_info, doc=doc)
-
-            now = datetime.utcnow().today().date()
-            middle = ["%04d" % now.year, "%02d" % now.month]
-            middle_name = ".".join(middle)
-            collection_name_items = [self.context.get_app_id(), middle_name, collection_name]
             canonical_collection_name = ".".join(collection_name_items)
-
             connection = self.connection["insights"]
             database = connection[app_info.cluster.db_name]
             collection = database[canonical_collection_name]
-
             result = yield motor.Op(collection.insert, doc)
 
             raise tornado.gen.Return(result)
+
 
     def initialize(self):
         super(BaseHandler, self).initialize()

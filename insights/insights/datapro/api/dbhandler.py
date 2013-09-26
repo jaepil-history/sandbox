@@ -8,6 +8,8 @@ try:
 except ImportError:
     pymongo = None
 
+from datetime import datetime
+from datetime import timedelta
 
 class DBHandler(object):
     def __init__(self, dbs):
@@ -47,7 +49,7 @@ class DBHandler(object):
         return app_info
 
 
-    def find_from_insights(self, app_id, collection_name, query=None):
+    def find_from_insights(self, app_id, year_month, collection_name, query=None):
         if collection_name is None:
             raise Exception("Collection name is not specified")
 
@@ -55,7 +57,7 @@ class DBHandler(object):
             app_id = str(app_id)
 
         app_info = self.get_app_info_from_appspand(app_id)
-        collection_name_items = [app_id, "event", collection_name]
+        collection_name_items = [app_id, year_month, collection_name]
         canonical_collection_name = ".".join(collection_name_items)
 
         connection = self.connection["insights"]
