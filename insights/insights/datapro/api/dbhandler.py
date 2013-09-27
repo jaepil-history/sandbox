@@ -68,6 +68,22 @@ class DBHandler(object):
         return cursor
 
 
+    def find_from_usr(self, app_id, query=None):
+        if not isinstance(app_id, basestring):
+            app_id = str(app_id)
+
+        app_info = self.get_app_info_from_appspand(app_id)
+        collection_name_items = [app_id, 'usr']
+        canonical_collection_name = ".".join(collection_name_items)
+
+        connection = self.connection["insights"]
+        database = connection[app_info['cluster']['db_name']]
+        collection = database[canonical_collection_name]
+
+        cursor = collection.find(query)
+        return cursor
+
+
     def find_from_processed(self, app_id, collection_name, query=None):
         if collection_name is None:
             raise Exception("Collection name is not specified")

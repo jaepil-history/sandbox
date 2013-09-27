@@ -48,10 +48,11 @@ class DataProDaemon(object):
         self.db_handler = DBHandler(self.dbs)
 
     def run(self):
-        today = datetime.utcnow().date() + timedelta(days=1)
+
+        today = datetime.utcnow().date()
         yesterday = today - timedelta(days=1)
-        start = datetime(yesterday.year, yesterday.month, yesterday.day, 00, 00, 00)
-        end = datetime(today.year, today.month, today.day, 00, 00, 00)
+        start = datetime.combine(yesterday, time())
+        end = datetime.combine(today, time())
 
         while True:
             print 'datapro is running'

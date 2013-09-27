@@ -119,7 +119,7 @@ class NRUDistribution(BaseResult):
 
     def initialize(self):
         self._dt = datetime.utcnow()
-        yesterday = datetime.utcnow().date() - timedelta(days=1)
+        yesterday = self._dt.date() - timedelta(days=1)
         self.title = str(yesterday)
         # ts : timestamp
         if self.timestamp is None:
@@ -169,7 +169,7 @@ class DAUDistribution(BaseResult):
 
     def initialize(self):
         self._dt = datetime.utcnow()
-        yesterday = datetime.utcnow().date() - timedelta(days=1)
+        yesterday = self._dt.date() - timedelta(days=1)
         self.title = str(yesterday)
         # ts : timestamp
         if self.timestamp is None:
@@ -219,7 +219,7 @@ class UserRetention(Document):
 
     def initialize(self):
         self._dt = datetime.utcnow()
-        self.start_date = self._dt.date()
+        self.start_date = self._dt.date() - timedelta(days=1)
         self.title = str(self.start_date)
         # ts : timestamp
         if self.timestamp is None:

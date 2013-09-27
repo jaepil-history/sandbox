@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     db_handler = DBHandler(dbs)
 
-    today = datetime.utcnow().date() + timedelta(days=1)
+    today = datetime.utcnow().date()
     yesterday = today - timedelta(days=1)
     start = datetime.combine(yesterday, time())
     end = datetime.combine(today, time())

@@ -27,9 +27,13 @@ def run(db_handler, start, end):
 
         nru = models.NRUDistribution()
         ret = models.UserRetention()
+        ret.title
+
+        middle = ["%04d" % start.year, "%02d" % start.month]
+        middle_name = ".".join(middle)
 
         query = {'_dt': {'$gte':start, '$lt':end }}
-        for doc in db_handler.find_from_insights(app_id, 'apa', query):
+        for doc in db_handler.find_from_insights(app_id, middle_name, 'apa', query):
             counts += 1
             last_doc_id = doc['_id']
             nru.accumulate(doc)
@@ -68,7 +72,7 @@ if __name__ == "__main__":
 
     db_handler = DBHandler(dbs)
 
-    today = datetime.utcnow().date() + timedelta(days=1)
+    today = datetime.utcnow().date()
     yesterday = today - timedelta(days=1)
     start = datetime.combine(yesterday, time())
     end = datetime.combine(today, time())

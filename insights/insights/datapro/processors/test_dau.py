@@ -25,26 +25,33 @@ def run(db_handler, start, end):
         last_doc_id = None
         start_cal = datetime.utcnow()
 
-        ret_end = datetime.combine(start_cal.date(), time())
-        ret_start = start_cal.date() - timedelta(days=models.MAX_RETENTION_DAYS)
-        ret_start = datetime.combine(ret_start, time())
+        #middle = ["%04d" % start.year, "%02d" % start.month]
+        #middle_name = ".".join(middle)
 
+        print 'start_cal: ' + str(start_cal)
+        ret_end = end + timedelta(days=1)
+        print 'ret_end: ' + str(ret_end)
+        ret_start = end - timedelta(days=models.MAX_RETENTION_DAYS)
+        ret_start = datetime.combine(ret_start, time())
+        print 'ret_start: ' + str(ret_start)
+
+        print 'calculating retention ...'
         ret_array = []
         query = {'_dt': {'$gte':ret_start, '$lt':ret_end}}
         for ret in db_handler.find_from_processed(app_id, 'ret', query):
-            # print ret
-            # print (start_cal.date() - ret['_dt'].date()).days
+            print ret
+            print (start_cal.date() - ret['_dt'].date()).days
             temp = {str((start_cal.date() - ret['_dt'].date()).days) : ret['nu']}
             ret_array.append(temp)
 
-        # print 'ret_array' + str(ret_array)
+        print 'ret_array: ' + str(ret_array)
 
         for i in range(models.MAX_RETENTION_DAYS):
             pass
 
         dau = models.DAUDistribution()
         query = {'l_in': {'$gte':start, '$lt':end}}
-        for usr in db_handler.find_from_insights(app_id, 'usr', query):
+        for usr in db_handler.find_from_usr(app_id, query):
             counts += 1
             last_doc_id = usr['_id']
             diff = (start_cal.date() - usr['c'].date()).days
@@ -80,7 +87,7 @@ if __name__ == "__main__":
 
     db_handler = DBHandler(dbs)
 
-    today = datetime.utcnow().date() + timedelta(days=1)
+    today = datetime.utcnow().date()
     yesterday = today - timedelta(days=1)
     start = datetime.combine(yesterday, time())
     end = datetime.combine(today, time())
