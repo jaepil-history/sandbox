@@ -27,9 +27,9 @@ import settings
 options = settings.parse_options()
 
 class InsightsClient(object):
-    INSIGHTS_API_URL = "http://api.insights.appspand.com:8001/api/v1/"
+    #INSIGHTS_API_URL = "http://api.insights.appspand.com:8001/api/v1/"
     # INSIGHTS_API_URL = "http://192.168.0.170:8001/api/v1/"
-    # INSIGHTS_API_URL = "http://localhost:8001/api/v1/"
+    INSIGHTS_API_URL = "http://localhost:8001/api/v1/"
 
     def __init__(self, app_id):
         self.app_id = app_id
