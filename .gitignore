@@ -49,3 +49,5 @@ local_settings.py
 # Android
 .gradle
 
+# Sandbox
+sandbox/local
