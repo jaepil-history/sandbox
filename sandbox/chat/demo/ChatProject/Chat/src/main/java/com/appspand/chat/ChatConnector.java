@@ -87,6 +87,8 @@ public class ChatConnector {
                 @Override
                 public void onClose(int code, String reason) {
                     if (D) Log.d(TAG, "Connection lost.");
+
+                    internalOpen(null);
                 }
             });
         } catch (WebSocketException e) {
