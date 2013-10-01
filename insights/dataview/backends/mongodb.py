@@ -16,7 +16,9 @@ class MongoBackend():
     user = settings.MONGO['user']
     password = settings.MONGO['password']
     database = settings.MONGO['database']
-    valid_collections = settings.PROCESSED_LIST + internal_collections
+    valid_collections = internal_collections
+    for item in settings.PROCESSED_LIST:
+        valid_collections.append(item.lower())
 
     def __init__(self):
         self._database = None
@@ -40,15 +42,28 @@ class MongoBackend():
 
         return self._database   
 
-    def get_collection(self, collection):
+
+    def get_collection(self, collection_name, app_id=None):
         db = self.get_database()
-        
-        if collection in self.valid_collections:
-            if collection in self.internal_collections:
-                collection = "{0}".format(collection) # protect the collection that dataview uses internally
+        collection_name = collection_name.lower()
+
+        if collection_name is None:
+            raise Exception("Collection name is not specified")
+
+        if collection_name in self.valid_collections:
+            if app_id is None:
+                if collection_name in self.internal_collections:
+                    collection = "{0}".format(collection_name)  # protect the collection that dataview uses internally
+                else:
+                    return False
             else:
-                collection = "processed_{0}".format(collection)
-            
+                if not isinstance(app_id, basestring):
+                    app_id = str(app_id)
+
+                collection_name_items = [app_id, collection_name]
+                collection = ".".join(collection_name_items)
+
+            print 'collection_name: ' + collection
             collection = db[collection]
         
         else:
@@ -56,28 +71,33 @@ class MongoBackend():
 
         return collection
 
-    
-    def index(self, collection):
-        collection = self.get_collection(collection)
-        collection.ensure_index([('time', pymongo.DESCENDING)])
-    
 
-    def store_entry(self, entry, collection):
-        """ Stores a system entry  """
-        
-        collection = self.get_collection(collection)
-        
-        if collection:
-            collection.save(entry, safe=True)   
+    def find_from_processed(self, app_id, collection_name, query=None):
+        collection = self.get_collection(collection_name, app_id)
+        cursor = collection.find(query)
+        return cursor
 
-    def store_entries(self, entries):
-        ''' 
-            List with dictionaries, loops through all of them and saves them to the database
-            Accepted format:
-            {'cpu': {'time': 1313096288, 'idle': 93, 'wait': 0, 'user': 2, 'system': 5}}
-        '''
-        for key, value in entries.iteritems():
-            self.store_entry(value, key)
-            self.index(key)
+
+    #def index(self, collection):
+    #    collection = self.get_collection(collection)
+    #    collection.ensure_index([('time', pymongo.DESCENDING)])
+    #
+    #def store_entry(self, entry, collection):
+    #    """ Stores a system entry  """
+    #
+    #    collection = self.get_collection(collection)
+    #
+    #    if collection:
+    #        collection.save(entry, safe=True)
+    #
+    #def store_entries(self, entries):
+    #    '''
+    #        List with dictionaries, loops through all of them and saves them to the database
+    #        Accepted format:
+    #        {'cpu': {'time': 1313096288, 'idle': 93, 'wait': 0, 'user': 2, 'system': 5}}
+    #    '''
+    #    for key, value in entries.iteritems():
+    #        self.store_entry(value, key)
+    #        self.index(key)
 
 backend = MongoBackend()

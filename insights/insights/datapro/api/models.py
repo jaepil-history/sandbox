@@ -26,7 +26,7 @@ class BaseResult(Document):
     _dt = DateTimeField(required=True)
     title = StringField(required=True, db_field='t')
     timestamp = IntField(db_field='ts')
-    last_doc_id = ObjectIdField(required=True, db_field='l_id')
+    last_doc_id = ObjectIdField(db_field='l_id') # for reference, not necessary. if doc's count = 0, last_doc_id = None
     runtime = LongField(required=True)
     counts = IntField()
     level = ListField(IntField(), default=lambda: [0 for x in range(MAX_LEVEL)], db_field='lv')
@@ -144,7 +144,7 @@ class NRUDistribution(BaseResult):
                 print ValidationError.to_dict()
 
         doc = self.to_python()
-        result = db_handler.insert_to_processed(app_id=app_id, collection_name='nru', doc=doc)
+        result = db_handler.insert_to_processed(app_id=app_id, collection_name='installs', doc=doc)
         return result
 
     def upsert(self, db_handler, app_id, query, validate=True):
@@ -156,7 +156,7 @@ class NRUDistribution(BaseResult):
                 print ValidationError.to_dict()
 
         doc = self.to_python()
-        result = db_handler.upsert_to_processed(app_id=app_id, collection_name='nru', query=query, doc=doc)
+        result = db_handler.upsert_to_processed(app_id=app_id, collection_name='installs', query=query, doc=doc)
         return result
 
 
@@ -242,7 +242,7 @@ class UserRetention(Document):
                 print ValidationError.to_dict()
 
         doc = self.to_python()
-        result = db_handler.insert_to_processed(app_id=app_id, collection_name='ret', doc=doc)
+        result = db_handler.insert_to_processed(app_id=app_id, collection_name='retention', doc=doc)
         return result
 
     def upsert(self, db_handler, app_id, query, validate=True):
@@ -254,7 +254,7 @@ class UserRetention(Document):
                 print ValidationError.to_dict()
 
         doc = self.to_python()
-        result = db_handler.upsert_to_processed(app_id=app_id, collection_name='ret', query=query, doc=doc)
+        result = db_handler.upsert_to_processed(app_id=app_id, collection_name='retention', query=query, doc=doc)
         return result
 
 

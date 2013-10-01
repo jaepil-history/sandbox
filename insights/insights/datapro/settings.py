@@ -35,8 +35,6 @@ def parse_options(args=None):
                    help="Insights Connection URI for mongodb")
     options.define("mongodb_processed_connection_uri", default="mongodb://localhost:27017", type=str,
                    help="Processed Connection URI for mongodb")
-    options.define("mongodb_retention_connection_uri", default="mongodb://localhost:27017", type=str,
-                   help="Retention Connection URI for mongodb")
     options.define("mongodb_pool_size", default=10, type=int,
                    help="Max. concurrent connection")
     options.define("mongodb_timeout", default=1000 * 10, type=int,
@@ -51,8 +49,10 @@ def parse_options(args=None):
                    help="Database name for insights data")
     options.define("mongodb_processed_db_name", default="processed", type=str,
                    help="Database name for processed data")
-    options.define("mongodb_retention_db_name", default="retention", type=str,
-                   help="Database name for retention data")
+
+    # Processed Data List
+    options.define("processed_list", default=[], type=list,
+                   help="Processed Data List")
 
     # Timezone
     options.define("timezone", default="Asia/Seoul", type=str,

@@ -4,22 +4,16 @@
 # Copyright 2013 Appspand
 
 import sys
-import time
 import logging
-from time import gmtime, strftime
+from time import gmtime, strftime, sleep
 
 from insights.datapro import __version__
-# from insights.datapro.system.daemon import Daemon
-# from insights.datapro.system import runner
+# from insights.system.daemon import Daemon
 from insights.datapro import settings
 from insights.datapro.api.dbhandler import DBHandler
 from pymongo import MongoClient
-from datetime import datetime, timedelta
-
-from processors import test_pymongo
-from processors import test_retention
-from processors import test_count_logins
-from processors import test_nru
+from datetime import datetime, timedelta, time
+from insights.datapro.processors import cal_nru_dau_retention
 
 # Keep all log files in one place
 LOGFILE = 'dataprod.log'
@@ -59,14 +53,13 @@ class DataProDaemon(object):
             print strftime("%Y-%m-%d %H:%M:%S", gmtime())
             print strftime("%a, %d %b %Y %X +0000", gmtime())
 
-            # test_pymongo.run(self.db_handler)
-            test_nru.run(self.db_handler, start, end)
-            test_count_logins.run(self.db_handler, start, end)
+            # pymongo.run(self.db_handler)
+            cal_nru_dau_retention.run(self.db_handler, start, end)
             # test_retention.run(self.db_handler, start, end)
 
-            # Analyze data every 60 seconds
+            # Analyze data every single day
             # time.sleep(self.interval)
-            time.sleep(6000)
+            sleep(60 * 60 * 24)
 
 
 if __name__ == "__main__":

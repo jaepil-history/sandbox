@@ -2,8 +2,10 @@ from hashlib import sha1
 from os import getenv
 
 from pymongo import DESCENDING, ASCENDING
+from bson.json_util import dumps
 
 from dataview.backends.mongodb import MongoBackend
+from datetime import datetime, timedelta, time
 
 
 class BaseModel(object):
@@ -74,6 +76,38 @@ class DashboardModel(BaseModel):
 
 
 class ProcessedDataModel(BaseModel):
+
+    def __init__(self):
+        super(ProcessedDataModel, self).__init__()
+
+    """
+    Return pymongo object of processed data
+    """
+    def get_processed_data(self, app_id, selected_data, date_from, date_to): #, group):
+
+        date_from = date_from - timedelta(days=1)
+        date_to = date_to + timedelta(days=3)
+        #date_from = datetime.strptime(date_from, "%y-%m-%d")
+        #date_to = datetime.strptime(date_to, "%y-%m-%d")
+        date_from = datetime.combine(date_from, time())
+        date_to = datetime.combine(date_to, time())
+        #print 'date_from: ' + str(date_from)
+        #print 'date_to: ' + str(date_to)
+
+        data = {}
+
+        for selected in selected_data:
+            row = self.mongo.get_collection(selected, app_id)
+            print 'row: ' + str(row)
+
+            cursor = row.find({"_dt": {"$gte": date_from, "$lt": date_to }}).sort('_dt', ASCENDING)
+            data[selected] = dumps(cursor)
+            print data[selected]
+
+        return data
+
+
+class ProcessedDataModel_Origin(BaseModel):
 
     def __init__(self):
         super(ProcessedDataModel, self).__init__()

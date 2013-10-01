@@ -3,16 +3,20 @@
 #
 # Copyright 2013 Appspand
 
+
 import sys
-import time
 import logging
+from time import gmtime, strftime, sleep
 
 from insights.datapro import __version__
 from insights.system.daemon import Daemon
-from insights.system import runner
+#from insights.system import runner
 from insights.datapro import settings
 from insights.datapro.api.dbhandler import DBHandler
 from pymongo import MongoClient
+from datetime import datetime, timedelta, time
+from insights.datapro.processors import cal_nru_dau_retention
+
 
 PIDFILE = '/var/run/dataprod.pid'
 # Keep all log files in one place
@@ -45,22 +49,23 @@ class DataProDaemon(Daemon):
 
     def run(self):
 
+        today = datetime.utcnow().date()
+        yesterday = today - timedelta(days=1)
+        start = datetime.combine(yesterday, time())
+        end = datetime.combine(today, time())
+
         while True:
-            system_info = runner.system()
-            try:
-                self.db_handler.store_entries(system_info)
-            except Exception, e:
-                logger.exception('Saving system info failed')
+            print 'datapro is running'
+            print strftime("%Y-%m-%d %H:%M:%S", gmtime())
+            print strftime("%a, %d %b %Y %X +0000", gmtime())
 
-            process_info = runner.processes()
+            # pymongo.run(self.db_handler)
+            cal_nru_dau_retention.run(self.db_handler, start, end)
+            # test_retention.run(self.db_handler, start, end)
 
-            try:
-                self.db_handler.store_entries(process_info)
-            except Exception, e:
-                logger.exception('Saving process info failed')
-
-            # Checks the system every 60 seconds
-            time.sleep(settings.SYSTEM_CHECK_PERIOD)
+            # Analyze data every single day
+            # time.sleep(self.interval)
+            sleep(60 * 60 * 24)
 
 
 if __name__ == "__main__":

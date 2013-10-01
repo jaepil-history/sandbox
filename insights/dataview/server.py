@@ -9,7 +9,6 @@ from dataview.views.app import(
         BasicView,
         AnalyticsView,
         OperationView,
-        DashboardView,
         SettingsView,
         SettingsChangePasswordView)
 from dataview.views.auth import LoginView, CreateUserView, LogoutView
@@ -49,4 +48,5 @@ application = tornado.web.Application(handlers, **app_settings)
 
 if __name__ == "__main__":
     application.listen(int(settings.WEB_APP['port']))
+    print 'dataview listen to ' + settings.WEB_APP['port']
     tornado.ioloop.IOLoop.instance().start()

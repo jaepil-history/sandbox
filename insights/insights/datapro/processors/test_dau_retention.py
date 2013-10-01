@@ -31,35 +31,43 @@ def run(db_handler, start, end):
         print 'start_cal: ' + str(start_cal)
         ret_end = end + timedelta(days=1)
         print 'ret_end: ' + str(ret_end)
-        ret_start = end - timedelta(days=models.MAX_RETENTION_DAYS)
+        ret_start = end - timedelta(days=models.MAX_RETENTION_DAYS - 1)
         ret_start = datetime.combine(ret_start, time())
         print 'ret_start: ' + str(ret_start)
 
         print 'calculating retention ...'
-        ret_array = []
-        query = {'_dt': {'$gte':ret_start, '$lt':ret_end}}
-        for ret in db_handler.find_from_processed(app_id, 'ret', query):
-            print ret
-            print (start_cal.date() - ret['_dt'].date()).days
-            temp = {str((start_cal.date() - ret['_dt'].date()).days) : ret['nu']}
-            ret_array.append(temp)
-
-        print 'ret_array: ' + str(ret_array)
-
-        for i in range(models.MAX_RETENTION_DAYS):
-            pass
+        ret_array = [0 for _ in range(models.MAX_RETENTION_DAYS)]
 
         dau = models.DAUDistribution()
         query = {'l_in': {'$gte':start, '$lt':end}}
         for usr in db_handler.find_from_usr(app_id, query):
             counts += 1
             last_doc_id = usr['_id']
-            diff = (start_cal.date() - usr['c'].date()).days
+            diff = (start_cal.date() - usr['c'].date()).days - 1
+            #print 'diff(dau): ' + str(diff)
             dau.accumulate(usr)
-            # if today - usr['c'] > 0:
-            #     pass
+            ret_array[diff] += 1
 
-        # print 'last_doc_id = ' + str(last_doc_id)
+        query = {'_dt': {'$gte':ret_start, '$lt':ret_end}}
+        for ret in db_handler.find_from_processed(app_id, 'retention', query):
+            #ret_model = models.UserRetention(ret)
+            #print 'ret_model: ' + str(ret_model.to_python())
+            diff = (start_cal.date() - ret['_dt'].date()).days
+            print ret
+            print diff
+            if ret['nu'] != 0:
+                ret_array[diff] = float(ret_array[diff]) / float(ret['nu'])
+            else:
+                ret_array[diff] = 0.0
+            ret['ret'][diff] = ret_array[diff]
+            db_handler.upsert_to_processed(app_id, 'retention', {"_id": ret['_id']}, ret)
+            #ret.upsert(db_handler, )
+
+        print 'ret_array: ' + str(ret_array)
+
+        query = {'_dt': {'$gte':ret_start, '$lt':ret_end}}
+        for ret in db_handler.find_from_processed(app_id, 'retention', query):
+            print ret
 
         end_cal = datetime.utcnow()
         elapsed = (end_cal - start_cal).microseconds * 0.001
@@ -70,7 +78,7 @@ def run(db_handler, start, end):
         dau.last_doc_id = last_doc_id
         dau.runtime = elapsed
 
-        # print dau.to_python()
+        print dau.to_python()
         query = {"t": dau.title}
         dau.upsert(db_handler, app_id, query)
 

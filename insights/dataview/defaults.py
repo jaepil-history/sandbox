@@ -32,26 +32,7 @@ MONGO = {
     'database' : 'processed',
 }
 
-DISCOVERY = config.get('discovery', [])
-EMAILS = config.get('emails', [])
-EVENTS = config.get('events', [])
-INSTALLS = config.get('installs', [])
-INVITES = config.get('invites', [])
-MESSAGES = config.get('messages', [])
-MONETIZATION = config.get('monetization', [])
-NOTIFICATIONS = config.get('notifications', [])
-VIRALITY = config.get('virality', [])
-RETURNING_USERS = config.get('returning_users', [])
-STREAM = config.get('stream', [])
-TRAFFIC = config.get('traffic', [])
-TIME = config.get('time', [])
-USER_DISTRIBUTION = config.get('user_distribution', [])
-USER_RETENTION = config.get('user_retention', [])
-USER_SESSIONS = config.get('user_sessions', [])
-UNIQUE_VISITORS = config.get('unique_visitors', [])
-
 PROCESSED_LIST = config.get('processed_list', [])
-
 
 host = _web_app.get('host', 'http://127.0.0.1')
 
@@ -75,3 +56,20 @@ if key != None and len(key) > 0:
 else:
     SECRET_KEY = 'TGJKhSSeZaPZr24W6GlByAaLVe0VKvg8qs+8O7y=' #Don't break the dataview
 
+#DISCOVERY = config.get('discovery', [])
+#EMAILS = config.get('emails', [])
+#EVENTS = config.get('events', [])
+#INSTALLS = config.get('installs', [])
+#INVITES = config.get('invites', [])
+#MESSAGES = config.get('messages', [])
+#MONETIZATION = config.get('monetization', [])
+#NOTIFICATIONS = config.get('notifications', [])
+#VIRALITY = config.get('virality', [])
+#RETURNING_USERS = config.get('returning_users', [])
+#STREAM = config.get('stream', [])
+#TRAFFIC = config.get('traffic', [])
+#TIME = config.get('time', [])
+#USER_DISTRIBUTION = config.get('user_distribution', [])
+#USER_RETENTION = config.get('user_retention', [])
+#USER_SESSIONS = config.get('user_sessions', [])
+#UNIQUE_VISITORS = config.get('unique_visitors', [])

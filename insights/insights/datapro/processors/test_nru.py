@@ -27,7 +27,7 @@ def run(db_handler, start, end):
 
         nru = models.NRUDistribution()
         ret = models.UserRetention()
-        ret.title
+        #ret.title
 
         middle = ["%04d" % start.year, "%02d" % start.month]
         middle_name = ".".join(middle)
@@ -54,7 +54,7 @@ def run(db_handler, start, end):
         nru.last_doc_id = last_doc_id
         nru.runtime = elapsed
 
-        # print nru.to_python()
+        print nru.to_python()
         query = {"t": nru.title}
         nru.upsert(db_handler, app_id, query)
         # nru.save(db_handler, app_id)
