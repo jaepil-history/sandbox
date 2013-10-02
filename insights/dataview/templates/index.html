@@ -182,7 +182,7 @@ $(function()  {
                 tooltip: {
                     formatter: function() {
                         return '<b>'+ this.series.name +'</b><br/>'+
-                            this.x +': '+ this.y +'HP';
+                            '[ ' + this.x +', '+ this.y + ' ]';
                     }
                 },
                 legend: {
@@ -222,13 +222,13 @@ $(function()  {
                 xAxis: {
                     categories: x_range,
                     title: {
-                        text: 'date',
+                        text: 'days later',
                         y: 20
                     }
                 },
                 yAxis: {
                     title: {
-                        text: 'number'
+                        text: 'ratio'
                     },
                     plotLines: [{
                         value: 0,
@@ -238,8 +238,8 @@ $(function()  {
                 },
                 tooltip: {
                     formatter: function() {
-                        return '<b>'+ this.series.name +'</b><br/>'+
-                            this.x +': '+ this.y +'HP';
+                        return '<b>'+ this.series.name + ' NRU' + '</b><br/>'+
+                            '[ ' + this.x +', '+ this.y + ' ]';
                     }
                 },
                 legend: {

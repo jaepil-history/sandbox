@@ -24,8 +24,8 @@ def cal_nru(db_handler, app_id, start, end):
 
     nru = models.NRUDistribution()
     ret = models.UserRetention()
-    #ret.title
 
+    # fix it when 2 months needed
     middle = ["%04d" % start.year, "%02d" % start.month]
     middle_name = ".".join(middle)
 
@@ -36,22 +36,16 @@ def cal_nru(db_handler, app_id, start, end):
         nru.accumulate(doc)
 
     ret.new_users = counts
-    print ret.to_python()
     query = {"t": ret.title}
     ret.upsert(db_handler, app_id, query)
 
-    # print 'last_doc_id = ' + str(last_doc_id)
-
     end_cal = datetime.utcnow()
     elapsed = (end_cal - start_cal).microseconds * 0.001
-    print 'time to write db: ' + str(elapsed) + 'msec'
-    # print 'counted items: ' + str(counts)
 
     nru.counts = counts
     nru.last_doc_id = last_doc_id
     nru.runtime = elapsed
 
-    print nru.to_python()
     query = {"t": nru.title}
     nru.upsert(db_handler, app_id, query)
 
@@ -62,15 +56,9 @@ def cal_dau_retention(db_handler, app_id, start, end):
     last_doc_id = None
     start_cal = datetime.utcnow()
 
-    #middle = ["%04d" % start.year, "%02d" % start.month]
-    #middle_name = ".".join(middle)
-
-    print 'start_cal: ' + str(start_cal)
     ret_end = end + timedelta(days=1)
-    print 'ret_end: ' + str(ret_end)
     ret_start = end - timedelta(days=models.MAX_RETENTION_DAYS - 1)
     ret_start = datetime.combine(ret_start, time())
-    print 'ret_start: ' + str(ret_start)
 
     print 'calculating retention ...'
     ret_array = [0 for _ in range(models.MAX_RETENTION_DAYS)]
@@ -81,15 +69,12 @@ def cal_dau_retention(db_handler, app_id, start, end):
         counts += 1
         last_doc_id = usr['_id']
         diff = (start_cal.date() - usr['c'].date()).days - 1
-        #print 'diff(dau): ' + str(diff)
         dau.accumulate(usr)
         ret_array[diff] += 1
 
     query = {'_dt': {'$gte':ret_start, '$lt':ret_end}}
     for ret in db_handler.find_from_processed(app_id, 'retention', query):
         diff = (start_cal.date() - ret['_dt'].date()).days
-        print 'ret is: ' + str(ret)
-        print diff
         if ret['nu'] != 0:
             ret_array[diff] = float(ret_array[diff]) / float(ret['nu'])
         else:
@@ -97,22 +82,17 @@ def cal_dau_retention(db_handler, app_id, start, end):
         ret['ret'][diff] = ret_array[diff]
         db_handler.upsert_to_processed(app_id, 'retention', {"_id": ret['_id']}, ret)
 
-    print 'ret_array: ' + str(ret_array)
-
-    query = {'_dt': {'$gte':ret_start, '$lt':ret_end}}
-    for ret in db_handler.find_from_processed(app_id, 'retention', query):
-        print 'updated ret: ' + str(ret)
+    #query = {'_dt': {'$gte':ret_start, '$lt':ret_end}}
+    #for ret in db_handler.find_from_processed(app_id, 'retention', query):
+    #    print 'updated ret: ' + str(ret)
 
     end_cal = datetime.utcnow()
     elapsed = (end_cal - start_cal).microseconds * 0.001
-    print 'time to write db: ' + str(elapsed) + 'msec'
-    # print 'counted items: ' + str(counts)
 
     dau.counts = counts
     dau.last_doc_id = last_doc_id
     dau.runtime = elapsed
 
-    print dau.to_python()
     query = {"t": dau.title}
     dau.upsert(db_handler, app_id, query)
 

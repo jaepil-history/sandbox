@@ -1,7 +1,5 @@
 from datetime import datetime
 from os import getenv
-import json
-from bson import json_util
 
 import tornado.web
 from dataview import __version__
@@ -120,6 +118,5 @@ class BaseView(tornado.web.RequestHandler):
         kwargs['app'] = self.template_vars
         rendered_template = jinja_render(template, *args, **kwargs)
         # print 'render_template: ' + rendered_template
-        #rendered_template = json.dumps(rendered_template) #, default=json_util.default)
         self.write(rendered_template)
 

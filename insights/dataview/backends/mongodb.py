@@ -63,7 +63,6 @@ class MongoBackend():
                 collection_name_items = [app_id, collection_name]
                 collection = ".".join(collection_name_items)
 
-            print 'collection_name: ' + collection
             collection = db[collection]
         
         else:

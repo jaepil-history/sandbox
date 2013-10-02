@@ -13,8 +13,9 @@ from mongoengine import ObjectIdField
 from mongoengine import IntField
 from mongoengine import LongField
 from mongoengine import FloatField
-from mongoengine import ListField
 from mongoengine import StringField
+from mongoengine import ListField
+from mongoengine import DictField
 from mongoengine import ValidationError
 
 MAX_LEVEL = 100
@@ -46,7 +47,7 @@ class BaseResult(Document):
 
     def group_by_level(self, doc):
         try:
-            self.level[doc['ul']-1] += 1
+            self.level[doc['ul'] - 1] += 1
         except:
             print 'user level is not proper'
 
@@ -207,11 +208,10 @@ class DAUDistribution(BaseResult):
 class UserRetention(Document):
 
     _dt = DateTimeField(required=True)
-    #record_date = DateTimeField(required=True, db_field='s')
     title = StringField(required=True, db_field='t')
     new_users = IntField(required=True, db_field='nu')
     timestamp = IntField(db_field='ts')
-    retention = ListField(FloatField(), default=lambda: [False for x in range(MAX_RETENTION_DAYS)], db_field='ret')
+    retention = ListField(FloatField(), default=lambda: [0 for x in range(MAX_RETENTION_DAYS)], db_field='ret')
 
     def __init__(self, *args, **values):
         super(Document, self).__init__(*args, **values)
@@ -255,6 +255,98 @@ class UserRetention(Document):
 
         doc = self.to_python()
         result = db_handler.upsert_to_processed(app_id=app_id, collection_name='retention', query=query, doc=doc)
+        return result
+
+
+# selling items(paying by game money) distribution by friends count and by level
+class ItemsDistribution(BaseResult):
+    items = DictField(db_field='items')
+
+    def __init__(self, *args, **values):
+        super(BaseResult, self).__init__(*args, **values)
+        self.initialize()
+
+    def initialize(self):
+        self._dt = datetime.utcnow()
+        yesterday = self._dt.date() - timedelta(days=1)
+        self.title = str(yesterday)
+        # ts : timestamp
+        if self.timestamp is None:
+            self.timestamp = int(time.time())
+
+    def accumulate(self, doc):
+        self.group_by_friends(doc)
+        self.group_by_level(doc)
+
+    def save(self, db_handler, app_id, validate=True):
+        if validate:
+            try:
+                self.validate()
+            except ValidationError:
+                print 'result validation error.'
+                print ValidationError.to_dict()
+
+        doc = self.to_python()
+        result = db_handler.insert_to_processed(app_id=app_id, collection_name='items', doc=doc)
+        return result
+
+    def upsert(self, db_handler, app_id, query, validate=True):
+        if validate:
+            try:
+                self.validate()
+            except ValidationError:
+                print 'result validation error.'
+                print ValidationError.to_dict()
+
+        doc = self.to_python()
+        result = db_handler.upsert_to_processed(app_id=app_id, collection_name='items', query=query, doc=doc)
+        return result
+
+
+# paying users distribution by friends count and by level
+class PUDistribution(BaseResult):
+    item_list = ListField(IntField(), db_field='items')
+    # currency. USD:0, KWN:1, YEN:2,
+    currency = [0, 1, 2]
+
+    def __init__(self, *args, **values):
+        super(BaseResult, self).__init__(*args, **values)
+        self.initialize()
+
+    def initialize(self):
+        self._dt = datetime.utcnow()
+        yesterday = self._dt.date() - timedelta(days=1)
+        self.title = str(yesterday)
+        # ts : timestamp
+        if self.timestamp is None:
+            self.timestamp = int(time.time())
+
+    def accumulate(self, doc):
+        self.group_by_friends(doc)
+        self.group_by_level(doc)
+
+    def save(self, db_handler, app_id, validate=True):
+        if validate:
+            try:
+                self.validate()
+            except ValidationError:
+                print 'result validation error.'
+                print ValidationError.to_dict()
+
+        doc = self.to_python()
+        result = db_handler.insert_to_processed(app_id=app_id, collection_name='pu', doc=doc)
+        return result
+
+    def upsert(self, db_handler, app_id, query, validate=True):
+        if validate:
+            try:
+                self.validate()
+            except ValidationError:
+                print 'result validation error.'
+                print ValidationError.to_dict()
+
+        doc = self.to_python()
+        result = db_handler.upsert_to_processed(app_id=app_id, collection_name='pu', query=query, doc=doc)
         return result
 
 

@@ -94,7 +94,6 @@ class ProcessedDataModel(BaseModel):
 
         for selected in selected_data:
             row = self.mongo.get_collection(selected, app_id)
-
             cursor = row.find({"_dt": {"$gte": date_from, "$lt": date_to }}).sort('_dt', ASCENDING)
             data[selected] = list(cursor) # return list type
 
