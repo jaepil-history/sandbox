@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from datetime import timedelta
 from tornado import web
 from tornado import gen
@@ -48,11 +51,12 @@ class IndexView(BaseView):
 
         print 'request: ' + self.request.uri
 
+        # default : meteos app_id
         if app_id is None:
             app_id = "5226e79b35b6e6080cca3f1d"
 
         if date_range is None:
-            date_range = '1'
+            date_range = '30' # default 30 days
 
         if group is None:
             group = 'None'
@@ -74,44 +78,78 @@ class IndexView(BaseView):
         all_charts = settings.PROCESSED_LIST
         charts_list = []
 
-        if selected_chart is not None:
-            charts_list.append(selected_chart)
-        else:
+        if selected_chart is None or selected_chart == 'All':
             charts_list = all_charts
+        else:
+            charts_list.append(selected_chart)
 
         print 'charts_list: ' + str(charts_list)
         print 'all_list: ' + str(all_charts)
 
-        #from bson.json_util import dumps
         charts_data = processed_data_model.get_processed_data(app_id, charts_list, date_from, date_to)
-        print 'charts_data: ' + str(charts_data)
-        #for key, value in charts_data:
-        #    print 'key: ' + str(key)
-        #    value = dumps(value)
-        #    print 'value: ' + str(value)
+        print 'charts_data(before): ' + str(charts_data)
 
+        for key in charts_list:
+            temp_list = []
+            if key != 'Retention':
+                for i in range(len(charts_data[key])):
+                    temp = {}
+                    doc = charts_data[key][i]
+                    print 'doc: ' + str(doc)
+                    print doc['t']
+                    print doc['counts']
+                    temp['date'] = doc['t'].encode('ascii', 'ignore')
+                    temp['counts'] = doc['counts']
 
-        # {'title',data_array} dictionary format
-        dummy_data = {
-            "DAU": [1, 2, 3, 4, 5],
-            "Installs": [6, 7, 8, 9, 10],
-            "Removals": [11, 12, 13, 14, 15],
-            "Invites": [16, 17, 18, 19, 20],
-            "Logins": [21, 22, 23, 24, 25],
-            "Retention": [26, 27, 28, 29, 30],
-            "Virality": [31, 32, 33, 34, 35],
-            "Returning": [36, 37, 38, 39, 40],
-            "Revenue": [41, 42, 43, 44, 45],
-            "Items": [46, 47, 48, 49, 50]
-            }
+                    if group == 'level':
+                        if key != 'Installs':
+                            temp['level'] = doc['lv']
+                    elif group == 'friends':
+                        temp['friends'] = doc['f']
 
-        charts_data = {}
+                    temp_list.append(temp)
 
-        for title in charts_list:
-            charts_data[title] = dummy_data[title]
+                charts_data[key] = temp_list
 
+            elif key == 'Retention':
+                for i in range(len(charts_data[key])):
+                    temp = {}
+                    doc = charts_data[key][i]
+                    print 'doc: ' + str(doc)
+                    print doc['t']
+                    print doc['ret']
+                    temp['date'] = doc['t'].encode('ascii', 'ignore')
+                    temp['ret'] = doc['ret']
 
-        print 'charts_data: ' + str(charts_data)
+                    temp_list.append(temp)
+
+                charts_data[key] = temp_list
+            else:
+                pass
+
+        print 'charts_data(after): ' + str(charts_data)
+
+        ## {'title',data_array} dictionary format
+        #dummy_data = {
+        #    "DAU": [1, 2, 3, 4, 5],
+        #    "Installs": [6, 7, 8, 9, 10],
+        #    "Removals": [11, 12, 13, 14, 15],
+        #    "Invites": [16, 17, 18, 19, 20],
+        #    "Logins": [21, 22, 23, 24, 25],
+        #    "Retention": [26, 27, 28, 29, 30],
+        #    "Virality": [31, 32, 33, 34, 35],
+        #    "Returning": [36, 37, 38, 39, 40],
+        #    "Revenue": [41, 42, 43, 44, 45],
+        #    "Items": [46, 47, 48, 49, 50]
+        #    }
+        #
+        #charts_data = {}
+        #
+        #for title in charts_list:
+        #    charts_data[title] = dummy_data[title]
+        #
+        #
+        #print 'charts_data: ' + str(charts_data)
 
         self.render('index.html',
                 current_page=self.current_page,

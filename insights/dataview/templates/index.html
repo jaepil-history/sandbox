@@ -36,10 +36,20 @@
              <tr>
                 <td>
                     <select id='selected_chart' name='selected_chart' style="width:150px;">
-                        {% for c in all_charts  %}
-                            <option {% if c in charts_list %}selected='selected' {% endif %} value="{{ c }}">{{ c }}</option>
-                        {% endfor %}
-                        <!--<option {% if selected_chart == 'DAU' %}selected="selected"{% endif %} value="DAU">DAU</option>-->
+                        <!--{% for c in all_charts  %}-->
+                            <!--<option {% if c in charts_list %}selected='selected' {% endif %} value="{{ c }}">{{ c }}</option>-->
+                        <!--{% endfor %}-->
+                        <option {% if selected_chart == 'All' %}selected="selected"{% endif %} value="All">All</option>
+                        <option {% if selected_chart == 'DAU' %}selected="selected"{% endif %} value="DAU">DAU</option>
+                        <option {% if selected_chart == 'Installs' %}selected="selected"{% endif %} value="Installs">Installs</option>
+                        <option {% if selected_chart == 'Removals' %}selected="selected"{% endif %} value="Removals">Removals</option>
+                        <option {% if selected_chart == 'Invites' %}selected="selected"{% endif %} value="Invites">Invites</option>
+                        <option {% if selected_chart == 'Logins' %}selected="selected"{% endif %} value="Logins">Logins</option>
+                        <option {% if selected_chart == 'Retention' %}selected="selected"{% endif %} value="Retention">Retention</option>
+                        <option {% if selected_chart == 'Virality' %}selected="selected"{% endif %} value="Virality">Virality</option>
+                        <option {% if selected_chart == 'Returning' %}selected="selected"{% endif %} value="Returning">Returning</option>
+                        <option {% if selected_chart == 'Revenue' %}selected="selected"{% endif %} value="Revenue">Revenue</option>
+                        <option {% if selected_chart == 'Items' %}selected="selected"{% endif %} value="Items">Items</option>
                     </select>
                 </td>
                 <td>
@@ -77,7 +87,7 @@
 <h3>Activity</h3>
 <!-- Graphs ========================================================================= -->
 <div id="charts" class="row-fluid">
-{% for chart in charts_list  %}
+{% for chart in charts_list %}
     <h2>{{ chart }}</h2>
     {% if charts_data[chart].__len__() > 0 %}
         <div class="span6" id="{{ chart }}_container" style="min-width: 400px; height: 400px; margin: auto"></div>
@@ -122,66 +132,132 @@
 <script>
 $(function()  {
 
-    var range = [5, 10, 15, 20, 25, 30]
-
     {% for chart in charts_list  %}
     {% if charts_data[chart].__len__() > 0 %}
-    var {{ chart }}_series = [];
+        {% if chart != 'Retention' %}
+            var dump_data = {{ charts_data[chart] }};
+            var x_range = [];
+            var y_values = [];
+            var {{ chart }}_series = [];
 
-    {{ chart }}_series.push({name: "{{ chart }}", data: {{ charts_data[chart] }} });
+            for(var i = 0; i < dump_data.length; i++) {
+                x_range.push(dump_data[i]['date']);
+                y_values.push(dump_data[i]['counts']);
+            }
 
-    var {{ chart }}_chart = new Highcharts.Chart({
-        chart: {
-            renderTo: '{{ chart }}_container',
-            type: 'line',
-            marginRight: 130,
-            marginBottom: 60
-        },
-        title: {
-            text: '{{ chart }}',
-            x: -20 //center
-        },
-        subtitle: {
-            text: '',
-            x: -20
-        },
-        xAxis: {
-            categories: range,
-            title: {
-                text: 'date',
-                y: 20
+            {{ chart }}_series.push({name: "{{ chart }}", data: y_values});
+
+            var {{ chart }}_chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: '{{ chart }}_container',
+                    type: 'line',
+                    marginRight: 130,
+                    marginBottom: 60
+                },
+                title: {
+                    text: '{{ chart }}',
+                    x: -20 //center
+                },
+                subtitle: {
+                    text: '',
+                    x: -20
+                },
+                xAxis: {
+                    categories: x_range,
+                    title: {
+                        text: 'date',
+                        y: 20
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: 'number'
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    formatter: function() {
+                        return '<b>'+ this.series.name +'</b><br/>'+
+                            this.x +': '+ this.y +'HP';
+                    }
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'top',
+                    x: -10,
+                    y: 30,
+                    borderWidth: 0
+                },
+                series: {{ chart }}_series
+            });
+        {% else %}{# if 'Retention' #}
+            var dump_data = {{ charts_data[chart] }};
+            var x_range = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28];
+            var {{ chart }}_series = [];
+
+            for(var i = 0; i < dump_data.length; i++) {
+                {{ chart }}_series.push({name: dump_data[i]['date'], data: dump_data[i]['ret']});
             }
-        },
-        yAxis: {
-            title: {
-                text: 'number'
-            },
-            plotLines: [{
-                value: 0,
-                width: 1,
-                color: '#808080'
-            }]
-        },
-        tooltip: {
-            formatter: function() {
-                return '<b>'+ this.series.name +'</b><br/>'+
-                    this.x +': '+ this.y +'HP';
-            }
-        },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'top',
-            x: -10,
-            y: 30,
-            borderWidth: 0
-        },
-        series: {{ chart }}_series
-    });
-    {% else %}
-        alert('There is no data');
+
+            var {{ chart }}_chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: '{{ chart }}_container',
+                    type: 'line',
+                    marginRight: 130,
+                    marginBottom: 60
+                },
+                title: {
+                    text: '{{ chart }}',
+                    x: -20 //center
+                },
+                subtitle: {
+                    text: '',
+                    x: -20
+                },
+                xAxis: {
+                    categories: x_range,
+                    title: {
+                        text: 'date',
+                        y: 20
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: 'number'
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    formatter: function() {
+                        return '<b>'+ this.series.name +'</b><br/>'+
+                            this.x +': '+ this.y +'HP';
+                    }
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'top',
+                    x: -10,
+                    y: 30,
+                    borderWidth: 0
+                },
+                series: {{ chart }}_series
+            });
+        {% endif %}{# if 'Retention' #}
+    {% else %}{# len if-else #}
+//        alert('There is no data');
     {% endif %}{# len #}
     {% endfor %}{# chart #}
+
 
     var endDate = -1; // 기준일: 하루전
     $("#date_from").datepicker({

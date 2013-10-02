@@ -124,7 +124,6 @@ def clean_string(variable):
     or isinstance(variable, long):
         
         variable = float(variable) if not isinstance(variable, float) else variable
-        
         return variable
 
     else:
@@ -134,7 +133,7 @@ def clean_string(variable):
 
         if len(extracted_value) > 0:
             extracted_value = extracted_value[0]
-            extracted_value.replace(",",".")
+            extracted_value.replace(",", ".")
             extracted_value = float(extracted_value)
         else:
             extracted_value = 0
