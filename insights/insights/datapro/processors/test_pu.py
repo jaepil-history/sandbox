@@ -20,44 +20,56 @@ def run(db_handler, start, end):
     app_ids = db_handler.get_app_ids_from_appspand()
 
     for app_id in app_ids:
-        print 'calculating pu ...'
+        print 'calculating revenue ...'
         counts = 0
         last_doc_id = None
         start_cal = datetime.utcnow()
 
+        revenue = models.Revenue()
         pu = models.PUDistribution()
-        ret = models.UserRetention()
+        items = models.ItemsDistribution()
 
         # fix it when 2 months needed
         middle = ["%04d" % start.year, "%02d" % start.month]
         middle_name = ".".join(middle)
 
         query = {'_dt': {'$gte':start, '$lt':end }}
-        for doc in db_handler.find_from_insights(app_id, middle_name, 'apa', query):
-            counts += 1
-            last_doc_id = doc['_id']
-            nru.accumulate(doc)
+        pu_ids = db_handler.find_from_insights(app_id, middle_name, 'mtu', query).distinct('uuid')
+        print 'pu_ids: ' + str(pu_ids)
 
-        ret.new_users = counts
-        print ret.to_python()
-        query = {"t": ret.title}
-        ret.upsert(db_handler, app_id, query)
+        item_ids = db_handler.find_from_insights(app_id, middle_name, 'mtu', query).distinct('iid')
+        print 'item_ids: ' + str(item_ids)
+        #for doc in db_handler.find_from_insights(app_id, middle_name, 'mtu', query):
+        #    counts += 1
+        #    last_doc_id = doc['_id']
+        #    revenue.accumulate(doc)
+        #    pu.accumulate(doc)
+        #    items.accumulate(doc)
 
-        # print 'last_doc_id = ' + str(last_doc_id)
+        print 'revenue: ' + str(revenue.to_python())
+        print 'pu: ' + str(pu.to_python())
+        print 'items: ' + str(items.to_python())
 
-        end_cal = datetime.utcnow()
-        elapsed = (end_cal - start_cal).microseconds * 0.001
-        print 'time to write db: ' + str(elapsed) + 'msec'
-        # print 'counted items: ' + str(counts)
-
-        nru.counts = counts
-        nru.last_doc_id = last_doc_id
-        nru.runtime = elapsed
-
-        print nru.to_python()
-        query = {"t": nru.title}
-        nru.upsert(db_handler, app_id, query)
-        # nru.save(db_handler, app_id)
+        #ret.new_users = counts
+        #print ret.to_python()
+        #query = {"t": ret.title}
+        #ret.upsert(db_handler, app_id, query)
+        #
+        ## print 'last_doc_id = ' + str(last_doc_id)
+        #
+        #end_cal = datetime.utcnow()
+        #elapsed = (end_cal - start_cal).microseconds * 0.001
+        #print 'time to write db: ' + str(elapsed) + 'msec'
+        ## print 'counted items: ' + str(counts)
+        #
+        #nru.counts = counts
+        #nru.last_doc_id = last_doc_id
+        #nru.runtime = elapsed
+        #
+        #print nru.to_python()
+        #query = {"t": nru.title}
+        #nru.upsert(db_handler, app_id, query)
+        ## nru.save(db_handler, app_id)
 
 
 if __name__ == "__main__":
