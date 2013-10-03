@@ -8,6 +8,7 @@ import sys
 from tornado import httpserver
 from tornado import ioloop
 from tornado import options
+from tornado import process
 from tornado import web
 
 from config import loader
@@ -57,14 +58,15 @@ def build_url_handlers():
 #                             socketTimeoutMS=mongodb.timeout)
 
 
-def init_http_server(config):
+def init_http_server(config, port):
     url_handlers = build_url_handlers()
     application = Application(
         handlers=None,
         debug=config.debug,
         config=config
     )
-    application.add_handlers(config.server.host, url_handlers)
+    for host_name in config.server.hosts:
+        application.add_handlers(host_name.host, url_handlers)
 
     ssl_options = None
     if config.security.ssl_cert and config.security.ssl_key:
@@ -74,7 +76,7 @@ def init_http_server(config):
         }
 
     http_server = httpserver.HTTPServer(application, ssl_options=ssl_options)
-    http_server.listen(config.server.port)
+    http_server.listen(port)
 
 
 def run_server(config):
@@ -89,18 +91,27 @@ def main():
     options.parse_command_line()
     config = loader.load_appcfg(sys.argv[1])
 
+    task_id = 0
+    if config.server.num_processes != 1:
+        task_id = process.fork_processes(config.server.num_processes)
+
+    listen_port = config.server.base_port + task_id
+
     logger.init(config=config)
     logger.general.debug("Configuration dump: %s" % config.to_json())
 
     # init_services(config=config)
     # init_database(config=config)
-    init_http_server(config=config)
+    init_http_server(config=config, port=listen_port)
 
     # test(config=config)
     # for idx in range(1, 100):
     #     create_test_user(idx=idx)
 
     logger.general.debug("IDGen server is started in %s mode..." % config.application.stage)
+    logger.general.debug("Total processes: %d" % config.server.num_processes)
+    logger.general.debug("Task ID: %d" % task_id)
+    logger.general.debug("HTTP listen port: %d" % listen_port)
 
     run_server(config=config)
 

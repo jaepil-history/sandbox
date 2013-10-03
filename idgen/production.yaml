@@ -17,18 +17,20 @@ logging:
     path: ../log/idgen
     filename: access.log
   application:
-    level: error
+    level: debug
     path: ../log/idgen
     filename: application.log
   general:
-    level: error
+    level: debug
     path: ../log/idgen
     filename: general.log
 
 # Identity
 server:
-  host: idgen.service.appspandapp.com
-  port: 8200
+  hosts:
+    - host: idgen.appspandapp.com
+  base_port: 8200
+  num_processes: 1
 
 # Security
 security:

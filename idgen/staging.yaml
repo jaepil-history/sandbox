@@ -27,8 +27,10 @@ logging:
 
 # Identity
 server:
-  host: idgen.service.staging.appspandapp.com
-  port: 8200
+  hosts:
+    - host: idgen.appspandapp.com
+  base_port: 8200
+  num_processes: 1
 
 # Security
 security:

@@ -27,9 +27,10 @@ logging:
 
 # Identity
 server:
-  # host: idgen.service.local.appspandapp.com
-  host: localhost
-  port: 8200
+  hosts:
+    - host: localhost
+  base_port: 8200
+  num_processes: 1
 
 # Security
 security:

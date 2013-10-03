@@ -32,9 +32,14 @@ class Logging(EmbeddedDocument):
     general = EmbeddedDocumentField(Logger, required=True)
 
 
-class HTTPServer(EmbeddedDocument):
+class HostName(EmbeddedDocument):
     host = StringField(required=True)
-    port = IntField(required=True)
+
+
+class HTTPServer(EmbeddedDocument):
+    hosts = ListField(EmbeddedDocumentField(HostName), required=True)
+    base_port = IntField(required=True)
+    num_processes = IntField(required=True)
 
 
 class Security(EmbeddedDocument):
