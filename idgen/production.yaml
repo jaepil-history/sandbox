@@ -13,7 +13,7 @@ debug: false
 # Logging
 logging:
   access:
-    level: error
+    level: debug
     path: ../log/idgen
     filename: access.log
   application:
