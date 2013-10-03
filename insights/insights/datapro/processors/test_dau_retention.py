@@ -25,9 +25,6 @@ def run(db_handler, start, end):
         last_doc_id = None
         start_cal = datetime.utcnow()
 
-        #middle = ["%04d" % start.year, "%02d" % start.month]
-        #middle_name = ".".join(middle)
-
         print 'start_cal: ' + str(start_cal)
         ret_end = end + timedelta(days=1)
         print 'ret_end: ' + str(ret_end)

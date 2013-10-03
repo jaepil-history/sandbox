@@ -20,12 +20,12 @@ def run(db_handler, start, end):
     app_ids = db_handler.get_app_ids_from_appspand()
 
     for app_id in app_ids:
-        print 'calculating nru ...'
+        print 'calculating pu ...'
         counts = 0
         last_doc_id = None
         start_cal = datetime.utcnow()
 
-        nru = models.NRUDistribution()
+        pu = models.PUDistribution()
         ret = models.UserRetention()
 
         # fix it when 2 months needed

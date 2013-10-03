@@ -51,7 +51,7 @@ class IndexView(BaseView):
 
         # default : meteos app_id
         if app_id is None:
-            app_id = "5226e79b35b6e6080cca3f1d"
+            app_id = "52352d0b6939193ca9f9873a"
 
         if date_range is None:
             date_range = '30' # default 30 days
