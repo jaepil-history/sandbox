@@ -34,7 +34,7 @@ logger = logging.getLogger('insightsd')
 class InsightsDaemon(Daemon):
 
     def run(self):
-        try:
+        try:ㅁㅅ
             from insights.api import urls
         except Exception, e:
             logger.exception('import failed')

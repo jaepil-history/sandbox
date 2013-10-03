@@ -16,6 +16,7 @@ from insights.datapro.api.dbhandler import DBHandler
 from pymongo import MongoClient
 from datetime import datetime, timedelta, time
 from insights.datapro.processors import cal_nru_dau_retention
+from insights.datapro.processors import cal_pu_revenue
 
 
 PIDFILE = '/var/run/dataprod.pid'
@@ -49,19 +50,20 @@ class DataProDaemon(Daemon):
 
     def run(self):
 
-        today = datetime.utcnow().date()
-        yesterday = today - timedelta(days=1)
-        start = datetime.combine(yesterday, time())
-        end = datetime.combine(today, time())
-
         while True:
             print 'datapro is running'
             print strftime("%Y-%m-%d %H:%M:%S", gmtime())
             print strftime("%a, %d %b %Y %X +0000", gmtime())
 
+            # default : 24 hours ago
+            today = datetime.utcnow().date()
+            yesterday = today - timedelta(days=1)
+            start = datetime.combine(yesterday, time())
+            end = datetime.combine(today, time())
+
             # pymongo.run(self.db_handler)
             cal_nru_dau_retention.run(self.db_handler, start, end)
-            # test_retention.run(self.db_handler, start, end)
+            cal_pu_revenue.run(self.db_handler, start, end)
 
             # Analyze data every single day
             # time.sleep(self.interval)

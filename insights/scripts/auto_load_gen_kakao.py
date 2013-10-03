@@ -157,6 +157,7 @@ class InsightsClient(object):
             "f": random.randint(0, 1000),
             "ul": random.randint(1, 100),
             "iid": random.randint(1, 30),
+            # cu 0 : USD, 1 : KWN, 2 : YEN ...etc
             "cu": random.randint(0, 1),
             "v": random.randint(100, 50000)
         }
@@ -251,7 +252,7 @@ def main(options):
     http_clients = []
     for app in apps:
         http_clients.append(InsightsClient(app_id=str(app['_id'])))
-        for uuid in range(20000, 23000):
+        for uuid in range(23000, 30000):
             http_client = http_clients[apps.index(app)]
             # client actions
             http_client.track_apa(uuid)
@@ -273,7 +274,7 @@ def main(options):
     for i in range(15000):
         # client and user are picked randomly
         http_client = http_clients[random.randint(0, len(apps) - 1)]
-        uuid = random.randint(1000, 23000)
+        uuid = random.randint(1000, 30000)
         # client actions
         http_client.track_cpu(uuid)
         http_client.track_lgt(uuid)

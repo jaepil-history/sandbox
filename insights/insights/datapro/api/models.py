@@ -29,7 +29,7 @@ class BaseResult(Document):
     timestamp = IntField(db_field='ts')
     last_doc_id = ObjectIdField(db_field='l_id') # for reference, not necessary. if doc's count = 0, last_doc_id = None
     runtime = LongField(required=True)
-    counts = IntField()
+    counts = IntField(required=True, default=0)
     level = ListField(IntField(), default=lambda: [0 for x in range(MAX_LEVEL)], db_field='lv')
     friends = ListField(IntField(), default=lambda: [0 for x in range(len(friends_division))], db_field='f')
 
@@ -260,7 +260,7 @@ class UserRetention(Document):
 
 # revenue distribution by friends count and by level
 class Revenue(BaseResult):
-    item_list = ListField(IntField(), db_field='items')
+
     # currency. USD:0, KWN:1, YEN:2,
     currency = [0, 1, 2]
 
@@ -305,25 +305,34 @@ class Revenue(BaseResult):
         return result
 
 
-# selling items(paying by game money) distribution by friends count and by level
-class ItemsDistribution(BaseResult):
-    items = DictField(db_field='items')
+# consumed items(paying by game money) distribution
+class ItemsDistribution(Document):
+
+    _dt = DateTimeField(required=True)
+    title = StringField(required=True, db_field='t')
+    total = IntField(required=True, db_field='total')
+    timestamp = IntField(db_field='ts')
+    items = ListField()
 
     def __init__(self, *args, **values):
-        super(BaseResult, self).__init__(*args, **values)
+        super(Document, self).__init__(*args, **values)
         self.initialize()
 
     def initialize(self):
         self._dt = datetime.utcnow()
-        yesterday = self._dt.date() - timedelta(days=1)
-        self.title = str(yesterday)
+        self.start_date = self._dt.date() - timedelta(days=1)
+        self.title = str(self.start_date)
         # ts : timestamp
         if self.timestamp is None:
             self.timestamp = int(time.time())
 
-    def accumulate(self, doc):
-        self.group_by_friends(doc)
-        self.group_by_level(doc)
+    def to_python(self):
+        data = self.to_mongo()
+        data = bson.son.SON(data).to_dict()
+        return data
+
+    def set_retention(self, db_handler, app_id, usr):
+        pass
 
     def save(self, db_handler, app_id, validate=True):
         if validate:
@@ -334,7 +343,7 @@ class ItemsDistribution(BaseResult):
                 print ValidationError.to_dict()
 
         doc = self.to_python()
-        result = db_handler.insert_to_processed(app_id=app_id, collection_name='items', doc=doc)
+        result = db_handler.insert_to_processed(app_id=app_id, collection_name='retention', doc=doc)
         return result
 
     def upsert(self, db_handler, app_id, query, validate=True):
@@ -346,24 +355,26 @@ class ItemsDistribution(BaseResult):
                 print ValidationError.to_dict()
 
         doc = self.to_python()
-        result = db_handler.upsert_to_processed(app_id=app_id, collection_name='items', query=query, doc=doc)
+        result = db_handler.upsert_to_processed(app_id=app_id, collection_name='retention', query=query, doc=doc)
         return result
 
 
 # paying users distribution by friends count and by level
-class PUDistribution(BaseResult):
-    item_list = ListField(IntField(), db_field='items')
-    # currency. USD:0, KWN:1, YEN:2,
-    currency = [0, 1, 2]
+# daily access users distribution by friends count and by level
+class PayingUsers(BaseResult):
 
-    def __init__(self, *args, **values):
+    currency = StringField()
+    revenue = LongField(required=True, default=0)
+
+    def __init__(self, currency, *args, **values):
         super(BaseResult, self).__init__(*args, **values)
-        self.initialize()
+        self.initialize(currency)
 
-    def initialize(self):
+    def initialize(self, currency):
         self._dt = datetime.utcnow()
         yesterday = self._dt.date() - timedelta(days=1)
         self.title = str(yesterday)
+        self.currency = currency
         # ts : timestamp
         if self.timestamp is None:
             self.timestamp = int(time.time())

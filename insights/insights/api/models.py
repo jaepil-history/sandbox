@@ -189,26 +189,6 @@ class Logout(BaseDoc):
     # meta = {'collection': 'lgt'}
 
 
-# dau : daily access users
-class DAU(BaseDoc):
-    """
-    s: The UID of the user.
-    f: The number of friends a user has.
-    ul: The level of user
-    data: Additional data, a JSON object string representing a dictionary or map of key-value pairs.
-        It must be base64-encoded.
-    ts: The ts in the Epoch time format.
-        Include this parameter to prevent the user's browser from caching the REST API call if sent
-        using JavaScript.
-    """
-
-    user_uid = LongField(required=True, db_field='uuid')
-    user_level = IntField(required=True, default=1, db_field='ul')
-    friends_count = IntField(db_field='f')
-    data = StringField()
-    timestamp = IntField(db_field='ts')
-
-
 # wid
 class Withdrawal(BaseDoc):
     """
@@ -246,6 +226,7 @@ class ItemConsumption(BaseDoc):
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     item_id = IntField(required=True, db_field='iid')
+    data = StringField()
     timestamp = IntField(db_field='ts')
 
 
@@ -253,6 +234,7 @@ class ItemConsumption(BaseDoc):
 class RevenueTracking(BaseDoc):
     """
     s: The UID of the user.
+    cu : currency. USD:0, KWN:1, YEN:2, ...etc
     v: The revenue value which must be passed in cents.
         Example: $1.25 should be passed as 125. Can be either a positive or negative integer.
         The maximum value that can be passed is 1000000 ($10,000).
@@ -270,6 +252,7 @@ class RevenueTracking(BaseDoc):
     item_id = IntField(required=True, db_field='iid')
     currency = IntField(required=True, db_field='cu') # USD:0, KWN:1, YEN:2, ...
     value = IntField(required=True, db_field='v')
+    data = StringField()
     timestamp = IntField(db_field='ts')
 
 

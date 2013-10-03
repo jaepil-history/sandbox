@@ -174,6 +174,7 @@ class ApplicationRemovedHandler(BaseHandler):
         self.finish()
 
 
+# cpu
 class UserInformationHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.coroutine

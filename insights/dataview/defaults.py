@@ -33,6 +33,7 @@ MONGO = {
 }
 
 PROCESSED_LIST = config.get('processed_list', [])
+APP_ID = config.get('app_id', '5226e77335b6e61184d73e39')
 
 host = _web_app.get('host', 'http://127.0.0.1')
 

@@ -93,7 +93,10 @@ class ProcessedDataModel(BaseModel):
         data = {}
 
         for selected in selected_data:
-            row = self.mongo.get_collection(selected, app_id)
+            if selected == 'Revenue':
+                row = self.mongo.get_collection('PU', app_id)
+            else:
+                row = self.mongo.get_collection(selected, app_id)
             cursor = row.find({"_dt": {"$gte": date_from, "$lt": date_to }}).sort('_dt', ASCENDING)
             data[selected] = list(cursor) # return list type
 

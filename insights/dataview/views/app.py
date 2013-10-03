@@ -49,9 +49,12 @@ class IndexView(BaseView):
         date_to = self.get_argument('date_to', None)
         group = self.get_argument('group', None)
 
+        print 'request: ' + self.request.uri
+
         # default : meteos app_id
         if app_id is None:
-            app_id = "52352d0b6939193ca9f9873a"
+            #app_id = "5226e77335b6e61184d73e39"
+            app_id = settings.APP_ID
 
         if date_range is None:
             date_range = '30' # default 30 days
@@ -81,11 +84,64 @@ class IndexView(BaseView):
         else:
             charts_list.append(selected_chart)
 
+        print 'all_list: ' + str(all_charts)
+        print 'selected: ' + str(charts_list)
+
         charts_data = processed_data_model.get_processed_data(app_id, charts_list, date_from, date_to)
 
         for key in charts_list:
             temp_list = []
-            if key != 'Retention':
+            if key == 'Retention':
+                for i in range(len(charts_data[key])):
+                    temp = {}
+                    doc = charts_data[key][i]
+                    temp['date'] = doc['t'].encode('ascii', 'ignore')
+                    temp['ret'] = doc['ret']
+
+                    temp_list.append(temp)
+
+                charts_data[key] = temp_list
+
+            elif key == 'PU':
+                usd_pu = []
+                kwn_pu = []
+                for i in range(len(charts_data[key])):
+                    doc = charts_data[key][i]
+
+                    for item in temp_list:
+                        if item['date'] == doc['t'].encode('ascii', 'ignore'):
+                            item[doc['currency'].encode('ascii', 'ignore')] = doc['counts']
+                            break
+
+                    else:
+                        temp = {}
+                        temp['date'] = doc['t'].encode('ascii', 'ignore')
+                        temp[doc['currency'].encode('ascii', 'ignore')] = doc['counts']
+                        temp_list.append(temp)
+
+                charts_data[key] = temp_list
+                print 'revenue data: ' + str(charts_data[key])
+
+            elif key == 'Revenue':
+                # Revenue_USD & Revenue_KWN : {'date': '2013-09-13', 'usd': 20031L, 'kwn': 78900L}
+                for i in range(len(charts_data[key])):
+                    doc = charts_data[key][i]
+
+                    for item in temp_list:
+                        if item['date'] == doc['t'].encode('ascii', 'ignore'):
+                            item[doc['currency'].encode('ascii', 'ignore')] = int(doc['revenue'])
+                            break
+
+                    else:
+                        temp = {}
+                        temp['date'] = doc['t'].encode('ascii', 'ignore')
+                        temp[doc['currency'].encode('ascii', 'ignore')] = int(doc['revenue'])
+                        temp_list.append(temp)
+
+                charts_data[key] = temp_list
+                #print 'revenue data: ' + str(charts_data[key])
+
+            else:
                 for i in range(len(charts_data[key])):
                     temp = {}
                     doc = charts_data[key][i]
@@ -97,23 +153,13 @@ class IndexView(BaseView):
                             temp['level'] = doc['lv']
                     elif group == 'friends':
                         temp['friends'] = doc['f']
+                    else:
+                        pass
 
                     temp_list.append(temp)
 
                 charts_data[key] = temp_list
 
-            elif key == 'Retention':
-                for i in range(len(charts_data[key])):
-                    temp = {}
-                    doc = charts_data[key][i]
-                    temp['date'] = doc['t'].encode('ascii', 'ignore')
-                    temp['ret'] = doc['ret']
-
-                    temp_list.append(temp)
-
-                charts_data[key] = temp_list
-            else:
-                pass
 
         self.render('index.html',
                 current_page=self.current_page,

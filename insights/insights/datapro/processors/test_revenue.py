@@ -26,7 +26,7 @@ def run(db_handler, start, end):
         start_cal = datetime.utcnow()
 
         revenue = models.Revenue()
-        pu = models.PUDistribution()
+        pu = models.PayingUsers()
         items = models.ItemsDistribution()
 
         # fix it when 2 months needed
@@ -34,12 +34,17 @@ def run(db_handler, start, end):
         middle_name = ".".join(middle)
 
         query = {'_dt': {'$gte':start, '$lt':end }}
-        for doc in db_handler.find_from_insights(app_id, middle_name, 'mtu', query):
-            counts += 1
-            last_doc_id = doc['_id']
-            revenue.accumulate(doc)
-            pu.accumulate(doc)
-            items.accumulate(doc)
+        pu_ids = db_handler.find_from_insights(app_id, middle_name, 'mtu', query).distinct('uuid')
+        print 'pu_ids: ' + str(pu_ids)
+
+        item_ids = db_handler.find_from_insights(app_id, middle_name, 'mtu', query).distinct('iid')
+        print 'item_ids: ' + str(item_ids)
+        #for doc in db_handler.find_from_insights(app_id, middle_name, 'mtu', query):
+        #    counts += 1
+        #    last_doc_id = doc['_id']
+        #    revenue.accumulate(doc)
+        #    pu.accumulate(doc)
+        #    items.accumulate(doc)
 
         print 'revenue: ' + str(revenue.to_python())
         print 'pu: ' + str(pu.to_python())
