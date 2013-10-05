@@ -8,7 +8,6 @@ import sys
 from tornado import httpserver
 from tornado import ioloop
 from tornado import options
-from tornado import process
 from tornado import web
 
 from config import loader
@@ -108,7 +107,6 @@ def main():
     #     create_test_user(idx=idx)
 
     logger.general.debug("IDGen server is started in %s mode..." % config.application.stage)
-    logger.general.debug("Total processes: %d" % config.server.num_processes)
     logger.general.debug("Task ID: %d" % task_id)
     logger.general.debug("HTTP listen port: %d" % listen_port)
 

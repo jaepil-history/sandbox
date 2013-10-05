@@ -39,7 +39,6 @@ class HostName(EmbeddedDocument):
 class HTTPServer(EmbeddedDocument):
     hosts = ListField(EmbeddedDocumentField(HostName), required=True)
     base_port = IntField(required=True)
-    num_processes = IntField(required=True)
 
 
 class Security(EmbeddedDocument):
