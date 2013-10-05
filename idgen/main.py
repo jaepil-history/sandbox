@@ -85,7 +85,7 @@ def run_server(config):
 
 def main():
     if len(sys.argv) < 2:
-        print "main.py [config]"
+        print "main.py [config] [task id]"
         return False
 
     options.parse_command_line()
