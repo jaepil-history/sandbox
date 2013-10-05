@@ -27,14 +27,14 @@ def build_url_handlers():
     return handlers
 
 
-# def init_services(config):
-#     if config.application.stage == "local":
-#         return
+def init_services(config):
+    if config.application.stage == "local":
+        return
 
-#     import newrelic.agent
-#     newrelic.agent.initialize("../conf/newrelic.ini",
-#                               config.application.stage)
-#     newrelic.agent.register_application()
+    import newrelic.agent
+    newrelic.agent.initialize("../conf/newrelic.ini",
+                              config.application.stage)
+    newrelic.agent.register_application()
 
 
 # def init_database(config):
@@ -98,7 +98,7 @@ def main():
     logger.init(config=config, task_id=task_id)
     logger.general.debug("Configuration dump: %s" % config.to_json())
 
-    # init_services(config=config)
+    init_services(config=config)
     # init_database(config=config)
     init_http_server(config=config, port=listen_port)
 
@@ -106,7 +106,8 @@ def main():
     # for idx in range(1, 100):
     #     create_test_user(idx=idx)
 
-    logger.general.debug("IDGen server is started in %s mode..." % config.application.stage)
+    logger.general.debug("Appspand IDgen server is started in %s mode..." \
+                         % config.application.stage)
     logger.general.debug("Task ID: %d" % task_id)
     logger.general.debug("HTTP listen port: %d" % listen_port)
 
