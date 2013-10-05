@@ -90,14 +90,13 @@ def main():
 
     options.parse_command_line()
     config = loader.load_appcfg(sys.argv[1])
-
     task_id = 0
-    if config.server.num_processes != 1:
-        task_id = process.fork_processes(config.server.num_processes)
+    if len(sys.argv) > 2:
+        task_id = int(sys.argv[2])
 
     listen_port = config.server.base_port + task_id
 
-    logger.init(config=config)
+    logger.init(config=config, task_id=task_id)
     logger.general.debug("Configuration dump: %s" % config.to_json())
 
     # init_services(config=config)

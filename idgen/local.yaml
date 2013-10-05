@@ -1,7 +1,7 @@
 %YAML 1.1
 ---
 application:
-  title: Appspand IDGen Service configuration for local environment
+  title: Appspand IDgen Service configuration for local environment
   module: appspand.idgen.main:main
   version: 1.0
   revision: 1
@@ -30,7 +30,6 @@ server:
   hosts:
     - host: localhost
   base_port: 8200
-  num_processes: 1
 
 # Security
 security:
