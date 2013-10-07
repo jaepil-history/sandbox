@@ -7,9 +7,9 @@ hiredis==0.1.1
 PyYAML==3.10
 
 # MongoDB
-pymongo==2.6
+pymongo==2.6.2
+motor==0.1.1
 -e git+https://github.com/jaepil/mongoengine.git#egg=mongoengine
-motor==0.1
 
 # Data serialization
 schematics>=0.6
