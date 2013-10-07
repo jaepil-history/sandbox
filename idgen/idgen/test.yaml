@@ -29,6 +29,7 @@ logging:
 server:
   hosts:
     - host: idgen.appspandapp.com
+    - host: idgen.internal.appspandapp.com
   base_port: 8200
 
 # Security
