@@ -3,12 +3,12 @@
 #
 # Copyright 2013 Appspand
 
-from insights.datapro import settings
+import settings
 
 from pymongo import MongoClient
-from insights.datapro.api.dbhandler import DBHandler
+from api import models
+from api.dbhandler import DBHandler
 from datetime import datetime, timedelta, time
-from insights.datapro.api import models
 
 def init_database(config):
     mongodb_client = MongoClient(host=config.mongodb_connection_uri,
