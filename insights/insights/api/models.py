@@ -44,8 +44,8 @@ class BaseDoc(Document):
         if validate:
             try:
                 self.validate()
-            except ValidationError:
-                doc = ValidationError.to_dict()
+            except ValidationError as e:
+                doc = e.to_dict()
                 raise tornado.gen.Return(doc)
 
         doc = self.to_python()
