@@ -9,7 +9,7 @@ from os.path import join, abspath, dirname
 PROJECT_ROOT = abspath(dirname(__file__))
 TEMPLATES_DIR = join(PROJECT_ROOT, 'templates')
 
-config_path = 'config/dataview.conf'
+config_path = 'conf/dataview.conf'
 try:
     config_file = file(config_path).read()
     config = json.loads(config_file)
