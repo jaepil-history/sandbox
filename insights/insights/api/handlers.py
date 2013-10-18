@@ -126,6 +126,8 @@ class BaseHandler(tornado.web.RequestHandler):
             database = connection[app_info.cluster.db_name]
             collection = database[canonical_collection_name]
             result = yield motor.Op(collection.insert, doc)
+            if collection_name == 'usr':
+                motor.Op(collection.ensure_index, "uuid")
 
             raise tornado.gen.Return(result)
 
