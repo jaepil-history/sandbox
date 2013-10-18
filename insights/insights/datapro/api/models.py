@@ -411,7 +411,8 @@ class PayingUsers(BaseResult):
 class CustomEvent(Document):
 
     _dt = DateTimeField(required=True)
-    uuid = LongField(required=True)
+    #user_uid = StringField(required=True, max_length=100, db_field='uuid')
+    uuid = StringField(required=True, max_length=100, db_field='uuid')
     name = StringField(required=True)
     value = LongField(required=True)
 

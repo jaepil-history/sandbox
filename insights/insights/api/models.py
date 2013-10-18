@@ -89,7 +89,7 @@ class ApplicationAdded(BaseDoc):
     """
 
     _mt = StringField(default='apa')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     created_at = DateTimeField(required=True, db_field='c')
@@ -112,7 +112,7 @@ class ApplicationRemoved(BaseDoc):
     """
 
     _mt = StringField(default='apr')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     data = StringField()
@@ -134,7 +134,7 @@ class User(BaseDoc):
         using JavaScript.
     """
 
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     created_at = DateTimeField(required=True, db_field='c')
@@ -161,7 +161,7 @@ class UserInformation(BaseDoc):
     """
 
     _mt = StringField(default='cpu')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     data = StringField()
@@ -182,7 +182,7 @@ class Logout(BaseDoc):
     """
 
     _mt = StringField(default='lgt')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     timestamp = IntField(db_field='ts')
@@ -203,7 +203,7 @@ class Withdrawal(BaseDoc):
     """
 
     _mt = StringField(default='wid')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     timestamp = IntField(db_field='ts')
@@ -222,7 +222,7 @@ class ItemConsumption(BaseDoc):
     """
 
     _mt = StringField(default='icu')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     item_id = IntField(required=True, db_field='iid')
@@ -246,7 +246,7 @@ class RevenueTracking(BaseDoc):
     """
 
     _mt = StringField(default='mtu')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     item_id = IntField(required=True, db_field='iid')
@@ -270,7 +270,7 @@ class InviteSent(BaseDoc):
     """
 
     _mt = StringField(default='ins')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     data = StringField()
@@ -291,7 +291,7 @@ class MessageReceived(BaseDoc):
     """
 
     _mt = StringField(default='msr')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     data = StringField()
@@ -312,7 +312,7 @@ class ItemSent(BaseDoc):
     """
 
     _mt = StringField(default='its')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     item_id = IntField(required=True, db_field='iid')
@@ -334,7 +334,7 @@ class ItemReceived(BaseDoc):
     """
 
     _mt = StringField(default='itr')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     item_id = IntField(required=True, db_field='iid')
@@ -356,7 +356,7 @@ class InGameResult(BaseDoc):
     """
 
     _mt = StringField(default='itr')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     data = StringField()
@@ -381,7 +381,7 @@ class PageRequest(BaseDoc):
     """
 
     _mt = StringField(default='pgr')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     url = StringField(min_length=1, max_length=128)
     ip = StringField(min_length=1, max_length=32)
     data = StringField()
@@ -401,7 +401,7 @@ class InviteReceived(BaseDoc):
     """
 
     _mt = StringField(default='inr')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     user_level = IntField(required=True, default=1, db_field='ul')
     friends_count = IntField(db_field='f')
     data = StringField()
@@ -420,7 +420,7 @@ class CustomEvent(BaseDoc):
     """
 
     _mt = StringField(default='evt')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     event_name = StringField(min_length=1, max_length=128, required=True)
     value = IntField(default=1)
     level = IntField(default=1, db_field='lv')
@@ -431,7 +431,7 @@ class CustomEvent(BaseDoc):
 # gci
 class GoalCounts(BaseDoc):
     _mt = StringField(default='gci')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     data = StringField()
     timestamp = IntField(db_field='ts')
 

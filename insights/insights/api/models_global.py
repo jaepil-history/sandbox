@@ -90,7 +90,7 @@ class ApplicationAdded(BaseDoc):
         using JavaScript.
     """
     _mt = StringField(default='apa')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     tracking_uid = StringField(regex="[0-9A-Fa-f]+", min_length=8, max_length=16)
     data = StringField()
     timestamp = IntField(db_field='ts')
@@ -109,7 +109,7 @@ class ApplicationRemoved(BaseDoc):
     """
 
     _mt = StringField(default='apr')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     data = StringField()
     timestamp = IntField(db_field='ts')
 
@@ -133,7 +133,7 @@ class UserInformation(BaseDoc):
     """
 
     _mt = StringField(default='cpu')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     birthday = StringField(min_length=10, max_length=10, db_field='b')
     gender = StringField(min_length=1, max_length=1, db_field='g')
     country = StringField(db_field='lc')
@@ -158,7 +158,7 @@ class Login(BaseDoc):
         using JavaScript.
     """
     _mt = StringField(default='lgn')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     data = StringField()
     timestamp = IntField(db_field='ts')
     # meta = {'collection': 'lgn'}
@@ -180,7 +180,7 @@ class Logout(BaseDoc):
         using JavaScript.
     """
     _mt = StringField(default='lgt')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     data = StringField()
     timestamp = IntField(db_field='ts')
     # meta = {'collection': 'lgt'}
@@ -198,7 +198,7 @@ class RevenueTracking(BaseDoc):
     """
 
     _mt = StringField(default='mtu')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     event_name = StringField(min_length=1, max_length=128)
     value = IntField(required=True)
     level = IntField(default=1)
@@ -218,7 +218,7 @@ class CustomEvent(BaseDoc):
     """
 
     _mt = StringField(default='evt')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     event_name = StringField(min_length=1, max_length=128, required=True)
     value = IntField(default=1)
     level = IntField(default=1)
@@ -265,7 +265,7 @@ class PageRequest(BaseDoc):
     """
 
     _mt = StringField(default='pgr')
-    user_uid = LongField(required=True, db_field='uuid')
+    user_uid = StringField(required=True, max_length=100, db_field='uuid')
     url = StringField(min_length=1, max_length=128)
     ip = StringField(min_length=1, max_length=32)
     data = StringField()

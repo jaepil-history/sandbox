@@ -16,6 +16,8 @@ import datetime
 import time
 import logging
 
+from gen_uuid import uniqueid
+
 # Configure logging
 # LOGFILE = '/usr/local/insights/autogen.log'
 # logging.basicConfig(filename=LOGFILE,level=logging.DEBUG)
@@ -29,7 +31,7 @@ options = settings.parse_options()
 class InsightsClient(object):
     #INSIGHTS_API_URL = "http://api.insights.appspand.com:8001/api/v1/"
     # INSIGHTS_API_URL = "http://192.168.0.170:8001/api/v1/"
-    INSIGHTS_API_URL = "http://localhost:8001/api/v1/"
+    INSIGHTS_API_URL = "http://localhost:8300/api/v1/"
 
     def __init__(self, app_id):
         self.app_id = app_id
@@ -249,11 +251,14 @@ def main(options):
     print apps
 
     # execute once initially
+    uuids = []
     http_clients = []
     for app in apps:
         http_clients.append(InsightsClient(app_id=str(app['_id'])))
-        for uuid in range(23000, 30000):
+        for _ in range(1000):
             http_client = http_clients[apps.index(app)]
+            uuid = str(uniqueid())
+            uuids.append(uuid)
             # client actions
             http_client.track_apa(uuid)
 
@@ -271,10 +276,10 @@ def main(options):
     # for app in apps:
     #     http_clients.append(InsightsClient(app_id=str(app['_id'])))
 
-    for i in range(15000):
+    for i in range(len(uuids)):
         # client and user are picked randomly
         http_client = http_clients[random.randint(0, len(apps) - 1)]
-        uuid = random.randint(1000, 30000)
+        uuid = uuids[random.randint(0, len(uuids) -1)]
         # client actions
         http_client.track_cpu(uuid)
         http_client.track_lgt(uuid)
