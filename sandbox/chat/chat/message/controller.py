@@ -222,6 +222,23 @@ def read(user_uid, target_uid, message_uids, is_group=False):
     return messages
 
 
+def flush_expired_messages(queue_info, messages):
+    expired_uids = []
+    for muid in queue_info.message_uids:
+        found = False
+        for mi in messages:
+            if muid == mi.uid:
+                found = True
+                break
+        if not found:
+            expired_uids.append(muid)
+
+    for muid in expired_uids:
+        queue_info.message_uids.remove(muid)
+    if expired_uids:
+        queue_info.save()
+
+
 def get(src_uid, dest_uid, since_uid=None, count=None, message_uids=None, is_group=False):
     queue_info = queue.controller.find_one(user_uid=src_uid)
     if queue_info is None:
@@ -232,5 +249,69 @@ def get(src_uid, dest_uid, since_uid=None, count=None, message_uids=None, is_gro
         messages = find(message_uids=queue_info.message_uids)
     if message_uids:
         messages += find(message_uids=message_uids)
+
+    flush_expired_messages(queue_info=queue_info, messages=messages)
+
+    return messages
+
+
+def get_messages(src_uid, dest_uid, since_uid, count, message_uids, reverse=True, is_group=False):
+    queue_info = queue.controller.find_one(user_uid=src_uid)
+    if queue_info is None:
+        queue_info = queue.controller.create(user_uid=src_uid)
+
+    target_message_uids = []
+    if since_uid > 0:
+        for muid in queue_info.message_uids:
+            if reverse:
+                if muid < since_uid:
+                    continue
+            else:
+                if muid > since_uid:
+                    continue
+
+            if len(target_message_uids) < count:
+                target_message_uids.append(muid)
+            else:
+                break
+
+    for muid in message_uids:
+        if muid not in target_message_uids:
+            target_message_uids.append(muid)
+
+    messages = find(message_uids=target_message_uids)
+
+    flush_expired_messages(queue_info=queue_info, messages=messages)
+
+    return messages
+
+
+def get_last_messages(src_uid, dest_uids, count, is_group=False):
+    queue_info = queue.controller.find_one(user_uid=src_uid)
+    if queue_info is None:
+        queue_info = queue.controller.create(user_uid=src_uid)
+
+    target_message_uids = []
+    if since_uid > 0:
+        for muid in queue_info.message_uids:
+            if reverse:
+                if muid < since_uid:
+                    continue
+            else:
+                if muid > since_uid:
+                    continue
+
+            if len(target_message_uids) < count:
+                target_message_uids.append(muid)
+            else:
+                break
+
+    for muid in message_uids:
+        if muid not in target_message_uids:
+            target_message_uids.append(muid)
+
+    messages = find(message_uids=target_message_uids)
+
+    flush_expired_messages(queue_info=queue_info, messages=messages)
 
     return messages
