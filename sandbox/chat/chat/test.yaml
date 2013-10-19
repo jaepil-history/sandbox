@@ -5,13 +5,17 @@ application:
   module: chat.main:main
   version: 1.0
   revision: 1
+  stage: test
 
 # Debugging
 debug: true
 
 # Identity
-host: chat.test.appspand.com
-port: 8200
+server:
+  hosts:
+    - host: chat.test.appspand.com
+    - host: chat.test.appspandapp.com
+  base_port: 8200
 
 # Databases
 database:

@@ -18,6 +18,16 @@ class Application(EmbeddedDocument):
     module = StringField(required=True)
     version = StringField(required=True)
     revision = IntField(required=True)
+    stage = StringField(required=True)
+
+
+class HostName(EmbeddedDocument):
+    host = StringField(required=True)
+
+
+class HTTPServer(EmbeddedDocument):
+    hosts = ListField(EmbeddedDocumentField(HostName), required=True)
+    base_port = IntField(required=True)
 
 
 class MongoDB(EmbeddedDocument):
@@ -61,8 +71,7 @@ class Interop(EmbeddedDocument):
 class AppConfig(Document):
     application = EmbeddedDocumentField(Application, required=True)
     debug = BooleanField(required=True)
-    host = StringField(required=True)
-    port = IntField(required=True)
+    server = EmbeddedDocumentField(HTTPServer, required=True)
     database = EmbeddedDocumentField(Database, required=True)
     session = EmbeddedDocumentField(Session, required=True)
     interop = EmbeddedDocumentField(Interop)

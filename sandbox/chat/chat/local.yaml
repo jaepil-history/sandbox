@@ -5,13 +5,16 @@ application:
   module: chat.main:main
   version: 1.0
   revision: 1
+  stage: local
 
 # Debugging
 debug: true
 
 # Identity
-host: localhost
-port: 8200
+server:
+  hosts:
+    - host: localhost
+  base_port: 8200
 
 # Databases
 database:

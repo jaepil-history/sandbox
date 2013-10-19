@@ -82,17 +82,18 @@ def init_database(config):
                             % mongodb.connection_uri)
 
 
-def init_server(config):
+def init_server(config, port):
     url_handlers = build_url_handlers()
     application = Application(
         handlers=url_handlers,
         debug=config.debug,
         config=config
     )
-    application.add_handlers(config.host, url_handlers)
+    for host_name in config.server.hosts:
+        application.add_handlers(host_name.host, url_handlers)
 
     http_server = httpserver.HTTPServer(application)
-    http_server.listen(config.port)
+    http_server.listen(port)
 
     # tcp_server = acceptor.Acceptor()
     # tcp_server.listen(port=config.port_tcp)
@@ -101,6 +102,14 @@ def init_server(config):
 def init_service(config):
     if config.interop:
         interop.service.start()
+
+    if config.application.stage == "local":
+        return
+
+    import newrelic.agent
+    newrelic.agent.initialize("../conf/newrelic.ini",
+                              config.application.stage)
+    newrelic.agent.register_application()
 
 
 def run_server(config):
@@ -111,15 +120,20 @@ def main():
     logger.init()
 
     if len(sys.argv) < 2:
-        print "main.py [config]"
+        print "main.py [config] [task id]"
         return False
 
     options.parse_command_line()
     config = app.config.load_appcfg(sys.argv[1])
+    task_id = 0
+    if len(sys.argv) > 2:
+        task_id = int(sys.argv[2])
+
+    listen_port = config.server.base_port + task_id
 
     init_database(config=config)
 
-    init_server(config=config)
+    init_server(config=config, port=listen_port)
     init_service(config=config)
 
     logger.access_log.debug("Chat server is started...")
