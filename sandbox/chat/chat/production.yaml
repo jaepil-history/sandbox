@@ -17,7 +17,7 @@ server:
     - host: chat.dev.appspand.com
     - host: chat.appspandapp.com
     - host: chat.dev.appspandapp.com
-  base_port: 8200
+  base_port: 8400
 
 # Databases
 database:

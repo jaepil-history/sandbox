@@ -14,7 +14,7 @@ debug: true
 server:
   hosts:
     - host: localhost
-  base_port: 8200
+  base_port: 8400
 
 # Databases
 database:
