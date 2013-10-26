@@ -49,7 +49,7 @@ def send(sender_uid, target_uid, message, is_secret=False, is_group=False):
 
     message_uid = idgen.get_next_id()
     issued_at = now
-    expires_at = 0
+    expires_at = now + datetime.timedelta(days=7)
     recipient_count = countdown
     unveil_count = 0
     message_info = models.Message(uid=message_uid,
