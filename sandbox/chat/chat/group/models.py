@@ -18,7 +18,7 @@ class Group(Document):
     title = StringField(max_length=512)
     owner = StringField(required=True, max_length=512)
     members = ListField(StringField(max_length=512), required=True)
-    created_at = IntField(required=True)
+    created_at = DateTimeField(required=True)
 
     meta = {
         "indexes": [

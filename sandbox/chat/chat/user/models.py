@@ -31,8 +31,8 @@ class User(Document):
     name = StringField(required=True, max_length=255)
     devices = ListField(EmbeddedDocumentField(DeviceInfo))
     joined_groups = ListField(StringField(max_length=512))
-    created_at = IntField(required=True)
-    last_login_at = IntField(required=True)
+    created_at = DateTimeField(required=True)
+    last_login_at = DateTimeField(required=True)
 
     meta = {
         "indexes": [

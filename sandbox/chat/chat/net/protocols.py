@@ -7,6 +7,8 @@ from schematics.models import Model
 from schematics.types import BaseType, BooleanType, IntType, LongType, StringType
 from schematics.types.compound import ModelType, DictType, ListType
 
+from util import timestamp
+
 # from mongoengine import Document
 # from mongoengine import EmbeddedDocument
 #
@@ -174,8 +176,8 @@ class MessageInfo(Message):
         self.group_uid = document.group_uid
         self.message = document.message
         self.countdown = document.countdown
-        self.issued_at = document.issued_at
-        self.expires_at = document.expires_at
+        self.issued_at = timestamp.get_timestamp(document.issued_at)
+        self.expires_at = timestamp.get_timestamp(document.expires_at)
         self.is_secret = document.is_secret
         self.recipient_count = document.recipient_count
         self.unveil_count = document.unveil_count
@@ -186,8 +188,8 @@ class MessageInfo(Message):
         document.group_uid = self.group_uid
         document.message = self.message
         document.countdown = self.countdown
-        document.issued_at = self.issued_at
-        document.expires_at = self.expires_at
+        document.issued_at = timestamp.get_datetime(self.issued_at)
+        document.expires_at = timestamp.get_datetime(self.expires_at)
         document.is_secret = self.is_secret
         document.recipient_count = self.recipient_count
         document.unveil_count = self.unveil_count

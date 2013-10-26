@@ -23,11 +23,9 @@ from util import cache
 def shutdown():
     io_loop = ioloop.IOLoop.instance()
 
-    # io_loop.tcp_server.stop()
-
-    # logging.info('Will shutdown in 2 seconds ...')
     interop.service.stop()
-    io_loop.add_timeout(time.time() + 2, io_loop.stop)
+
+    io_loop.add_timeout(time.time() + 1, io_loop.stop)
 
 
 def sig_handler(sig, frame):
@@ -37,10 +35,6 @@ def sig_handler(sig, frame):
     Tornado server you can find here:
     http://codemehanika.org/blog/2011-10-28-graceful-stop-tornado.html
     """
-
-    io_loop = ioloop.IOLoop.instance()
-
-    # logging.warning('Caught signal: %s', sig)
 
     ioloop.IOLoop.instance().add_callback(shutdown)
 

@@ -1,12 +1,14 @@
 # Copyright (c) 2013 Appspand, Inc.
 
-import models
+import datetime
+
 import event.controller
 import queue.controller
 import group.controller
 
 from util import idgen
-from util import timestamp
+
+import models
 
 
 def _find_group(group_uid):
@@ -43,8 +45,10 @@ def send(sender_uid, target_uid, message, is_secret=False, is_group=False):
         target_uids = [target_uid]
         countdown = 1
 
+    now = datetime.datetime.utcnow()
+
     message_uid = idgen.get_next_id()
-    issued_at = timestamp.get_timestamp()
+    issued_at = now
     expires_at = 0
     recipient_count = countdown
     unveil_count = 0

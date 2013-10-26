@@ -48,9 +48,12 @@ def init_database(config):
 
 def flush_queue(config):
     queue_rows = queue.models.Queue.objects()
+    count = 0
     for row in queue_rows:
         messages = message.models.Message.objects(uid__in=row.message_uids)
         expired_muids = []
+        count += 1
+        print count, row.user_uid, len(row.message_uids), len(messages)
         for muid in row.message_uids:
             found = False
             for msg in messages:

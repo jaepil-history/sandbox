@@ -1,5 +1,7 @@
 # Copyright (c) 2013 Appspand, Inc.
 
+import datetime
+
 from util import timestamp
 
 import message.controller
@@ -13,7 +15,7 @@ def create(user_uid, user_name, platform_id=None, device_token=None):
         devices.append(models.DeviceInfo(platform_id=platform_id,
                                          device_token=device_token))
 
-    now = timestamp.get_timestamp()
+    now = datetime.datetime.utcnow()
     user_info = models.User(uid=user_uid,
                             name=user_name,
                             devices=devices,
@@ -44,8 +46,10 @@ def login(user_uid, user_name):
         user_info = create(user_uid=user_uid,
                            user_name=user_name)
 
+    now = datetime.datetime.utcnow()
+
     user_info.name = user_name
-    user_info.last_login_at = timestamp.get_timestamp()
+    user_info.last_login_at = now
     user_info.save()
 
     return user_info

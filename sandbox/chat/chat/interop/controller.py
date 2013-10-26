@@ -7,6 +7,7 @@ from boto.sqs import jsonmessage
 
 from log import logger
 import message.controller
+from util import timestamp
 
 
 SQS = sqs.connect_to_region(aws_access_key_id="AKIAIFHFM4CZA26UVV4A",
@@ -32,8 +33,8 @@ def push(sender_uid, group_uid, target_uids, message_info):
             "group_uid": message_info.group_uid,
             "message": message_info.message,
             "countdown": message_info.countdown,
-            "issued_at": message_info.issued_at,
-            "expires_at": message_info.expires_at
+            "issued_at": timestamp.get_timestamp(message_info.issued_at),
+            "expires_at": timestamp.get_timestamp(message_info.expires_at)
         }
     }
     push_message = jsonmessage.JSONMessage(body=push_body)
@@ -43,7 +44,7 @@ def push(sender_uid, group_uid, target_uids, message_info):
 
 def pull():
     result = []
-    items = SQS_QUEUE_FROM_SNEK.get_messages()
+    items = SQS_QUEUE_FROM_SNEK.get_messages(wait_time_seconds=2)
     if items:
         for item in items:
             item_body = item.get_body()

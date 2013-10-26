@@ -1,10 +1,10 @@
 # Copyright (c) 2013 Appspand, Inc.
 
 # import hashlib
+import datetime
 
 from util import cache
 from util import idgen
-from util import timestamp
 
 import app.config
 import event.controller
@@ -43,7 +43,7 @@ def _load(group_uid):
 
 
 def create(owner_uid, invitee_uids, title=None):
-    now = timestamp.get_timestamp()
+    now = datetime.datetime.utcnow()
     #uid = hashlib.sha1("%s-%d" % (owner_uid, now)).hexdigest()
     uid = ("%d" % idgen.get_next_id())
 
