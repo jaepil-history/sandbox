@@ -39,7 +39,7 @@ def push(sender_uid, group_uid, target_uids, message_info):
     }
     push_message = jsonmessage.JSONMessage(body=push_body)
     SQS_QUEUE_TO_SNEK.write(push_message)
-    logger.access_log.debug("pushed to snek: %r" % push_body)
+    logger.access.debug("pushed to snek: %r" % push_body)
 
 
 def pull():

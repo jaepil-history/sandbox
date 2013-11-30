@@ -42,8 +42,7 @@ def init_database(config):
                         host=mongodb.connection_uri,
                         max_pool_size=mongodb.connection_pool,
                         socketTimeoutMS=mongodb.timeout)
-    logger.access_log.debug("mongodb connection url: %s"
-                            % mongodb.connection_uri)
+    logger.access.debug("mongodb connection url: %s" % mongodb.connection_uri)
 
 
 def flush_queue(config):

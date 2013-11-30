@@ -21,6 +21,18 @@ class Application(EmbeddedDocument):
     stage = StringField(required=True)
 
 
+class Logger(EmbeddedDocument):
+    level = StringField(required=True)
+    path = StringField(required=True)
+    filename = StringField(required=True)
+
+
+class Logging(EmbeddedDocument):
+    access = EmbeddedDocumentField(Logger, required=True)
+    application = EmbeddedDocumentField(Logger, required=True)
+    general = EmbeddedDocumentField(Logger, required=True)
+
+
 class HostName(EmbeddedDocument):
     host = StringField(required=True)
 
@@ -71,6 +83,7 @@ class Interop(EmbeddedDocument):
 class AppConfig(Document):
     application = EmbeddedDocumentField(Application, required=True)
     debug = BooleanField(required=True)
+    logging = EmbeddedDocumentField(Logging, required=True)
     server = EmbeddedDocumentField(HTTPServer, required=True)
     database = EmbeddedDocumentField(Database, required=True)
     session = EmbeddedDocumentField(Session, required=True)

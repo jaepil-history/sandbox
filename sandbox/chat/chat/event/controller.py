@@ -15,7 +15,7 @@ def _send_message(sender_uid, target_uids, data):
 
     (online, offline) = LinkManager.instance().find(user_uids=dest_uids)
 
-    logger.access_log.debug("online: %d, offline: %d" % (len(online), len(offline)))
+    logger.access.debug("online: %d, offline: %d" % (len(online), len(offline)))
 
     for link in online:
         link.send(data)

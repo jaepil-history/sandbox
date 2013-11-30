@@ -72,8 +72,7 @@ def init_database(config):
                         host=mongodb.connection_uri,
                         max_pool_size=mongodb.connection_pool,
                         socketTimeoutMS=mongodb.timeout)
-    logger.access_log.debug("mongodb connection url: %s"
-                            % mongodb.connection_uri)
+    logger.access.debug("mongodb connection url: %s" % mongodb.connection_uri)
 
 
 def init_server(config, port):
@@ -111,8 +110,6 @@ def run_server(config):
 
 
 def main():
-    logger.init()
-
     if len(sys.argv) < 2:
         print "main.py [config] [task id]"
         return False
@@ -125,12 +122,17 @@ def main():
 
     listen_port = config.server.base_port + task_id
 
+    logger.init(config=config, task_id=task_id)
+    logger.general.debug("Configuration dump: %s" % config.to_json())
+
     init_database(config=config)
 
     init_server(config=config, port=listen_port)
     init_service(config=config)
 
-    logger.access_log.debug("Chat server is started...")
+    logger.general.debug("Chat server is started...")
+    logger.general.debug("Task ID: %d" % task_id)
+    logger.general.debug("HTTP listen port: %d" % listen_port)
 
     run_server(config=config)
 

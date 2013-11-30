@@ -27,7 +27,7 @@ class QueuePoller(Thread):
 
     def run(self):
         while not self.terminated:
-            logger.access_log.debug("checking messages from snek queue...")
+            logger.access.debug("checking messages from snek queue...")
             items = controller.pull()
             if items:
                 IOLoop.instance().add_callback(self.on_items, items)
@@ -35,7 +35,7 @@ class QueuePoller(Thread):
     def on_items(self, items):
         for item in items:
             item_data = json.loads(item)
-            logger.access_log.debug("pull from snek: %r" % item_data)
+            logger.access.debug("pull from snek: %r" % item_data)
 
             send_req = net.protocols.Message_SendReq(item_data)
             message.controller.send(sender_uid=send_req.sender_uid,

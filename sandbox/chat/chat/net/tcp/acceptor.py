@@ -41,7 +41,7 @@ class Acceptor(TCPServer):
     def on_opened(self, link):
         link.user_uid = None
 
-        logger.access_log.debug("Link(%d): on opened" % link.hash())
+        logger.access.debug("Link(%d): on opened" % link.hash())
 
         net.LinkManager.instance().add(link_id=link.hash(), link=link)
 
@@ -51,7 +51,7 @@ class Acceptor(TCPServer):
         link.stream.read_until(b"\r\n\r\n", callback=on_received)
 
     def on_received(self, link, data):
-        logger.access_log.debug("Link(%d): on received - %s" % (link.hash(), data))
+        logger.access.debug("Link(%d): on received - %s" % (link.hash(), data))
         #link.send(data)
         self.on_message(link, data)
 
@@ -59,7 +59,7 @@ class Acceptor(TCPServer):
         link.stream.read_until(b"\r\n\r\n", callback=on_received)
 
     def on_closed(self, link):
-        logger.access_log.debug("Link(%d): on closed" % link.hash())
+        logger.access.debug("Link(%d): on closed" % link.hash())
 
         if link.user_uid:
             net.LinkManager.instance().logout(user_uid=link.user_uid)

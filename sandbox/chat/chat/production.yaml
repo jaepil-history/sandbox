@@ -10,6 +10,25 @@ application:
 # Debugging
 debug: false
 
+# Logging
+logging:
+  access:
+    level: debug
+    path: ../log
+    filename: access.log
+  application:
+    level: debug
+    path: ../log
+    filename: application.log
+  general:
+    level: debug
+    path: ../log
+    filename: general.log
+  billing:
+    level: debug
+    path: ../log
+    filename: billing.log
+
 # Identity
 server:
   hosts:
