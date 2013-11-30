@@ -43,8 +43,7 @@ def find(user_uids):
 def login(user_uid, user_name):
     user_info = find_one(user_uid=user_uid)
     if user_info is None:
-        user_info = create(user_uid=user_uid,
-                           user_name=user_name)
+        user_info = create(user_uid=user_uid, user_name=user_name)
 
     now = datetime.datetime.utcnow()
 
