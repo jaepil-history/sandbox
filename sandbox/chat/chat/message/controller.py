@@ -290,32 +290,34 @@ def get_messages(src_uid, dest_uid, since_uid, count, message_uids, reverse=True
     return messages
 
 
-def get_last_messages(src_uid, dest_uids, count, is_group=False):
+def get_summarized_info(src_uid):
     queue_info = queue.controller.find_one(user_uid=src_uid)
     if queue_info is None:
         queue_info = queue.controller.create(user_uid=src_uid)
 
     target_message_uids = []
-    if since_uid > 0:
-        for muid in queue_info.message_uids:
-            if reverse:
-                if muid < since_uid:
-                    continue
-            else:
-                if muid > since_uid:
-                    continue
+    for muid in queue_info.message_uids:
+        if reverse:
+            if muid < since_uid:
+                continue
+        else:
+            if muid > since_uid:
+                continue
 
-            if len(target_message_uids) < count:
-                target_message_uids.append(muid)
-            else:
-                break
-
-    for muid in message_uids:
-        if muid not in target_message_uids:
+        if len(target_message_uids) < count:
             target_message_uids.append(muid)
+        else:
+            break
 
-    messages = find(message_uids=target_message_uids)
+    messages = []
+    if queue_info.message_uids:
+        messages = find(message_uids=queue_info.message_uids)
 
-    flush_expired_messages(queue_info=queue_info, messages=messages)
+    result = {}
+    for m in reversed(messages):
+        if m.group_uid not in result:
+            result[m.group_uid] = m
+
+    # flush_expired_messages(queue_info=queue_info, messages=messages)
 
     return messages

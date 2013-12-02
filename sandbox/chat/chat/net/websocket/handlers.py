@@ -15,13 +15,14 @@ from net.websocket.link import WebSocketLink
 
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
-    MessageDispatcher = {
+    ProtocolMap = {
         "User_LoginReq": net.protocols.User_LoginReq,
         "User_UnregisterReq": net.protocols.User_UnregisterReq,
         "Group_JoinReq": net.protocols.Group_JoinReq,
         "Group_LeaveReq": net.protocols.Group_LeaveReq,
         "Group_InviteReq": net.protocols.Group_InviteReq,
         "Group_InfoReq": net.protocols.Group_InfoReq,
+        "Message_GetSummary": net.protocols.Message_GetSummaryReq,
         "Message_SendReq": net.protocols.Message_SendReq,
         "Message_CancelReq": net.protocols.Message_CancelReq,
         "Message_OpenReq": net.protocols.Message_OpenReq,
@@ -29,6 +30,26 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         "Message_GetReq": net.protocols.Message_GetReq,
         "Message_ClearReq": net.protocols.Message_ClearReq
     }
+    MessageDispatcher = {}
+
+    def __init__(self, *args, **kwargs):
+        super(WebSocketHandler, self).__init__(*args, **kwargs)
+
+        WebSocketHandler.MessageDispatcher = {
+            "User_LoginReq": self.user_login,
+            "User_UnregisterReq": self.user_unregister,
+            "Group_JoinReq": self.group_join,
+            "Group_LeaveReq": self.group_leave,
+            "Group_InviteReq": self.group_invite,
+            "Group_InfoReq": self.group_info,
+            "Message_GetSummary": self.message_get_summary,
+            "Message_SendReq": self.message_send,
+            "Message_CancelReq": self.message_cancel,
+            "Message_OpenReq": self.message_open,
+            "Message_ReadReq": self.message_read,
+            "Message_GetReq": self.message_get,
+            "Message_ClearReq": self.message_clear
+        }
 
     def open(self):
         self.user_uid = None
@@ -38,14 +59,15 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
         net.LinkManager.instance().add(link_id=link.hash(), link=link)
 
-        logger.access_log.debug("WebSocket(%d): on opened" % self.link_id)
+        logger.access.debug("WebSocket(%d): on opened" % self.link_id)
 
     def on_message(self, message):
         link = net.LinkManager.instance().find_one(link_id=self.link_id)
         if link is None:
-            logger.access_log.debug("WebSocket(%d): link not found" % self.link_id)
+            logger.access.debug("WebSocket(%d): link not found" % self.link_id)
 
-        logger.access_log.debug("WebSocket(%d): on message - %s" % (self.link_id, message.encode("utf-8")))
+        logger.access.debug("WebSocket(%d): on message - %s"
+            % (self.link_id, message.encode("utf-8")))
 
         msg = json.loads(message)
         if "cmd" not in msg or "user_uid" not in msg or "payload" not in msg:
@@ -54,42 +76,21 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         cmd = msg["cmd"]
         user_uid = msg["user_uid"]
 
-        if cmd not in WebSocketHandler.MessageDispatcher:
+        protocol_class =WebSocketHandler.ProtocolMap.get(cmd, None)
+        if not protocol_class:
             raise KeyError("Unknown command name")
 
-        cls = WebSocketHandler.MessageDispatcher[cmd]
-        req = net.protocols.from_json(cls=cls, raw_data=msg)
+        req = net.protocols.from_json(cls=protocol_class, raw_data=msg)
 
-        if cmd == "User_LoginReq":
-            self.user_login(link=link, user_uid=user_uid, request=req)
-        elif cmd == "User_UnregisterReq":
-            self.user_unregister(link=link, user_uid=user_uid, request=req)
-        elif cmd == "Group_JoinReq":
-            self.group_join(link=link, user_uid=user_uid, request=req)
-        elif cmd == "Group_LeaveReq":
-            self.group_leave(link=link, user_uid=user_uid, request=req)
-        elif cmd == "Group_InviteReq":
-            self.group_invite(link=link, user_uid=user_uid, request=req)
-        elif cmd == "Group_InfoReq":
-            self.group_info(link=link, user_uid=user_uid, request=req)
-        elif cmd == "Message_SendReq":
-            self.message_send(link=link, user_uid=user_uid, request=req)
-        elif cmd == "Message_CancelReq":
-            self.message_cancel(link=link, user_uid=user_uid, request=req)
-        elif cmd == "Message_OpenReq":
-            self.message_open(link=link, user_uid=user_uid, request=req)
-        elif cmd == "Message_ReadReq":
-            self.message_read(link=link, user_uid=user_uid, request=req)
-        elif cmd == "Message_GetReq":
-            self.message_get(link=link, user_uid=user_uid, request=req)
-        elif cmd == "Message_ClearReq":
-            self.message_clear(link=link, user_uid=user_uid, request=req)
-        else:
+        callback = WebSocketHandler.MessageDispatcher.get(cmd, None)
+        if not callback:
             #self.unknown_cmd(link=link, user_uid=user_uid, request=req)
-            pass
+            raise KeyError("Unknown command name")
+
+        callback(link=link, user_uid=user_uid, request=req)
 
     def on_close(self):
-        logger.access_log.debug("WebSocket(%d): on closed" % self.link_id)
+        logger.access.debug("WebSocket(%d): on closed" % self.link_id)
 
         if self.user_uid:
             net.LinkManager.instance().logout(user_uid=self.user_uid)
@@ -239,6 +240,27 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         ans.members = members
         ans.error_code = error_code
         ans.error_message = error_message
+        ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
+        self.write_message(ans_json)
+
+    def message_get_summary(self, link, user_uid, request):
+        message_info = message.controller.get_summarized_info(src_uid=user_uid)
+
+        error_code = 0
+        error_message = "OK"
+
+        summary = []
+        for doc in message_info:
+            mi = net.protocols.MessageInfo()
+            mi.from_mongo_engine(doc)
+            summary.append(mi)
+
+        ans = net.protocols.Message_GetSummaryAns()
+        ans.request = request
+        ans.summary = summary
+        ans.error_code = error_code
+        ans.error_message = error_message
+
         ans_json = net.protocols.to_json(user_uid=user_uid, message=ans)
         self.write_message(ans_json)
 

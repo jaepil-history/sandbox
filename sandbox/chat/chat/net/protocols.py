@@ -195,6 +195,17 @@ class MessageInfo(Message):
         document.unveil_count = self.unveil_count
 
 
+class Message_GetSummaryReq(Message):
+    user_uid = StringType(required=True, max_length=512)
+
+
+class Message_GetSummaryAns(Message):
+    request = ModelType(Message_GetSummaryReq)
+    summary = ListType(ModelType(MessageInfo))
+    error_code = IntType(required=True)
+    error_message = StringType(required=True)
+
+
 class Message_SendReq(Message):
     sender_uid = StringType(required=True, max_length=512)
     target_uid = StringType(required=True, max_length=512)
